@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { ModelNameAlreadyExistsError } from '@modules/model/errors'
 import { EntityManager, getConnection, Repository } from 'typeorm'
-import { CreateModelDto } from '../dto/create-model.dto'
-import { Model } from '../entities'
-import { ModelNameAlreadyExistsError } from '../errors/model-name-already-exists.error'
+import { CreateModelDto } from '@modules/model/dtos'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Model } from '@modules/model/entities'
+import { Injectable } from '@nestjs/common'
 import { v4 } from 'uuid'
 
 @Injectable()
