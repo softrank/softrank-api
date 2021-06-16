@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm'
-import { ModelProcess } from '@modules/model/entities'
 import { ModelLevel } from './model-level.entity'
+import { CreateModelDto } from '../dto/create-model.dto'
+import { v4 } from 'uuid'
 
 @Entity({
   schema: 'model'
@@ -37,4 +38,15 @@ export class Model {
   @OneToMany(() => ModelLevel, (modelLevel: ModelLevel) => modelLevel.model)
   @JoinColumn({ name: 'id', referencedColumnName: 'model' })
   modelLevel: ModelLevel
+
+  static createModel(createModelDto: CreateModelDto): Model {
+    const model = new Model()
+
+    model.id = v4()
+    model.name = createModelDto.name
+    model.year = createModelDto.year
+    model.description = createModelDto.description
+
+    return model
+  }
 }

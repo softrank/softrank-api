@@ -1,5 +1,6 @@
-import { Controller, Post } from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
 import { CreateModelService } from '../services/create-model.service'
+import { CreateModelDto } from '../dto/create-model.dto'
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -7,8 +8,8 @@ import {
 } from '@nestjs/swagger'
 
 @Controller()
-export class ModuleController {
-  constructor(private readonly appService: CreateModelService) {}
+export class ModulController {
+  constructor(private readonly createModelService: CreateModelService) {}
 
   @ApiTags('Model')
   @Post()
@@ -18,7 +19,7 @@ export class ModuleController {
   @ApiBadRequestResponse({
     description: 'Erro de requisição por parte do front'
   })
-  async createModel(): Promise<any> {
-    return this.appService.create()
+  async createModel(@Body() createModelDto: CreateModelDto): Promise<any> {
+    return this.createModelService.create(createModelDto)
   }
 }
