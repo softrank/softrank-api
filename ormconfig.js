@@ -7,7 +7,7 @@ module.exports = {
   database: 'SRK',
   synchronize: true,
   entities: ['dist/modules/**/entities/*.entity.js'],
-  migrations: ['migration/*.js', 'dist/migration/*.js'],
+  migrations: ['dist/migration/*.js'],
   cli: {
     migrationsDir: 'src/migration'
   }
