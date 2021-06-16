@@ -1,5 +1,4 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm'
-import { ModelProcess } from '@modules/model/entities'
 import { ModelLevel } from './model-level.entity'
 
 @Entity({
