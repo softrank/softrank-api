@@ -1,17 +1,19 @@
 import { GetModelService, CreateModelService } from '@modules/model/services'
 import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { uuidParamValidation } from '@utils/validations'
 import { CreateModelDto } from '@modules/model/dtos'
 import { Model } from '@modules/model/entities'
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags
 } from '@nestjs/swagger'
 
 @ApiTags('Model')
 @Controller('models')
-export class ModulController {
+export class ModelController {
   constructor(
     private readonly createModelService: CreateModelService,
     private readonly getModelService: GetModelService
@@ -40,10 +42,12 @@ export class ModulController {
   @ApiOkResponse({
     description: 'Modelo buscado com sucesso'
   })
-  @ApiBadRequestResponse({
+  @ApiNotFoundResponse({
     description: 'Id do modelo não existente'
   })
-  async getModelById(@Param('id') id: string): Promise<Model> {
+  async getModelById(
+    @Param('id', uuidParamValidation()) id: string
+  ): Promise<Model> {
     return this.getModelService.getById(id)
   }
 }

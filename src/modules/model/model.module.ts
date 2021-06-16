@@ -1,5 +1,5 @@
-import { ModulController } from '@modules/model/controllers'
-import { CreateModelService } from '@modules/model/services'
+import { ModelController } from '@modules/model/controllers'
+import { CreateModelService, GetModelService } from '@modules/model/services'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Module } from '@nestjs/common'
 import {
@@ -13,7 +13,7 @@ import {
   imports: [
     TypeOrmModule.forFeature([ExpectedResult, ModelProcess, ModelLevel, Model])
   ],
-  controllers: [ModulController],
-  providers: [CreateModelService]
+  controllers: [ModelController],
+  providers: [CreateModelService, GetModelService]
 })
 export class ModelModule {}
