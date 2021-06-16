@@ -10,7 +10,7 @@ export class CreateModelDto {
   name: string
 
   @ApiProperty({
-    example: new Date().toUTCString()
+    example: new Date()
   })
   @IsNotEmpty()
   year: Date
