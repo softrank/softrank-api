@@ -1,8 +1,10 @@
 import { GetModelService, CreateModelService } from '@modules/model/services'
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 import { uuidParamValidation } from '@utils/validations'
-import { CreateModelDto } from '@modules/model/dtos'
+import { CreateModelDto, UpdateModelBodyDto } from '@modules/model/dtos'
 import { Model } from '@modules/model/entities'
+import { UpdateModelService } from '../services/update-model.service'
+import { UpdateModelDto } from '../dtos/update-model.dto'
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -16,7 +18,8 @@ import {
 export class ModelController {
   constructor(
     private readonly createModelService: CreateModelService,
-    private readonly getModelService: GetModelService
+    private readonly getModelService: GetModelService,
+    private readonly updateModelService: UpdateModelService
   ) {}
 
   @Post()
@@ -28,6 +31,23 @@ export class ModelController {
   })
   async createModel(@Body() createModelDto: CreateModelDto): Promise<Model> {
     return this.createModelService.create(createModelDto)
+  }
+
+  @Put(':id')
+  @ApiOkResponse({
+    description: 'Modelo atualizado com sucesso'
+  })
+  @ApiBadRequestResponse({
+    description: 'Erro de requisição por parte do front'
+  })
+  async updateModel(
+    @Body() updateModelBodyDto: UpdateModelBodyDto,
+    @Param('id', uuidParamValidation()) id: string
+  ): Promise<Model> {
+    const updateModelDto = new UpdateModelDto(
+      Object.assign(updateModelBodyDto, { id })
+    )
+    return this.updateModelService.update(updateModelDto)
   }
 
   @Get()
