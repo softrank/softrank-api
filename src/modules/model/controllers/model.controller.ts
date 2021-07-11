@@ -2,7 +2,7 @@ import { GetModelService, CreateModelService } from '@modules/model/services'
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 import { uuidParamValidation } from '@utils/validations'
 import { CreateModelDto, UpdateModelBodyDto } from '@modules/model/dtos'
-import { Model } from '@modules/model/entities'
+import { ModelEntity } from '@modules/model/entities'
 import { UpdateModelService } from '../services/update-model.service'
 import { UpdateModelDto } from '../dtos/update-model.dto'
 import {
@@ -29,7 +29,9 @@ export class ModelController {
   @ApiBadRequestResponse({
     description: 'Erro de requisição por parte do front'
   })
-  async createModel(@Body() createModelDto: CreateModelDto): Promise<Model> {
+  async createModel(
+    @Body() createModelDto: CreateModelDto
+  ): Promise<ModelEntity> {
     return this.createModelService.create(createModelDto)
   }
 
@@ -43,7 +45,7 @@ export class ModelController {
   async updateModel(
     @Body() updateModelBodyDto: UpdateModelBodyDto,
     @Param('id', uuidParamValidation()) id: string
-  ): Promise<Model> {
+  ): Promise<ModelEntity> {
     const updateModelDto = new UpdateModelDto(
       Object.assign(updateModelBodyDto, { id })
     )
@@ -54,7 +56,7 @@ export class ModelController {
   @ApiOkResponse({
     description: 'Modelos buscados com sucesso'
   })
-  async listModels(): Promise<Model[]> {
+  async listModels(): Promise<ModelEntity[]> {
     return this.getModelService.listModels()
   }
 
@@ -67,7 +69,7 @@ export class ModelController {
   })
   async getModelById(
     @Param('id', uuidParamValidation()) id: string
-  ): Promise<Model> {
+  ): Promise<ModelEntity> {
     return this.getModelService.getById(id)
   }
 }

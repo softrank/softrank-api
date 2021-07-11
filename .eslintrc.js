@@ -22,6 +22,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'never'],
     'object-curly-spacing': 'off',
-    '@typescript-eslint/object-curly-spacing': ['error', 'always']
+    '@typescript-eslint/object-curly-spacing': ['error', 'always'],
+    '@typescript-eslint/no-unused-vars': ['error', { 'ignoreDestructuringVars': true }]
   }
 }

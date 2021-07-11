@@ -1,24 +1,18 @@
 import { ModelNotFoundError } from '@modules/model/errors'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Model } from '@modules/model/entities'
+import { ModelEntity } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { ModelRepository } from '@modules/model/repositories'
 
 @Injectable()
 export class GetModelService {
-  constructor(
-    @InjectRepository(Model)
-    private readonly modelRepository: Repository<Model>
-  ) {}
+  constructor(private readonly modelRepository: ModelRepository) {}
 
-  async listModels(): Promise<Model[]> {
-    const models = await this.modelRepository.find()
-
-    return models
+  async listModels(): Promise<ModelEntity[]> {
+    return await this.modelRepository.listModels()
   }
 
   async getById(id: string) {
-    const model = await this.modelRepository.findOne({ where: { id } })
+    const model = await this.modelRepository.findById(id)
 
     if (!model) {
       throw new ModelNotFoundError()

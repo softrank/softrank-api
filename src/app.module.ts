@@ -1,16 +1,16 @@
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { getConnectionOptions } from 'typeorm'
 import { ModelModule } from '@modules/model'
 import { Module } from '@nestjs/common'
+import { MongooseModule } from '@nestjs/mongoose'
+import { database } from './config/env'
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: async () => await getConnectionOptions()
+    MongooseModule.forRoot(database.mongoURI, {
+      useCreateIndex: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true
     }),
     ModelModule
-  ],
-  controllers: [],
-  providers: []
+  ]
 })
 export class AppModule {}
