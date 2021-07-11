@@ -1,5 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { UpdateModelLevelDto } from '@modules/model/dtos'
 import { IsNotEmpty, IsString } from 'class-validator'
+import { ModelEntity } from '@modules/model/entities'
+import { ApiProperty } from '@nestjs/swagger'
 
 export class UpdateModelBodyDto {
   @ApiProperty({
@@ -21,6 +23,12 @@ export class UpdateModelBodyDto {
   @IsNotEmpty()
   @IsString()
   description: string
+
+  @ApiProperty({
+    type: [UpdateModelLevelDto],
+    required: false
+  })
+  modelLevels?: UpdateModelLevelDto[]
 }
 
 export class UpdateModelDto extends UpdateModelBodyDto {
@@ -30,7 +38,24 @@ export class UpdateModelDto extends UpdateModelBodyDto {
     this.name = updateModelDto.name
     this.year = updateModelDto.year
     this.description = updateModelDto.description
+    this.modelLevels = updateModelDto.modelLevels?.map(
+      UpdateModelLevelDto.toEntity
+    )
   }
 
   id: string
+
+  static toEntity(updateModelDto: UpdateModelDto): ModelEntity {
+    const model = new ModelEntity()
+
+    model.id = updateModelDto.id
+    model.name = updateModelDto.name
+    model.year = updateModelDto.year
+    model.description = updateModelDto.description
+    model.modelLevels = updateModelDto.modelLevels?.map(
+      UpdateModelLevelDto.toEntity
+    )
+
+    return model
+  }
 }

@@ -1,10 +1,10 @@
 import { Schema, Document } from 'mongoose'
 import { ObjectId } from 'bson'
 
-export function simpleSchema(
-  data: any,
+export function simpleSchema<T = any>(
+  data: T,
   needTimeStamp: boolean = false
-): Schema {
+): Schema<T> {
   return new Schema(Object.assign(data, { _id: false, __v: false }), {
     timestamps: needTimeStamp
   })

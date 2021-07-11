@@ -1,11 +1,14 @@
-import { convertToObjectId, normalizeModel } from '@utils/helpers'
+import { ModelProviders } from '@modules/model/model.providers'
 import { ModelDocument } from '@modules/model/repositories'
+import { ModelNotFoundError } from '@modules/model/errors'
 import { ModelEntity } from '@modules/model/entities'
 import { Inject, Injectable } from '@nestjs/common'
-import { ModelProviders } from '@modules/model/model.providers'
-import { ModelNotFoundError } from '@modules/model/errors'
-import { normalizeModelMapper } from '@utils/helpers'
 import { Model } from 'mongoose'
+import {
+  convertToObjectId,
+  normalizeModel,
+  normalizeModelMapper
+} from '@utils/helpers'
 
 @Injectable()
 export class ModelRepository {
@@ -14,7 +17,7 @@ export class ModelRepository {
     private readonly modelModel: Model<ModelDocument>
   ) {}
 
-  async create(data: any) {
+  async create(data: any): Promise<ModelEntity> {
     const document = await this.modelModel.create(data)
     return normalizeModel(document)
   }
@@ -45,7 +48,7 @@ export class ModelRepository {
     return Boolean(document)
   }
 
-  async update(data: ModelEntity): Promise<any> {
+  async update(data: ModelEntity): Promise<ModelEntity> {
     const { id, ...dataWithoutId } = data
     const document = await this.modelModel.findById(convertToObjectId(data.id))
 

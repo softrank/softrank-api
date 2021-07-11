@@ -3,7 +3,6 @@ import { ModelRepository } from '@modules/model/repositories'
 import { ModelEntity } from '@modules/model/entities'
 import { CreateModelDto } from '@modules/model/dtos'
 import { Injectable } from '@nestjs/common'
-import { v4 } from 'uuid'
 
 @Injectable()
 export class CreateModelService {
@@ -25,12 +24,6 @@ export class CreateModelService {
   }
 
   private createModel(createModelDto: CreateModelDto): ModelEntity {
-    const model = new ModelEntity()
-
-    model.name = createModelDto.name
-    model.year = createModelDto.year
-    model.description = createModelDto.description
-
-    return model
+    return CreateModelDto.toEntity(createModelDto)
   }
 }

@@ -11,7 +11,7 @@ export class GetModelService {
     return await this.modelRepository.listModels()
   }
 
-  async getById(id: string) {
+  async getById(id: string): Promise<ModelEntity> {
     const model = await this.modelRepository.findById(id)
 
     if (!model) {

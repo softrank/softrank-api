@@ -1,21 +1,24 @@
+import { Document, Schema, model, SchemaTypeOptions } from 'mongoose'
 import { ModelEntity } from '@modules/model/entities'
 import { simpleSchema } from '@utils/helpers'
-import { Document, Schema, model } from 'mongoose'
-import { v4 } from 'uuid'
+import { ObjectId } from 'bson'
 
 const expectedResultSchema = simpleSchema(
   {
     id: {
-      type: String,
-      default: v4()
+      type: ObjectId,
+      default: () => new ObjectId(),
+      get: (value: ObjectId) => value.toHexString()
     },
     name: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     initial: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     description: {
       type: String,
@@ -36,16 +39,19 @@ const expectedResultSchema = simpleSchema(
 const modelProcessSchema = simpleSchema(
   {
     id: {
-      type: String,
-      default: v4()
+      type: ObjectId,
+      default: () => new ObjectId(),
+      get: (value: ObjectId) => value.toHexString()
     },
     name: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
-    initials: {
+    initial: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     description: {
       type: String,
@@ -61,12 +67,14 @@ const modelProcessSchema = simpleSchema(
 const modelLevelSchema = simpleSchema(
   {
     id: {
-      type: String,
-      default: v4()
+      type: ObjectId,
+      default: () => new ObjectId(),
+      get: (value: ObjectId) => value.toHexString()
     },
     initial: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     modelProcesses: {
       type: [modelProcessSchema]
@@ -75,14 +83,18 @@ const modelLevelSchema = simpleSchema(
   true
 )
 
-export const modelSchema: Schema<Record<keyof ModelEntity, any>> = new Schema(
+export const modelSchema: Schema<
+  Record<keyof ModelEntity, SchemaTypeOptions<ModelEntity>>
+> = new Schema(
   {
     id: {
-      type: String
+      type: String,
+      required: true
     },
     name: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     year: {
       type: Date,
