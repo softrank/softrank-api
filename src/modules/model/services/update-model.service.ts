@@ -1,55 +1,38 @@
 import { ModelNameAlreadyExistsError } from '@modules/model/errors'
-import { EntityManager, getConnection, Repository, Not } from 'typeorm'
+import { ModelRepository } from '@modules/model/repositories'
+import { ModelEntity } from '@modules/model/entities'
 import { UpdateModelDto } from '@modules/model/dtos'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Model } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
+import { ModelNotFoundError } from '../errors/model-not-found.error'
 
 @Injectable()
 export class UpdateModelService {
-  constructor(
-    @InjectRepository(Model)
-    private readonly modelRepository: Repository<Model>
-  ) {}
-  async update(updateModelDto: UpdateModelDto): Promise<Model> {
-    return await getConnection().transaction(async (manager: EntityManager) => {
-      return this.updateWithTransaction(updateModelDto, manager)
-    })
+  constructor(private readonly modelRepository: ModelRepository) {}
+
+  async update(updateModelDto: UpdateModelDto): Promise<ModelEntity> {
+    await this.checkModelExceptions(updateModelDto)
+    const updatingModel = this.buildModel(updateModelDto)
+    return await this.modelRepository.update(updatingModel)
   }
 
-  async updateWithTransaction(
-    updateModelDto: UpdateModelDto,
-    manager: EntityManager
-  ): Promise<Model> {
-    await this.checkModelNameExists(updateModelDto)
-    const model = this.updateModel(updateModelDto)
-
-    return await manager.save(model)
-  }
-
-  private async checkModelNameExists({
+  private async checkModelExceptions({
     id,
     name
   }: UpdateModelDto): Promise<void> {
-    const model = await this.modelRepository.findOne({
-      where: {
-        id: Not(id),
-        name
-      }
-    })
-    if (model) {
+    const model = await this.modelRepository.findById(id)
+
+    if (!model) {
+      throw new ModelNotFoundError()
+    }
+
+    const hasAnotherModel = await this.modelRepository.checkUpdateName(id, name)
+
+    if (hasAnotherModel) {
       throw new ModelNameAlreadyExistsError()
     }
   }
 
-  private updateModel(updateModelDto: UpdateModelDto): Model {
-    const model = new Model()
-
-    model.id = updateModelDto.id
-    model.name = updateModelDto.name
-    model.year = updateModelDto.year
-    model.description = updateModelDto.description
-
-    return model
+  private buildModel(updateModelDto: UpdateModelDto): ModelEntity {
+    return UpdateModelDto.toEntity(updateModelDto)
   }
 }

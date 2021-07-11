@@ -1,23 +1,23 @@
 import { ModelController } from '@modules/model/controllers'
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { DatabaseModule } from '@config/db/database.module'
 import { Module } from '@nestjs/common'
+import { modelProviders } from './model.providers'
 import {
   CreateModelService,
   GetModelService,
   UpdateModelService
 } from '@modules/model/services'
-import {
-  ExpectedResult,
-  ModelProcess,
-  ModelLevel,
-  Model
-} from '@modules/model/entities'
+import { ModelRepository } from './repositories'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ExpectedResult, ModelProcess, ModelLevel, Model])
-  ],
+  imports: [DatabaseModule],
   controllers: [ModelController],
-  providers: [CreateModelService, GetModelService, UpdateModelService]
+  providers: [
+    CreateModelService,
+    GetModelService,
+    UpdateModelService,
+    ModelRepository,
+    ...modelProviders
+  ]
 })
 export class ModelModule {}

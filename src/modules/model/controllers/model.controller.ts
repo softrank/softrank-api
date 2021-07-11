@@ -1,17 +1,23 @@
-import { GetModelService, CreateModelService } from '@modules/model/services'
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 import { uuidParamValidation } from '@utils/validations'
-import { CreateModelDto, UpdateModelBodyDto } from '@modules/model/dtos'
-import { Model } from '@modules/model/entities'
-import { UpdateModelService } from '../services/update-model.service'
-import { UpdateModelDto } from '../dtos/update-model.dto'
+import { ModelEntity } from '@modules/model/entities'
+import { ApiTags } from '@nestjs/swagger'
 import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiTags
-} from '@nestjs/swagger'
+  CreateModelDto,
+  UpdateModelBodyDto,
+  UpdateModelDto
+} from '@modules/model/dtos'
+import {
+  CreateModelDocumentation,
+  UpdateModelDocumentation,
+  GetModelByIdDocumentation,
+  ListModelsDocumentation
+} from '@modules/model/swagger'
+import {
+  GetModelService,
+  CreateModelService,
+  UpdateModelService
+} from '@modules/model/services'
 
 @ApiTags('Model')
 @Controller('models')
@@ -23,27 +29,19 @@ export class ModelController {
   ) {}
 
   @Post()
-  @ApiCreatedResponse({
-    description: 'Modelo criado com sucesso'
-  })
-  @ApiBadRequestResponse({
-    description: 'Erro de requisição por parte do front'
-  })
-  async createModel(@Body() createModelDto: CreateModelDto): Promise<Model> {
+  @CreateModelDocumentation()
+  async createModel(
+    @Body() createModelDto: CreateModelDto
+  ): Promise<ModelEntity> {
     return this.createModelService.create(createModelDto)
   }
 
   @Put(':id')
-  @ApiOkResponse({
-    description: 'Modelo atualizado com sucesso'
-  })
-  @ApiBadRequestResponse({
-    description: 'Erro de requisição por parte do front'
-  })
+  @UpdateModelDocumentation()
   async updateModel(
     @Body() updateModelBodyDto: UpdateModelBodyDto,
     @Param('id', uuidParamValidation()) id: string
-  ): Promise<Model> {
+  ): Promise<ModelEntity> {
     const updateModelDto = new UpdateModelDto(
       Object.assign(updateModelBodyDto, { id })
     )
@@ -51,23 +49,16 @@ export class ModelController {
   }
 
   @Get()
-  @ApiOkResponse({
-    description: 'Modelos buscados com sucesso'
-  })
-  async listModels(): Promise<Model[]> {
+  @ListModelsDocumentation()
+  async listModels(): Promise<ModelEntity[]> {
     return this.getModelService.listModels()
   }
 
   @Get(':id')
-  @ApiOkResponse({
-    description: 'Modelo buscado com sucesso'
-  })
-  @ApiNotFoundResponse({
-    description: 'Id do modelo não existente'
-  })
+  @GetModelByIdDocumentation()
   async getModelById(
     @Param('id', uuidParamValidation()) id: string
-  ): Promise<Model> {
+  ): Promise<ModelEntity> {
     return this.getModelService.getById(id)
   }
 }
