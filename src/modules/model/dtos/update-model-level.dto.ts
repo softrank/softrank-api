@@ -15,7 +15,7 @@ export class UpdateModelLevelDto {
   initial: string
 
   @ApiProperty({
-    type: [UpdateModelProcessDto],
+    type: () => [UpdateModelProcessDto],
     required: false
   })
   modelProcesses?: UpdateModelProcessDto[]

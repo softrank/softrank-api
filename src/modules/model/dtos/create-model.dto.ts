@@ -25,7 +25,7 @@ export class CreateModelDto {
   description: string
 
   @ApiProperty({
-    type: [CreateModelLevelDto],
+    type: () => [CreateModelLevelDto],
     required: false
   })
   modelLevels?: CreateModelLevelDto[]

@@ -26,7 +26,7 @@ export class UpdateModelProcessDto {
   description: string
 
   @ApiProperty({
-    type: [UpdateExpectedResultDto],
+    type: () => [UpdateExpectedResultDto],
     required: false
   })
   expectedResults?: UpdateExpectedResultDto[]

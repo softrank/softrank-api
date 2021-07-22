@@ -19,7 +19,7 @@ export class CreateModelProcessDto {
   description: string
 
   @ApiProperty({
-    type: [CreateExpectedResultDto],
+    type: () => [CreateExpectedResultDto],
     required: false
   })
   expectedResults?: CreateExpectedResultDto[]

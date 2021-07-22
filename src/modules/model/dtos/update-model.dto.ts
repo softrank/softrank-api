@@ -25,7 +25,7 @@ export class UpdateModelBodyDto {
   description: string
 
   @ApiProperty({
-    type: [UpdateModelLevelDto],
+    type: () => [UpdateModelLevelDto],
     required: false
   })
   modelLevels?: UpdateModelLevelDto[]
