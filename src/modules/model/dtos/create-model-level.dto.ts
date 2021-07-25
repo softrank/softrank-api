@@ -9,7 +9,7 @@ export class CreateModelLevelDto {
   initial: string
 
   @ApiProperty({
-    type: [CreateModelProcessDto],
+    type: () => [CreateModelProcessDto],
     required: false
   })
   modelProcesses?: CreateModelProcessDto[]
