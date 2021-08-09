@@ -5,9 +5,9 @@ import { ModelEntity } from '@modules/model/entities'
 import { Inject, Injectable } from '@nestjs/common'
 import { Model } from 'mongoose'
 import {
-  convertToObjectId,
-  normalizeModel,
-  normalizeModelMapper
+  ConvertToObjectId,
+  NormalizeDocument,
+  NormalizeDocumentMapper
 } from '@utils/helpers'
 
 @Injectable()
@@ -19,28 +19,28 @@ export class ModelRepository {
 
   async create(data: any): Promise<ModelEntity> {
     const document = await this.modelModel.create(data)
-    return normalizeModel(document)
+    return NormalizeDocument(document)
   }
 
   async findById(id: string): Promise<ModelEntity> {
-    const document = await this.modelModel.findById(convertToObjectId(id))
-    return normalizeModel(document)
+    const document = await this.modelModel.findById(ConvertToObjectId(id))
+    return NormalizeDocument(document)
   }
 
   async findByName(name: string): Promise<ModelEntity> {
     const document = await this.modelModel.findOne({ name })
-    return normalizeModel(document)
+    return NormalizeDocument(document)
   }
 
   async listModels(): Promise<ModelEntity[]> {
     const documents = await this.modelModel.find()
-    return normalizeModelMapper(documents)
+    return NormalizeDocumentMapper(documents)
   }
 
   async checkUpdateName(id: string, name: string): Promise<boolean> {
     const document = await this.modelModel
       .findOne({
-        _id: { $ne: convertToObjectId(id) },
+        _id: { $ne: ConvertToObjectId(id) },
         name
       })
       .lean()
@@ -50,7 +50,7 @@ export class ModelRepository {
 
   async update(data: ModelEntity): Promise<ModelEntity> {
     const { id, ...dataWithoutId } = data
-    const document = await this.modelModel.findById(convertToObjectId(data.id))
+    const document = await this.modelModel.findById(ConvertToObjectId(data.id))
 
     if (!document) {
       throw new ModelNotFoundError()
