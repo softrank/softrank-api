@@ -19,17 +19,15 @@ export class GetEvaluatorService {
 
   private async findEvaluatorById(id: string): Promise<EntityEntity> {
     const evaluator = await this.entityRepository.findById(id)
-
-    if (!evaluator) {
-      throw new EvaluatorNotFoundError()
-    }
-
-    return evaluator
+    return this.verifyEvaluator(evaluator)
   }
 
   private async findEvaluatorByUserId(userId: string): Promise<EntityEntity> {
     const evaluator = await this.entityRepository.findByUserId(userId)
+    return this.verifyEvaluator(evaluator)
+  }
 
+  private verifyEvaluator(evaluator: EntityEntity): EntityEntity {
     if (!evaluator) {
       throw new EvaluatorNotFoundError()
     }

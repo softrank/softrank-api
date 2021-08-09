@@ -17,8 +17,6 @@ export class ProctedEvaluatorController {
   @Get('me')
   @CreateEvaluatorDocumentation()
   async me(@GetUser() user: LoggedUser): Promise<EvaluatorDto> {
-    console.log(user)
-
     return this.getEvaluatorService.me(user.id)
   }
 }
