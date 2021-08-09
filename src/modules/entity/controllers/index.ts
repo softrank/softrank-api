@@ -1,1 +1,2 @@
-export * from './evaluator.controller'
+export * from './unprocted-evaluator.controller'
+export * from './procted-evaluator.controller'

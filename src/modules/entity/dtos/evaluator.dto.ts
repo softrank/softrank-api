@@ -1,13 +1,27 @@
+import { EntityEntity } from '@modules/entity/entities'
 import { DocumentTypeEnum } from '@shared/enums'
-import { EntityEntity } from '../entities/entity.entity'
+import { ApiProperty } from '@nestjs/swagger'
 
 export class EvaluatorDto {
+  @ApiProperty()
   id: string
+
+  @ApiProperty()
   name: string
+
+  @ApiProperty()
   email: string
+
+  @ApiProperty()
   documentType: DocumentTypeEnum
+
+  @ApiProperty()
   documentNumber: string
+
+  @ApiProperty()
   phone: string
+
+  @ApiProperty()
   userId?: string
 
   static fromEntity(entity: EntityEntity): EvaluatorDto {

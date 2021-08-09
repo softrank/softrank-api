@@ -15,7 +15,6 @@ async function bootstrap() {
     .setDescription('Rotas do backend do Softrank')
     .setVersion('1.0')
     .addBearerAuth()
-    .addTag('SRK')
     .build()
 
   const document = SwaggerModule.createDocument(app, configSwagger)

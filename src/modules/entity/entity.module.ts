@@ -1,5 +1,11 @@
-import { CreateEvaluatorService } from '@modules/entity/services'
-import { EvaluatorController } from '@modules/entity/controllers'
+import {
+  CreateEvaluatorService,
+  GetEvaluatorService
+} from '@modules/entity/services'
+import {
+  UnproctedEvaluatorController,
+  ProctedEvaluatorController
+} from '@modules/entity/controllers'
 import { EntityRepository } from '@modules/entity/repositories'
 import { DatabaseModule } from '@config/db/database.module'
 import { entityProviders } from './entity.providers'
@@ -8,7 +14,12 @@ import { Module } from '@nestjs/common'
 
 @Module({
   imports: [DatabaseModule, UserModule],
-  controllers: [EvaluatorController],
-  providers: [EntityRepository, CreateEvaluatorService, ...entityProviders]
+  controllers: [UnproctedEvaluatorController, ProctedEvaluatorController],
+  providers: [
+    EntityRepository,
+    CreateEvaluatorService,
+    GetEvaluatorService,
+    ...entityProviders
+  ]
 })
 export class EntityModule {}

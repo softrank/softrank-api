@@ -7,5 +7,5 @@ export class EntityEntity {
   documentType: DocumentTypeEnum
   documentNumber: string
   phone: string
-  userId?: string
+  userId?: string | any
 }
