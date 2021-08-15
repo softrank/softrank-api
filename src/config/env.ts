@@ -9,3 +9,8 @@ export const database = {
 export const api = {
   port: Number(process.env.API_PORT)
 }
+
+export const security = {
+  expiresIn: process.env.EXPIRES_IN,
+  secretKey: process.env.SECRET_KEY
+}

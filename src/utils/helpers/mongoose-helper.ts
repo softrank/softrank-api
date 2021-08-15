@@ -1,4 +1,4 @@
-import { Schema, Document } from 'mongoose'
+import { Schema, Document, startSession, ClientSession } from 'mongoose'
 import { ObjectId } from 'bson'
 
 export function simpleSchema<T = any>(
@@ -10,7 +10,7 @@ export function simpleSchema<T = any>(
   })
 }
 
-export function convertToObjectId(value: any): ObjectId {
+export function ConvertToObjectId(value: ObjectId | string): ObjectId {
   try {
     return new ObjectId(value)
   } catch {
@@ -18,24 +18,33 @@ export function convertToObjectId(value: any): ObjectId {
   }
 }
 
-export function normalizeModel<T = DefaultData>(model: T): T {
-  if (!model) {
+export function ConvertObjectIdToString(value: ObjectId): string {
+  return value?.toHexString()
+}
+
+export function NormalizeDocument<T = DefaultData>(document: T): T {
+  if (!document) {
     return null
   }
 
-  if (model instanceof Document) {
-    model = (model as Document).toObject() as T
+  if (document instanceof Document) {
+    document = (document as Document).toObject() as T
   }
 
-  const { _id, __v, ...normalizedData } = model as any
+  const { _id, __v, ...normalizedData } = document as any
   return Object.assign(normalizedData, { id: _id }) as any as T
 }
 
-export function normalizeModelMapper(models: any[]) {
-  if (models && Array.isArray(models)) {
-    return models.map((model) => normalizeModel(model))
+export function NormalizeDocumentMapper(documents: any[]) {
+  if (documents && Array.isArray(documents)) {
+    return documents.map((document) => NormalizeDocument(document))
   }
   return null
 }
 
 type DefaultData = { _id: any; __v: any }
+
+export async function startMongooseSession(): Promise<ClientSession> {
+  const session = await startSession()
+  return session
+}

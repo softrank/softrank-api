@@ -1,5 +1,5 @@
 import { ModelEntity, ModelLevelEntity } from '@modules/model/entities'
-import { convertToObjectId, normalizeModel } from '@utils/helpers'
+import { ConvertToObjectId, NormalizeDocument } from '@utils/helpers'
 import { ModelProviders } from '@modules/model/model.providers'
 import { ModelDocument } from '@modules/model/repositories'
 import { ModelNotFoundError } from '@modules/model/errors'
@@ -15,12 +15,12 @@ export class ModelLevelRepository {
 
   async findById(id: string): Promise<ModelLevelEntity> {
     const document = await this.modelModel.findOne({
-      'modelLevels.id': convertToObjectId(id)
+      'modelLevels.id': ConvertToObjectId(id)
     })
 
     const modelLevel = this.getModelLevel(document, { id })
 
-    return normalizeModel(modelLevel)
+    return NormalizeDocument(modelLevel)
   }
 
   async findByInitial(initial: string): Promise<ModelLevelEntity> {
@@ -30,13 +30,13 @@ export class ModelLevelRepository {
 
     const modelLevel = this.getModelLevel(document, { initial })
 
-    return normalizeModel(modelLevel)
+    return NormalizeDocument(modelLevel)
   }
 
   async checkUpdateName(id: string, name: string): Promise<boolean> {
     const document = await this.modelModel
       .findOne({
-        'modelLevels.id': { $ne: convertToObjectId(id) },
+        'modelLevels.id': { $ne: ConvertToObjectId(id) },
         'modelLevels.name': name
       })
       .lean()
@@ -47,7 +47,7 @@ export class ModelLevelRepository {
   async update(data: ModelLevelEntity): Promise<ModelLevelEntity> {
     const { id } = data
     const document = await this.modelModel.findOne({
-      'modelLevels.id': convertToObjectId(id)
+      'modelLevels.id': ConvertToObjectId(id)
     })
 
     if (!document) {
