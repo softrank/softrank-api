@@ -5,6 +5,18 @@ services:
     container_name: soft-rank-mongo-db
     image: mongo:4.4
     restart: always
+    entrypoint:
+      [
+        '/usr/bin/mongod',
+        '--bind_ip_all',
+        '--replSet',
+        'rs0',
+        '--journal',
+        '--dbpath',
+        '/data/db',
+        '--enableMajorityReadConcern',
+        'false'
+      ]
     volumes:
       - ./docker/mongo/data:/data/db
     ports:
