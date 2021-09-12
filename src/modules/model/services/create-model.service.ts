@@ -4,7 +4,7 @@ import { CreateModelDto } from '@modules/model/dtos'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Model } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
-import { v4 } from 'uuid'
+import { ModelDto } from '../../shared/dtos/model/model.dto'
 
 @Injectable()
 export class CreateModelService {
@@ -12,39 +12,40 @@ export class CreateModelService {
     @InjectRepository(Model)
     private readonly modelRepository: Repository<Model>
   ) {}
-  async create(createModelDto: CreateModelDto): Promise<Model> {
+  public async create(createModelDto: CreateModelDto): Promise<ModelDto> {
     return await getConnection().transaction(async (manager: EntityManager) => {
-      return this.createWithTransaction(createModelDto, manager)
+      return this.createWithManager(createModelDto, manager)
     })
   }
 
-  async createWithTransaction(
-    createModelDto: CreateModelDto,
-    manager: EntityManager
-  ): Promise<Model> {
-    await this.checkModelNameExists(createModelDto.name)
-    const model = this.createModel(createModelDto)
+  public async createWithManager(createModelDto: CreateModelDto, manager: EntityManager): Promise<ModelDto> {
+    await this.checkModelConflicts(createModelDto)
+    const model = this.buildModel(createModelDto)
+    const savedModel = await manager.save(model)
+    const modelDto = this.mapToDto(savedModel)
 
-    return await manager.save(model)
+    return modelDto
   }
 
-  private async checkModelNameExists(name: string): Promise<void> {
-    const model = await this.modelRepository.findOne({
-      where: { name }
-    })
+  private async checkModelConflicts({ name, year }: CreateModelDto): Promise<void> {
+    const model = await this.modelRepository
+      .createQueryBuilder('model')
+      .where('model.name = :name', { name })
+      .where('model.year = :year::timestamp', { year })
+      .getOne()
+
     if (model) {
       throw new ModelNameAlreadyExistsError()
     }
   }
 
-  private createModel(createModelDto: CreateModelDto): Model {
-    const model = new Model()
-
-    model.id = v4()
-    model.name = createModelDto.name
-    model.year = createModelDto.year
-    model.description = createModelDto.description
-
+  private buildModel(createModelDto: CreateModelDto): Model {
+    const model = CreateModelDto.toEntity(createModelDto)
     return model
+  }
+
+  private mapToDto(model: Model): ModelDto {
+    const modelDto = ModelDto.fromEntity(model)
+    return modelDto
   }
 }

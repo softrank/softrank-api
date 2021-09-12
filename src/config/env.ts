@@ -21,5 +21,6 @@ export const testDatabase = {
 }
 
 export const api = {
-  port: Number(process.env.API_PORT)
+  port: Number(process.env.API_PORT),
+  secretKey: process.env.SECRET_KEY
 }

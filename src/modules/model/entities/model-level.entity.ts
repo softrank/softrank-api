@@ -1,38 +1,23 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryColumn
-} from 'typeorm'
-import { ModelLevels } from '@modules/model/enums'
-import { Model } from './model.entity'
-import { ModelProcess } from './model-process.entity'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { Model } from '@modules/model/entities'
+import { AuditableEntity } from '../../shared/entities/auditable.entity'
 
-@Entity({
-  schema: 'model'
-})
-export class ModelLevel {
-  @PrimaryColumn({
-    type: 'uuid'
-  })
+@Entity({ schema: 'model' })
+@Unique(['initial', 'name', 'model'])
+export class ModelLevel extends AuditableEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({
-    type: 'char',
-    enum: ModelLevels
-  })
-  initial: ModelLevels
+  @Column({ type: 'char' })
+  initial: string
 
-  @ManyToOne(() => Model, (model: Model) => model.modelLevel)
-  @JoinColumn({ name: 'model', referencedColumnName: 'id' })
+  @Column({ type: 'varchar' })
+  name: string
+
+  @Column({ type: 'varchar', nullable: true })
+  predecessor: string
+
+  @ManyToOne(() => Model, (model: Model) => model.id)
+  @JoinColumn({ name: 'modelId', referencedColumnName: 'id' })
   model: Model
-
-  @OneToMany(
-    () => ModelProcess,
-    (modelProcess: ModelProcess) => modelProcess.modelLevel
-  )
-  @JoinColumn({ name: 'id', referencedColumnName: 'modelLevel' })
-  modelProcess: ModelProcess[]
 }

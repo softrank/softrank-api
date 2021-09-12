@@ -1,66 +1,29 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryColumn,
-  UpdateDateColumn
-} from 'typeorm'
-import { ModelLevels } from '@modules/model/enums'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { AuditableEntity } from '@modules/shared/entities'
 import { ModelProcess } from '@modules/model/entities'
 
-@Entity({
-  schema: 'model'
-})
-export class ExpectedResult {
-  @PrimaryColumn({ type: 'uuid' })
+@Entity({ schema: 'model' })
+@Unique(['name', 'initial', 'modelProcess'])
+export class ExpectedResult extends AuditableEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({
-    type: 'varchar'
-  })
+  @Column({ type: 'varchar' })
   name: string
 
-  @Column({
-    type: 'varchar'
-  })
-  initials: string
+  @Column({ type: 'varchar' })
+  initial: string
 
-  @Column({
-    type: 'varchar',
-    nullable: true
-  })
+  @Column({ type: 'varchar' })
   description: string
 
-  @Column({
-    type: 'char',
-    default: ModelLevels.G,
-    enum: ModelLevels
-  })
-  minLevel: ModelLevels
+  @Column({ type: 'char' })
+  minLevel: string
 
-  @Column({
-    type: 'char',
-    default: ModelLevels.A,
-    enum: ModelLevels
-  })
-  maxLevel: ModelLevels
+  @Column({ type: 'char', nullable: true })
+  maxLevel: string
 
-  @CreateDateColumn()
-  createdAt: Date
-
-  @UpdateDateColumn()
-  updatedAt: Date
-
-  @DeleteDateColumn()
-  deletedAt: Date
-
-  @ManyToOne(
-    () => ModelProcess,
-    (modelProcess: ModelProcess) => modelProcess.id
-  )
-  @JoinColumn({ name: 'process', referencedColumnName: 'id' })
+  @ManyToOne(() => ModelProcess, (modelProcess: ModelProcess) => modelProcess.id)
+  @JoinColumn({ name: 'modelProcessId', referencedColumnName: 'id' })
   modelProcess: ModelProcess
 }

@@ -1,26 +1,46 @@
+import { UpdateModelLevelDto, UpdateModelProcessDto } from '@modules/model/dtos'
+import { ArrayNotEmpty, IsNotEmpty, IsString, Validate, ValidateNested } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { Transform, Type } from 'class-transformer'
+import { ModelLevelValidator } from '../validators/model-level.validator'
+import { ModelExpectedResultValidator } from '../validators/model-expected-result.validator'
+import { dateTransformer } from '@modules/shared/transformers'
+import { stringDate } from '@utils/helpers'
 
 export class UpdateModelBodyDto {
   @ApiProperty({
-    example: 'SRK-Serviços-V2'
+    example: 'SRK-Serviços'
   })
   @IsNotEmpty()
   @IsString()
   name: string
 
-  @ApiProperty({
-    example: new Date()
-  })
+  @ApiProperty({ example: stringDate() })
   @IsNotEmpty()
+  @Transform(dateTransformer)
   year: Date
 
   @ApiProperty({
-    example: 'Uma bela descrição 2'
+    example: 'Uma bela descrição'
   })
   @IsNotEmpty()
   @IsString()
   description: string
+
+  @ApiProperty({ type: () => [UpdateModelLevelDto] })
+  @Type(() => UpdateModelLevelDto)
+  @IsNotEmpty()
+  @ArrayNotEmpty()
+  @ValidateNested()
+  @Validate(ModelLevelValidator)
+  modelLevels: UpdateModelLevelDto[]
+
+  @ApiProperty({ type: () => [UpdateModelProcessDto] })
+  @Type(() => UpdateModelProcessDto)
+  @ArrayNotEmpty()
+  @ValidateNested()
+  @Validate(ModelExpectedResultValidator)
+  modelProcesses: UpdateModelProcessDto[]
 }
 
 export class UpdateModelDto extends UpdateModelBodyDto {

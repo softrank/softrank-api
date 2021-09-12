@@ -1,44 +1,28 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { AuditableEntity } from '@modules/shared/entities'
 import { ExpectedResult } from '@modules/model/entities'
-import { ModelLevel } from './model-level.entity'
-import { ManyToOne } from 'typeorm'
+import { Model } from '@modules/model/entities'
 
-@Entity({
-  schema: 'model'
-})
-export class ModelProcess {
-  @PrimaryColumn({
-    type: 'uuid'
-  })
+@Entity({ schema: 'model' })
+@Unique(['name', 'initials', 'model'])
+export class ModelProcess extends AuditableEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({
-    type: 'varchar'
-  })
+  @Column({ type: 'varchar' })
   name: string
 
-  @Column({
-    type: 'varchar'
-  })
+  @Column({ type: 'varchar' })
   initials: string
 
-  @Column({
-    type: 'varchar',
-    nullable: true
-  })
+  @Column({ type: 'varchar' })
   description: string
 
-  @ManyToOne(() => ModelLevel, (modelLevel: ModelLevel) => modelLevel.id)
-  @JoinColumn({ name: 'modelLevel', referencedColumnName: 'id' })
-  modelLevel: ModelLevel
+  @OneToMany(() => ExpectedResult, (expectedResult: ExpectedResult) => expectedResult.modelProcess, { cascade: true })
+  @JoinColumn({ name: 'id', referencedColumnName: 'modelProcessId' })
+  expectedResults: ExpectedResult[]
 
-  @OneToMany(
-    () => ExpectedResult,
-    (expectedResult: ExpectedResult) => expectedResult.modelProcess,
-    {
-      cascade: true
-    }
-  )
-  @JoinColumn({ name: 'id', referencedColumnName: 'modelProcess' })
-  expectedResult: ExpectedResult[]
+  @ManyToOne(() => Model)
+  @JoinColumn({ name: 'modelId', referencedColumnName: 'id' })
+  model: Model
 }

@@ -1,5 +1,11 @@
+import { ArrayNotEmpty, IsNotEmpty, IsString, Validate, ValidateNested } from 'class-validator'
+import { ModelExpectedResultValidator, ModelLevelValidator } from '@modules/model/validators'
+import { CreateModelProcessDto, CreateModelLevelDto } from '@modules/model/dtos'
+import { dateTransformer } from '@modules/shared/transformers'
+import { Transform, Type } from 'class-transformer'
+import { Model } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { stringDate } from '@utils/helpers'
 
 export class CreateModelDto {
   @ApiProperty({
@@ -9,10 +15,9 @@ export class CreateModelDto {
   @IsString()
   name: string
 
-  @ApiProperty({
-    example: new Date()
-  })
+  @ApiProperty({ example: stringDate() })
   @IsNotEmpty()
+  @Transform(dateTransformer)
   year: Date
 
   @ApiProperty({
@@ -21,4 +26,31 @@ export class CreateModelDto {
   @IsNotEmpty()
   @IsString()
   description: string
+
+  @ApiProperty({ type: () => [CreateModelLevelDto] })
+  @Type(() => CreateModelLevelDto)
+  @IsNotEmpty()
+  @ArrayNotEmpty()
+  @ValidateNested()
+  @Validate(ModelLevelValidator)
+  modelLevels: CreateModelLevelDto[]
+
+  @ApiProperty({ type: () => [CreateModelProcessDto] })
+  @Type(() => CreateModelProcessDto)
+  @ArrayNotEmpty()
+  @ValidateNested()
+  @Validate(ModelExpectedResultValidator)
+  modelProcesses: CreateModelProcessDto[]
+
+  static toEntity(createModelDto: CreateModelDto): Model {
+    const entity = new Model()
+
+    entity.name = createModelDto.name
+    entity.year = createModelDto.year
+    entity.description = createModelDto.description
+    entity.modelLevels = createModelDto.modelLevels.map(CreateModelLevelDto.toEntity)
+    entity.modelProcesses = createModelDto.modelProcesses.map(CreateModelProcessDto.toEntity)
+
+    return entity
+  }
 }

@@ -1,39 +1,27 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm'
-import { ModelLevel } from './model-level.entity'
+import { Column, Entity, JoinColumn, OneToMany, Unique, PrimaryGeneratedColumn } from 'typeorm'
+import { ModelProcess, ModelLevel } from '@modules/model/entities'
+import { AuditableEntity } from '../../shared/entities/auditable.entity'
 
-@Entity({
-  schema: 'model'
-})
-export class Model {
-  @PrimaryColumn({
-    type: 'uuid'
-  })
+@Entity({ schema: 'model' })
+@Unique(['name', 'year'])
+export class Model extends AuditableEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({
-    type: 'varchar'
-  })
+  @Column({ type: 'varchar' })
   name: string
 
-  @Column({
-    type: 'timestamp'
-  })
+  @Column({ type: 'timestamp' })
   year: Date
 
-  @Column({
-    type: 'varchar',
-    nullable: true
-  })
+  @Column({ type: 'varchar', nullable: true })
   description: string
 
-  // @OneToMany(
-  //   () => ModelProcess,
-  //   (modelProcess: ModelProcess) => modelProcess.id
-  // )
-  // @JoinColumn({ name: 'modelProcess', referencedColumnName: 'id' })
-  // modelProcess: ModelProcess
+  @OneToMany(() => ModelProcess, (modelProcess: ModelProcess) => modelProcess.model, { cascade: true })
+  @JoinColumn({ name: 'id', referencedColumnName: 'modelId' })
+  modelProcesses: ModelProcess[]
 
-  @OneToMany(() => ModelLevel, (modelLevel: ModelLevel) => modelLevel.model)
-  @JoinColumn({ name: 'id', referencedColumnName: 'model' })
-  modelLevel: ModelLevel
+  @OneToMany(() => ModelLevel, (modelLevel: ModelLevel) => modelLevel.model, { cascade: true })
+  @JoinColumn({ name: 'id', referencedColumnName: 'modelId' })
+  modelLevels: ModelLevel[]
 }
