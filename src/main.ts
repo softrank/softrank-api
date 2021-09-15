@@ -9,6 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   app.useGlobalPipes(new ValidationPipe({ transform: true }))
   app.setGlobalPrefix('api')
+  app.enableCors()
 
   const configSwagger = new DocumentBuilder()
     .setTitle('SoftRank Doc')
