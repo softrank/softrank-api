@@ -10,7 +10,7 @@ export class ModelProcessDto {
   name: string
 
   @ApiProperty()
-  initials: string
+  initial: string
 
   @ApiProperty()
   description: string
@@ -23,7 +23,7 @@ export class ModelProcessDto {
 
     dto.id = modelProcess.id
     dto.name = modelProcess.name
-    dto.initials = modelProcess.initials
+    dto.initial = modelProcess.initial
     dto.description = modelProcess.description
     dto.expectedResults = modelProcess.expectedResults?.map(ExpectedResultDto.fromEntity)
 

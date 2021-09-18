@@ -60,7 +60,7 @@ export class CreateModelProcessService {
     const modelProcess = await this.manager.findOne(ModelProcess, {
       where: {
         name: createModelProcessDto.name,
-        initials: createModelProcessDto.initials,
+        initial: createModelProcessDto.initial,
         model: modelId
       }
     })
@@ -73,7 +73,7 @@ export class CreateModelProcessService {
   private buildModelProcessData(createModelProcessDto: CreateModelProcessDto, model: Model): ModelProcess {
     const modelProcess = new ModelProcess()
 
-    modelProcess.initials = createModelProcessDto.initials
+    modelProcess.initial = createModelProcessDto.initial
     modelProcess.name = createModelProcessDto.name
     modelProcess.description = createModelProcessDto.description
     modelProcess.model = model

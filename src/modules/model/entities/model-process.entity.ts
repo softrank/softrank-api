@@ -4,7 +4,7 @@ import { ExpectedResult } from '@modules/model/entities'
 import { Model } from '@modules/model/entities'
 
 @Entity({ schema: 'model' })
-@Unique(['name', 'initials', 'model'])
+@Unique(['name', 'initial', 'model'])
 export class ModelProcess extends AuditableEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -13,7 +13,7 @@ export class ModelProcess extends AuditableEntity {
   name: string
 
   @Column({ type: 'varchar' })
-  initials: string
+  initial: string
 
   @Column({ type: 'varchar' })
   description: string

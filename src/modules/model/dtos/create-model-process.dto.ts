@@ -13,7 +13,7 @@ export class CreateModelProcessDto {
   @ApiProperty({ example: 'GPR' })
   @IsNotEmpty()
   @IsString()
-  initials: string
+  initial: string
 
   @ApiProperty({ example: 'Define a maturidade de gerencia de projetos' })
   @IsNotEmpty()
@@ -29,7 +29,7 @@ export class CreateModelProcessDto {
   static toEntity(createModelProcessDto: CreateModelProcessDto): ModelProcess {
     const entity = new ModelProcess()
 
-    entity.initials = createModelProcessDto.initials
+    entity.initial = createModelProcessDto.initial
     entity.name = createModelProcessDto.name
     entity.description = createModelProcessDto.description
     entity.expectedResults = createModelProcessDto.expectedResults?.map(CreateExpectedResultDto.toEntity)
