@@ -1,16 +1,9 @@
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { getConnectionOptions } from 'typeorm'
+import { EntityModule } from '@modules/entity'
 import { ModelModule } from '@modules/model'
+import { UserModule } from '@modules/user'
 import { Module } from '@nestjs/common'
 
 @Module({
-  imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: async () => await getConnectionOptions()
-    }),
-    ModelModule
-  ],
-  controllers: [],
-  providers: []
+  imports: [ModelModule, EntityModule, UserModule]
 })
 export class AppModule {}
