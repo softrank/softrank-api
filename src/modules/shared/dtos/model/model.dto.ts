@@ -28,8 +28,8 @@ export class ModelDto {
     dto.name = model.name
     dto.year = model.year
     dto.description = model.description
-    dto.modelLevels = model.modelLevels.map(ModelLevelDto.fromEntity)
-    dto.modelProcesses = model.modelProcesses.map(ModelProcessDto.fromEntity)
+    dto.modelLevels = model.modelLevels?.map(ModelLevelDto.fromEntity)
+    dto.modelProcesses = model.modelProcesses?.map(ModelProcessDto.fromEntity)
 
     return dto
   }

@@ -5,3 +5,9 @@ export class ModelLevelNotFoundError extends HttpException {
     super('Model level not found', HttpStatus.NOT_FOUND)
   }
 }
+
+export class ModelLevelAlreadyExistsError extends HttpException {
+  constructor() {
+    super('Model level already exists', HttpStatus.CONFLICT)
+  }
+}

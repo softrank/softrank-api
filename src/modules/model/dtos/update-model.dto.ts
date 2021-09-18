@@ -1,10 +1,10 @@
 import { UpdateModelLevelDto, UpdateModelProcessDto } from '@modules/model/dtos'
 import { ArrayNotEmpty, IsNotEmpty, IsString, Validate, ValidateNested } from 'class-validator'
-import { ApiProperty } from '@nestjs/swagger'
-import { Transform, Type } from 'class-transformer'
-import { ModelLevelValidator } from '../validators/model-level.validator'
-import { ModelExpectedResultValidator } from '../validators/model-expected-result.validator'
+import { ModelLevelValidator, ModelExpectedResultValidator } from '@modules/model/validators'
+import { setPredecessorModelLevelTransformer } from '@modules/model/transformers'
 import { dateTransformer } from '@modules/shared/transformers'
+import { Transform, Type } from 'class-transformer'
+import { ApiProperty } from '@nestjs/swagger'
 import { stringDate } from '@utils/helpers'
 
 export class UpdateModelBodyDto {
@@ -32,6 +32,7 @@ export class UpdateModelBodyDto {
   @IsNotEmpty()
   @ArrayNotEmpty()
   @ValidateNested()
+  @Transform(setPredecessorModelLevelTransformer)
   @Validate(ModelLevelValidator)
   modelLevels: UpdateModelLevelDto[]
 
@@ -50,6 +51,7 @@ export class UpdateModelDto extends UpdateModelBodyDto {
     this.name = updateModelDto.name
     this.year = updateModelDto.year
     this.description = updateModelDto.description
+    this.modelLevels = updateModelDto.modelLevels
   }
 
   id: string

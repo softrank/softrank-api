@@ -41,7 +41,7 @@ export class CreateCommonEntityService {
 
     await this.checkCommonEntityConflicts(createEntityDto)
     const commonEntityToCreate = await this.buildCommonEntity(createEntityDto)
-    const createdCommonEntity = this.manager.save(commonEntityToCreate)
+    const createdCommonEntity = await this.manager.save(commonEntityToCreate)
 
     this.cleanManager()
 

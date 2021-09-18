@@ -25,7 +25,7 @@ export class ModelProcessDto {
     dto.name = modelProcess.name
     dto.initials = modelProcess.initials
     dto.description = modelProcess.description
-    dto.expectedResults = modelProcess.expectedResults.map(ExpectedResultDto.fromEntity)
+    dto.expectedResults = modelProcess.expectedResults?.map(ExpectedResultDto.fromEntity)
 
     return dto
   }

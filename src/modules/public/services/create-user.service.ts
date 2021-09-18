@@ -36,7 +36,7 @@ export class CreateUserService {
 
     await this.verifyUserConflicts(createUserDto.login)
     const userToCreate = this.buildUserEntity(createUserDto)
-    const savedUser = this.manager.save(userToCreate)
+    const savedUser = await this.manager.save(userToCreate)
 
     this.cleanManager()
     return savedUser

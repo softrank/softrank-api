@@ -1,5 +1,6 @@
-import { ArrayNotEmpty, IsNotEmpty, IsString, Validate, ValidateNested } from 'class-validator'
+import { ArrayNotEmpty, IsNotEmpty, IsString, Validate, ValidateNested, IsOptional } from 'class-validator'
 import { ModelExpectedResultValidator, ModelLevelValidator } from '@modules/model/validators'
+import { setPredecessorModelLevelTransformer } from '@modules/model/transformers'
 import { CreateModelProcessDto, CreateModelLevelDto } from '@modules/model/dtos'
 import { dateTransformer } from '@modules/shared/transformers'
 import { Transform, Type } from 'class-transformer'
@@ -32,12 +33,13 @@ export class CreateModelDto {
   @IsNotEmpty()
   @ArrayNotEmpty()
   @ValidateNested()
+  @Transform(setPredecessorModelLevelTransformer)
   @Validate(ModelLevelValidator)
   modelLevels: CreateModelLevelDto[]
 
   @ApiProperty({ type: () => [CreateModelProcessDto] })
   @Type(() => CreateModelProcessDto)
-  @ArrayNotEmpty()
+  @IsOptional()
   @ValidateNested()
   @Validate(ModelExpectedResultValidator)
   modelProcesses: CreateModelProcessDto[]
@@ -48,8 +50,8 @@ export class CreateModelDto {
     entity.name = createModelDto.name
     entity.year = createModelDto.year
     entity.description = createModelDto.description
-    entity.modelLevels = createModelDto.modelLevels.map(CreateModelLevelDto.toEntity)
-    entity.modelProcesses = createModelDto.modelProcesses.map(CreateModelProcessDto.toEntity)
+    entity.modelLevels = createModelDto.modelLevels?.map(CreateModelLevelDto.toEntity)
+    entity.modelProcesses = createModelDto.modelProcesses?.map(CreateModelProcessDto.toEntity)
 
     return entity
   }

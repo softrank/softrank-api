@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsNotEmpty, IsString, ValidateNested } from 'class-validator'
+import { IsNotEmpty, IsString, ValidateNested, IsOptional } from 'class-validator'
 import { CreateExpectedResultDto } from '@modules/model/dtos'
 import { ModelProcess } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
@@ -22,7 +22,7 @@ export class CreateModelProcessDto {
 
   @ApiProperty({ type: () => [CreateExpectedResultDto] })
   @Type(() => CreateExpectedResultDto)
-  @ArrayNotEmpty()
+  @IsOptional()
   @ValidateNested()
   expectedResults: CreateExpectedResultDto[]
 
@@ -32,7 +32,7 @@ export class CreateModelProcessDto {
     entity.initials = createModelProcessDto.initials
     entity.name = createModelProcessDto.name
     entity.description = createModelProcessDto.description
-    entity.expectedResults = createModelProcessDto.expectedResults.map(CreateExpectedResultDto.toEntity)
+    entity.expectedResults = createModelProcessDto.expectedResults?.map(CreateExpectedResultDto.toEntity)
 
     return entity
   }
