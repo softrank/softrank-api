@@ -18,7 +18,7 @@ export class UpdateModelProcessDto {
   @ApiProperty({ example: 'GPR' })
   @IsNotEmpty()
   @IsString()
-  initials: string
+  initial: string
 
   @ApiProperty({ example: 'Define a maturidade de gerencia de projetos' })
   @IsNotEmpty()

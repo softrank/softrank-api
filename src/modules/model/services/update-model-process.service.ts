@@ -69,7 +69,7 @@ export class UpdateModelProcessService {
       where: {
         id: Not(updateModelProcessDto.id),
         name: updateModelProcessDto.name,
-        initials: updateModelProcessDto.initials,
+        initial: updateModelProcessDto.initial,
         model: modelId
       }
     })
@@ -83,7 +83,7 @@ export class UpdateModelProcessService {
     modelProcess: ModelProcess,
     updateModelProcessDto: UpdateModelProcessDto
   ): ModelProcess {
-    modelProcess.initials = updateModelProcessDto.initials
+    modelProcess.initial = updateModelProcessDto.initial
     modelProcess.name = updateModelProcessDto.name
     modelProcess.description = updateModelProcessDto.description
 
