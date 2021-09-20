@@ -7,7 +7,7 @@ export class CreateSchemas1630173474511 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP SCHEMA model')
     await queryRunner.query('DROP SCHEMA evaluator')
+    await queryRunner.query('DROP SCHEMA model')
   }
 }
