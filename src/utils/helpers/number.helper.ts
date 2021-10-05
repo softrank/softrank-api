@@ -1,4 +1,4 @@
 export const cleanNonNumbers = (value: string): string => {
-  const regex = new RegExp(/\D/, 'i')
+  const regex = new RegExp(/\D/, 'g')
   return value?.replace(regex, '')
 }

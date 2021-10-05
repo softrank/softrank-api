@@ -48,10 +48,15 @@ export class CreateCommonEntityService {
     return createdCommonEntity
   }
 
-  private async checkCommonEntityConflicts({ documentNumber, email }: CreateCommonEntityDto): Promise<void | never> {
-    const commonEntity = await this.commonEntityRepository.findOne({
-      where: { documentNumber, email }
-    })
+  private async checkCommonEntityConflicts({
+    documentNumber,
+    email
+  }: CreateCommonEntityDto): Promise<void | never> {
+    const commonEntity = await this.commonEntityRepository
+      .createQueryBuilder('commonEntity')
+      .where('commonEntity.documentNumber = :documentNumber', { documentNumber })
+      .orWhere('commonEntity.email = :email', { email })
+      .getOne()
 
     if (commonEntity) {
       throw new CommonEntityAlreadyExistsError()

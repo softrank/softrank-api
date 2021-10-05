@@ -1,11 +1,11 @@
-import { Column, PrimaryGeneratedColumn, Entity as OrmEntity, OneToOne, JoinColumn } from 'typeorm'
+import { Column, PrimaryColumn, Entity, OneToOne, JoinColumn } from 'typeorm'
 import { DocumentTypeEnum } from '@modules/shared/enums'
 import { cleanNonNumbers } from '@utils/helpers'
 import { User } from '@modules/public/entities'
 
-@OrmEntity({ schema: 'public' })
+@Entity({ schema: 'public' })
 export class CommonEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string
 
   @Column('varchar')
@@ -36,6 +36,6 @@ export class CommonEntity {
   phone: string
 
   @OneToOne(() => User)
-  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'id', referencedColumnName: 'id' })
   user: User
 }

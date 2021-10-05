@@ -1,20 +1,12 @@
-import {
-  ArrayNotEmpty,
-  IsEnum,
-  IsNotEmpty,
-  IsString,
-  Validate,
-  ValidateNested,
-  IsUUID
-} from 'class-validator'
+import { IsEnum, IsNotEmpty, IsNotEmptyObject, IsString, Validate, ValidateNested } from 'class-validator'
 import { DocumentNumberValidator } from '@modules/shared/validators'
-import { CreateEvaluatorLicenseDto } from '@modules/evaluator/dtos'
 import { DocumentTypeEnum } from '@modules/shared/enums'
 import { ApiProperty } from '@nestjs/swagger'
+import { makeFakeCnpj } from '@utils/helpers'
+import { CreateEvaluatorInsitutionAddressDto } from './create-evaluator-institution-address.dto'
 import { Type } from 'class-transformer'
-import { v4 } from 'uuid'
 
-export class CreateEvaluatorDto {
+export class CreateEvaluatorInstitutionDto {
   @ApiProperty({ example: 'Lucas' })
   @IsNotEmpty()
   @IsString()
@@ -25,13 +17,13 @@ export class CreateEvaluatorDto {
   @IsString()
   email: string
 
-  @ApiProperty({ example: '07190909974' })
+  @ApiProperty({ example: makeFakeCnpj() })
   @IsNotEmpty()
   @IsString()
   @Validate(DocumentNumberValidator)
   documentNumber: string
 
-  @ApiProperty({ example: DocumentTypeEnum.F })
+  @ApiProperty({ example: DocumentTypeEnum.J })
   @IsNotEmpty()
   @IsString()
   @IsEnum(DocumentTypeEnum)
@@ -42,14 +34,9 @@ export class CreateEvaluatorDto {
   @IsString()
   phone: string
 
-  @ApiProperty({ example: v4() })
-  @IsNotEmpty()
-  @IsUUID('4')
-  evaluatorInstitutionId: string
-
-  @ApiProperty({ type: () => [CreateEvaluatorLicenseDto] })
-  @Type(() => CreateEvaluatorLicenseDto)
+  @ApiProperty({ type: () => CreateEvaluatorInsitutionAddressDto })
+  @Type(() => CreateEvaluatorInsitutionAddressDto)
   @ValidateNested()
-  @ArrayNotEmpty()
-  licenses: CreateEvaluatorLicenseDto[]
+  @IsNotEmptyObject()
+  address: CreateEvaluatorInsitutionAddressDto
 }

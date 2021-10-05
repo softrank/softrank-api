@@ -1,5 +1,5 @@
 import { UpdateModelLevelDto, UpdateModelProcessDto } from '@modules/model/dtos'
-import { ArrayNotEmpty, IsNotEmpty, IsString, Validate, ValidateNested } from 'class-validator'
+import { ArrayNotEmpty, IsNotEmpty, IsOptional, IsString, Validate, ValidateNested } from 'class-validator'
 import { ModelLevelValidator, ModelExpectedResultValidator } from '@modules/model/validators'
 import { setPredecessorModelLevelTransformer } from '@modules/model/transformers'
 import { dateTransformer } from '@modules/shared/transformers'
@@ -39,6 +39,7 @@ export class UpdateModelBodyDto {
   @ApiProperty({ type: () => [UpdateModelProcessDto] })
   @Type(() => UpdateModelProcessDto)
   @ArrayNotEmpty()
+  @IsOptional()
   @ValidateNested()
   @Validate(ModelExpectedResultValidator)
   modelProcesses: UpdateModelProcessDto[]

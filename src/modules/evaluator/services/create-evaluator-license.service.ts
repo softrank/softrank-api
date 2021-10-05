@@ -1,7 +1,7 @@
-import { EvaluatorLicenseAlreadyExistsError, EvaluatorNotFoundError } from '@modules/evaluator/errors'
 import { EvaluatorLicense, Evaluator } from '@modules/evaluator/entities'
 import { EvaluatorLicenseDto } from '@modules/shared/dtos/evaluator'
 import { CreateEvaluatorLicenseDto } from '@modules/evaluator/dtos'
+import { EvaluatorNotFoundError } from '@modules/evaluator/errors'
 import { ModelLevelNotFoundError } from '@modules/model/errors'
 import { EntityManager, getConnection } from 'typeorm'
 import { ModelLevel } from '@modules/model/entities'
@@ -34,25 +34,16 @@ export class CreateEvaluatorLicenseService {
     this.setManager(manager)
 
     const evaluator = await this.findEvaluatorById(evaluatorId)
-    await this.verifyEvaluatorLicensesConflicts(createEvaluatorLicenseDto)
     const modelLevel = await this.findModelLevelById(createEvaluatorLicenseDto.modelLevelId)
-    const evaluatorLicenseToCreate = this.buildEvaluatorLicenseEntity(createEvaluatorLicenseDto, evaluator, modelLevel)
+    const evaluatorLicenseToCreate = this.buildEvaluatorLicenseEntity(
+      createEvaluatorLicenseDto,
+      evaluator,
+      modelLevel
+    )
     const createdEvaluatorLicense = this.manager.save(evaluatorLicenseToCreate)
 
     this.cleanManager()
     return createdEvaluatorLicense
-  }
-
-  private async verifyEvaluatorLicensesConflicts(
-    createEvaluatorLicenseDto: CreateEvaluatorLicenseDto
-  ): Promise<void | never> {
-    const evaluatorLicense = await this.manager.findOne(EvaluatorLicense, {
-      where: { number: createEvaluatorLicenseDto.number }
-    })
-
-    if (evaluatorLicense) {
-      throw new EvaluatorLicenseAlreadyExistsError()
-    }
   }
 
   private async findModelLevelById(modelLevelId: string): Promise<ModelLevel> {
@@ -83,7 +74,6 @@ export class CreateEvaluatorLicenseService {
     const evaluatorLicense = new EvaluatorLicense()
 
     evaluatorLicense.expiration = createEvaluatorLicenseDto.expiration
-    evaluatorLicense.number = createEvaluatorLicenseDto.number
     evaluatorLicense.isActive = true
     evaluatorLicense.modelLevel = modelLevel
     evaluatorLicense.evaluator = evaluator

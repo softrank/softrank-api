@@ -9,17 +9,21 @@ interface CustomValidatorArguments extends ValidationArguments {
 @ValidatorConstraint()
 export class ModelExpectedResultValidator implements ValidatorConstraintInterface {
   validate(value: CreateModelProcessDto[], { object }: CustomValidatorArguments): boolean {
-    const initialLevels = object.modelLevels.map((modelLevel) => modelLevel.initial.toUpperCase())
-    const isValidMinOrMaxLevel = value?.every((modelProcess) => {
-      const isValidExpectedResult = modelProcess.expectedResults?.every((expectedResult) => {
-        const validMaxLevel = !expectedResult.maxLevel || initialLevels.includes(expectedResult.maxLevel.toUpperCase())
-        const validMinLevel = initialLevels.includes(expectedResult.minLevel.toUpperCase())
+    if (value) {
+      const initialLevels = object.modelLevels.map((modelLevel) => modelLevel.initial.toUpperCase())
+      const isValidMinOrMaxLevel = value?.every((modelProcess) => {
+        const isValidExpectedResult = modelProcess.expectedResults?.every((expectedResult) => {
+          const validMaxLevel =
+            !expectedResult.maxLevel || initialLevels.includes(expectedResult.maxLevel.toUpperCase())
+          const validMinLevel = initialLevels.includes(expectedResult.minLevel.toUpperCase())
 
-        return validMaxLevel && validMinLevel
+          return validMaxLevel && validMinLevel
+        })
+        return isValidExpectedResult
       })
-      return isValidExpectedResult
-    })
-    return isValidMinOrMaxLevel
+      return isValidMinOrMaxLevel
+    }
+    return true
   }
 
   defaultMessage(): string {
