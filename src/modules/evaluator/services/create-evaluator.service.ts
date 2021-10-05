@@ -1,8 +1,9 @@
-import { EvaluatorLicenseAlreadyExistsError } from '@modules/evaluator/errors'
+import { EvaluatorInstitutionNotFoundError } from '@modules/evaluator-institution/errors'
+import { EvaluatorInstitution } from '@modules/evaluator-institution/entities'
 import { Evaluator, EvaluatorLicense } from '@modules/evaluator/entities'
-import { In, Repository, EntityManager, getConnection } from 'typeorm'
 import { CreateCommonEntityService } from '@modules/public/services'
 import { CreateEvaluatorLicenseDto } from '@modules/evaluator/dtos'
+import { Repository, EntityManager, getConnection } from 'typeorm'
 import { ModelLevelNotFoundError } from '@modules/model/errors'
 import { EvaluatorDto } from '@modules/shared/dtos/evaluator'
 import { CreateEvaluatorDto } from '@modules/evaluator/dtos'
@@ -10,13 +11,14 @@ import { CreateCommonEntityDto } from '@modules/public/dtos'
 import { CommonEntity } from '@modules/public/entities'
 import { ModelLevel } from '@modules/model/entities'
 import { InjectRepository } from '@nestjs/typeorm'
+import { EvaluatorAlreadyExistsError } from '../errors'
 
 export class CreateEvaluatorService {
   constructor(
-    @InjectRepository(EvaluatorLicense)
-    private readonly evaluatorLicenseRepository: Repository<EvaluatorLicense>,
     @InjectRepository(ModelLevel)
     private readonly modelLevelRepository: Repository<ModelLevel>,
+    @InjectRepository(EvaluatorInstitution)
+    private readonly evaluatorInstitutionRepository: Repository<EvaluatorInstitution>,
     private readonly createCommonEntityService: CreateCommonEntityService
   ) {}
 
@@ -45,8 +47,9 @@ export class CreateEvaluatorService {
   ): Promise<Evaluator> {
     this.setManager(manager)
 
-    await this.checkEvaluatorLicenseConflicts(createEvaluatorDto)
-    const evaluatorToCreate = await this.buildEvaluatorEntity(createEvaluatorDto, userId)
+    await this.verifyEvaluatorConflicts(createEvaluatorDto)
+    const commonEntity = await this.findCommonEntity(createEvaluatorDto)
+    const evaluatorToCreate = await this.buildEvaluatorEntity(createEvaluatorDto, commonEntity, userId)
     const createdEvaluator = await this.manager.save(evaluatorToCreate)
 
     this.cleanManager()
@@ -54,15 +57,30 @@ export class CreateEvaluatorService {
     return createdEvaluator
   }
 
-  private async checkEvaluatorLicenseConflicts(createEvaluatorDto: CreateEvaluatorDto): Promise<void | never> {
-    const licensesNumber = createEvaluatorDto.licenses.map((license) => license.number)
-    const evaluatorLicense = await this.evaluatorLicenseRepository.findOne({
-      where: { number: In(licensesNumber) }
-    })
+  private async verifyEvaluatorConflicts({
+    email,
+    documentNumber
+  }: CreateEvaluatorDto): Promise<void | never> {
+    const evaluator = await this.manager
+      .createQueryBuilder(Evaluator, 'evaluator')
+      .leftJoin('evaluator.commonEntity', 'commonEntity')
+      .where('commonEntity.documentNumber = :documentNumber', { documentNumber })
+      .orWhere('commonEntity.email = :email', { email })
+      .getOne()
 
-    if (evaluatorLicense) {
-      throw new EvaluatorLicenseAlreadyExistsError()
+    if (evaluator) {
+      throw new EvaluatorAlreadyExistsError()
     }
+  }
+
+  private async findCommonEntity({ email, documentNumber }: CreateEvaluatorDto): Promise<CommonEntity> {
+    const commonEntity = await this.manager
+      .createQueryBuilder(CommonEntity, 'commonEntity')
+      .where('commonEntity.documentNumber = :documentNumber', { documentNumber })
+      .orWhere('commonEntity.email = :email', { email })
+      .getOne()
+
+    return commonEntity
   }
 
   private async findModelLevel(modelLevelId: string): Promise<ModelLevel> {
@@ -77,18 +95,41 @@ export class CreateEvaluatorService {
     return modelLevel
   }
 
-  private async buildEvaluatorEntity(createEvaluatorDto: CreateEvaluatorDto, userId: string): Promise<Evaluator> {
-    const commonEntity = await this.createCommonEntity(createEvaluatorDto, userId)
+  private async findEvaluatorInstitution(evaluatorInstitutionId: string): Promise<EvaluatorInstitution> {
+    const evaluatorInstitution = await this.evaluatorInstitutionRepository.findOne({
+      where: { id: evaluatorInstitutionId }
+    })
+
+    if (!evaluatorInstitution) {
+      throw new EvaluatorInstitutionNotFoundError()
+    }
+
+    return evaluatorInstitution
+  }
+
+  private async buildEvaluatorEntity(
+    createEvaluatorDto: CreateEvaluatorDto,
+    commonEntity: CommonEntity,
+    userId: string
+  ): Promise<Evaluator> {
     const licenses = await this.buildEvaluatorLicences(createEvaluatorDto.licenses)
+    const evaluatorInstitution = await this.findEvaluatorInstitution(
+      createEvaluatorDto.evaluatorInstitutionId
+    )
+
     const evaluator = new Evaluator()
 
     evaluator.licenses = licenses
-    evaluator.commonEntity = commonEntity
+    evaluator.commonEntity = commonEntity || (await this.createCommonEntity(createEvaluatorDto, userId))
+    evaluator.evaluatorInstitution = evaluatorInstitution
 
     return evaluator
   }
 
-  private async createCommonEntity(createEvaluatorDto: CreateEvaluatorDto, userId: string): Promise<CommonEntity> {
+  private async createCommonEntity(
+    createEvaluatorDto: CreateEvaluatorDto,
+    userId: string
+  ): Promise<CommonEntity> {
     const dto = this.transformToCreateCommonEntityDto(createEvaluatorDto, userId)
     const createdCommonEntity = await this.createCommonEntityService.createWithTransaction(dto, this.manager)
 
@@ -97,7 +138,7 @@ export class CreateEvaluatorService {
 
   private transformToCreateCommonEntityDto(
     createEvaluatorDto: CreateEvaluatorDto,
-    userId: string
+    userId?: string
   ): CreateCommonEntityDto {
     const dto = new CreateCommonEntityDto()
 
@@ -119,7 +160,6 @@ export class CreateEvaluatorService {
       const evaluatorLicense = new EvaluatorLicense()
 
       evaluatorLicense.expiration = createEvaluatorLicenseDto.expiration
-      evaluatorLicense.number = createEvaluatorLicenseDto.number
       evaluatorLicense.isActive = true
       evaluatorLicense.modelLevel = modelLevel
 

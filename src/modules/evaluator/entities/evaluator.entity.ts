@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne, ManyToOne } from 'typeorm'
+import { EvaluatorInstitution } from '@modules/evaluator-institution/entities'
 import { EvaluatorLicense } from '@modules/evaluator/entities'
 import { CommonEntity } from '@modules/public/entities'
 
@@ -12,6 +13,10 @@ export class Evaluator {
   licenses: EvaluatorLicense[]
 
   @OneToOne(() => CommonEntity)
-  @JoinColumn({ name: 'CommonEntityId', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'commonEntityId', referencedColumnName: 'id' })
   commonEntity: CommonEntity
+
+  @ManyToOne(() => EvaluatorInstitution, (evaluatorInstitution) => evaluatorInstitution.id)
+  @JoinColumn({ name: 'evaluatorInstitutionId', referencedColumnName: 'id' })
+  evaluatorInstitution: EvaluatorInstitution
 }

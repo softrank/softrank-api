@@ -10,9 +10,6 @@ export class EvaluatorLicense {
   @Column('date')
   expiration: Date
 
-  @Column('varchar')
-  number: string
-
   @Column('bool')
   isActive: boolean
 

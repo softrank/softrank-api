@@ -1,5 +1,11 @@
 import { HttpStatus, HttpException } from '@nestjs/common'
 
+export class EvaluatorAlreadyExistsError extends HttpException {
+  constructor() {
+    super('Evaluator already exists', HttpStatus.CONFLICT)
+  }
+}
+
 export class EvaluatorLicenseAlreadyExistsError extends HttpException {
   constructor() {
     super('Evaluator license already exists', HttpStatus.CONFLICT)

@@ -14,11 +14,6 @@ export class UpdateEvaluatorLicenseDto {
   @IsNotEmpty()
   expiration: Date
 
-  @ApiProperty({ example: '99999999' })
-  @IsNotEmpty()
-  @IsString()
-  number: string
-
   @ApiProperty({ example: v4() })
   @IsNotEmpty()
   @IsString()

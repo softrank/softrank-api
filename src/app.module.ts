@@ -4,6 +4,7 @@ import { ModelModule } from '@modules/model'
 import { Module } from '@nestjs/common'
 import { PublicModule } from '@modules/public/public.module'
 import { EvaluatorModule } from '@modules/evaluator/evaluator.module'
+import { EvaluatorInstitutionModule } from './modules/evaluator-institution/evaluator-institution.module'
 
 @Module({
   imports: [
@@ -12,9 +13,8 @@ import { EvaluatorModule } from '@modules/evaluator/evaluator.module'
     }),
     ModelModule,
     PublicModule,
-    EvaluatorModule
-  ],
-  controllers: [],
-  providers: []
+    EvaluatorModule,
+    EvaluatorInstitutionModule
+  ]
 })
 export class AppModule {}
