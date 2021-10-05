@@ -4,7 +4,6 @@ import { ModelLevelDto } from '@modules/shared/dtos/model'
 export class EvaluatorLicenseDto {
   id: string
   expiration: Date
-  number: string
   isActive: boolean
   modelLevel: ModelLevelDto
 
@@ -13,7 +12,6 @@ export class EvaluatorLicenseDto {
 
     dto.id = evaluatorLicense.id
     dto.expiration = evaluatorLicense.expiration
-    dto.number = evaluatorLicense.number
     dto.isActive = evaluatorLicense.isActive
     dto.modelLevel = ModelLevelDto.fromEntity(evaluatorLicense.modelLevel)
 

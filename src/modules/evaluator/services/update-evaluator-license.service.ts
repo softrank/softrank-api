@@ -30,7 +30,6 @@ export class UpdateEvaluatorLicenseService {
     this.setManager(manager)
 
     const evaluatorLicense = await this.findEvaluatorLicenseById(updateEvaluatorLicenseDto.id)
-    await this.verifyEvaluatorLicensesConflicts(updateEvaluatorLicenseDto)
     const modelLevel = await this.findModelLevelById(updateEvaluatorLicenseDto.modelLevelId)
     const evaluatorLicenseToUpdate = this.updateEvaluatorLicenseData(
       evaluatorLicense,
@@ -56,18 +55,6 @@ export class UpdateEvaluatorLicenseService {
     return evaluatorLicense
   }
 
-  private async verifyEvaluatorLicensesConflicts(
-    updateEvaluatorLicenseDto: UpdateEvaluatorLicenseDto
-  ): Promise<void | never> {
-    const evaluatorLicense = await this.manager.findOne(EvaluatorLicense, {
-      where: { id: Not(updateEvaluatorLicenseDto.id), number: updateEvaluatorLicenseDto.number }
-    })
-
-    if (evaluatorLicense) {
-      throw new EvaluatorLicenseAlreadyExistsError()
-    }
-  }
-
   private async findModelLevelById(modelLevelId: string): Promise<ModelLevel> {
     const modelLevel = await this.manager.findOne(ModelLevel, { where: { id: modelLevelId } })
 
@@ -84,7 +71,6 @@ export class UpdateEvaluatorLicenseService {
     modelLevel: ModelLevel
   ): EvaluatorLicense {
     evaluatorLicense.expiration = updateEvaluatorLicenseDto.expiration
-    evaluatorLicense.number = updateEvaluatorLicenseDto.number
     evaluatorLicense.isActive = true
     evaluatorLicense.modelLevel = modelLevel
 

@@ -118,13 +118,13 @@ export class CreateEvaluatorInstitutionService {
   ): Promise<EvaluatorInstitution> {
     const evaluatorInstitution = new EvaluatorInstitution()
 
-    evaluatorInstitution.id = commonEntity.id
     evaluatorInstitution.addresses = this.buildEvaluatorInstitutionAddressEntity(
       createEvaluatorInstitutionDto.address
     )
     evaluatorInstitution.commonEntity =
       commonEntity || (await this.createCommonEntity(createEvaluatorInstitutionDto, userId))
 
+    evaluatorInstitution.id = evaluatorInstitution.commonEntity.id
     return evaluatorInstitution
   }
 
