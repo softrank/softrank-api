@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn } from 'typeorm'
 import { AuditableEntity } from '@modules/shared/entities'
+import { UserRole } from './user-role.entity'
 
 @Entity({ schema: 'public' })
 export class User extends AuditableEntity {
@@ -14,4 +15,8 @@ export class User extends AuditableEntity {
 
   @Column({ type: 'varchar', nullable: true })
   recoveryToken: string
+
+  @OneToMany(() => UserRole, (userRoles) => userRoles.user)
+  @JoinColumn({ name: 'id', referencedColumnName: 'userId' })
+  roles: UserRole[]
 }

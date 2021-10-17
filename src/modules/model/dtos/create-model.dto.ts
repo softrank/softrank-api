@@ -7,6 +7,7 @@ import { Transform, Type } from 'class-transformer'
 import { Model } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
 import { stringDate } from '@utils/helpers'
+import { ModelManager } from '../entities/model-manager.entity'
 
 export class CreateModelDto {
   @ApiProperty({
@@ -44,7 +45,7 @@ export class CreateModelDto {
   @Validate(ModelExpectedResultValidator)
   modelProcesses: CreateModelProcessDto[]
 
-  static toEntity(createModelDto: CreateModelDto): Model {
+  static toEntity(createModelDto: CreateModelDto, modelManager: ModelManager): Model {
     const entity = new Model()
 
     entity.name = createModelDto.name
@@ -52,6 +53,7 @@ export class CreateModelDto {
     entity.description = createModelDto.description
     entity.modelLevels = createModelDto.modelLevels?.map(CreateModelLevelDto.toEntity)
     entity.modelProcesses = createModelDto.modelProcesses?.map(CreateModelProcessDto.toEntity)
+    entity.modelManager = modelManager
 
     return entity
   }

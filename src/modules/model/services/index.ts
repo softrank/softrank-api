@@ -3,6 +3,7 @@ export * from './create-expected-result.service'
 export * from './create-model-level.service'
 export * from './create-model-process.service'
 export * from './create-model.service'
+export * from './create-model-manager.service'
 
 // get services
 export * from './get-model.service'

@@ -12,23 +12,21 @@ import { CommonEntity } from '@modules/public/entities'
 import { ModelLevel } from '@modules/model/entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { EvaluatorAlreadyExistsError } from '../errors'
+import { EvaluatorStatusEnum } from '../enums'
+import { CreateUserRoleService } from '../../public/services/create-user-role.service'
+import { UserRoleEnum } from '@modules/shared/enums'
+import { ManagedService } from '../../shared/services/managed.service'
 
-export class CreateEvaluatorService {
+export class CreateEvaluatorService extends ManagedService {
   constructor(
     @InjectRepository(ModelLevel)
     private readonly modelLevelRepository: Repository<ModelLevel>,
     @InjectRepository(EvaluatorInstitution)
     private readonly evaluatorInstitutionRepository: Repository<EvaluatorInstitution>,
-    private readonly createCommonEntityService: CreateCommonEntityService
-  ) {}
-
-  private manager: EntityManager
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
+    private readonly createCommonEntityService: CreateCommonEntityService,
+    private readonly createUserRoleService: CreateUserRoleService
+  ) {
+    super()
   }
 
   public async create(createEvaluatorDto: CreateEvaluatorDto, userId: string): Promise<EvaluatorDto> {
@@ -51,6 +49,13 @@ export class CreateEvaluatorService {
     const commonEntity = await this.findCommonEntity(createEvaluatorDto)
     const evaluatorToCreate = await this.buildEvaluatorEntity(createEvaluatorDto, commonEntity, userId)
     const createdEvaluator = await this.manager.save(evaluatorToCreate)
+    await this.createUserRoleService.createWithTransaction(
+      {
+        userId,
+        role: UserRoleEnum.EVALUATOR
+      },
+      this.manager
+    )
 
     this.cleanManager()
 
@@ -119,6 +124,7 @@ export class CreateEvaluatorService {
 
     const evaluator = new Evaluator()
 
+    evaluator.status = EvaluatorStatusEnum.PENDING
     evaluator.licenses = licenses
     evaluator.commonEntity = commonEntity || (await this.createCommonEntity(createEvaluatorDto, userId))
     evaluator.evaluatorInstitution = evaluatorInstitution

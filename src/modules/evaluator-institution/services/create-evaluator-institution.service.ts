@@ -10,19 +10,17 @@ import { CommonEntity } from '@modules/public/entities'
 import { EntityManager, getConnection } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { EvaluatorInstitutionAlreadyExistsError } from '../errors/evaluator-institution.errors'
+import { CreateUserRoleService } from '../../public/services/create-user-role.service'
+import { ManagedService } from '../../shared/services/managed.service'
+import { UserRoleEnum } from '@modules/shared/enums'
 
 @Injectable()
-export class CreateEvaluatorInstitutionService {
-  constructor(private readonly createCommonEntityService: CreateCommonEntityService) {}
-
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
+export class CreateEvaluatorInstitutionService extends ManagedService {
+  constructor(
+    private readonly createCommonEntityService: CreateCommonEntityService,
+    private readonly createUserRoleService: CreateUserRoleService
+  ) {
+    super()
   }
 
   public async create(
@@ -51,6 +49,13 @@ export class CreateEvaluatorInstitutionService {
       userId
     )
     const createdEvaluatorInstitution = await this.manager.save(builtEvaluatorInstitution)
+    await this.createUserRoleService.createWithTransaction(
+      {
+        userId,
+        role: UserRoleEnum.EVALUATOR_INSTITUTION
+      },
+      this.manager
+    )
 
     this.cleanManager()
     return createdEvaluatorInstitution

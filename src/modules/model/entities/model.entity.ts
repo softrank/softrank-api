@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, OneToMany, Unique, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, OneToMany, Unique, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
 import { ModelProcess, ModelLevel } from '@modules/model/entities'
 import { AuditableEntity } from '../../shared/entities/auditable.entity'
+import { ModelManager } from './model-manager.entity'
 
 @Entity({ schema: 'model' })
 @Unique(['name', 'year'])
@@ -24,4 +25,8 @@ export class Model extends AuditableEntity {
   @OneToMany(() => ModelLevel, (modelLevel: ModelLevel) => modelLevel.model, { cascade: true })
   @JoinColumn({ name: 'id', referencedColumnName: 'modelId' })
   modelLevels: ModelLevel[]
+
+  @ManyToOne(() => ModelManager)
+  @JoinColumn({ name: 'modelManagerId', referencedColumnName: 'id' })
+  modelManager: ModelManager
 }
