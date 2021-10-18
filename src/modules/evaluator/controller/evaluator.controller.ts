@@ -8,27 +8,28 @@ import {
   CreateEvaluatorService,
   GetEvaluatorsService,
   GetEvaluatorService,
-  UpdateEvaluatorService
+  UpdateEvaluatorService,
+  EvaluatorMeService
 } from '@modules/evaluator/services'
 import { CreateEvaluatorDto, UpdateEvaluatorBodyDto, UpdateEvaluatorDto } from '@modules/evaluator/dtos'
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 import { AuthorizedUserDto } from '@modules/shared/dtos/public'
 import { EvaluatorDto } from '@modules/shared/dtos/evaluator'
-import { AuthorizationGuard } from '@modules/public/guards'
 import { AuthorizedUser } from '@modules/shared/decorators'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { ApiTags } from '@nestjs/swagger'
 import { uuidParamValidation } from '@utils/validations'
+import { RouteGuards } from '../../shared/decorators/route-guards.decorator'
 
 @Controller('evaluators')
 @ApiTags('Evaluator')
-@UseGuards(AuthorizationGuard)
-@ApiBearerAuth()
+@RouteGuards()
 export class EvaluatorController {
   constructor(
     private readonly createEvaluatorService: CreateEvaluatorService,
     private readonly getEvaluatorsService: GetEvaluatorsService,
     private readonly getEvaluatorService: GetEvaluatorService,
-    private readonly updateEvaluatorService: UpdateEvaluatorService
+    private readonly updateEvaluatorService: UpdateEvaluatorService,
+    private readonly evaluatorMeService: EvaluatorMeService
   ) {}
 
   @Post()
@@ -60,5 +61,10 @@ export class EvaluatorController {
   ): Promise<EvaluatorDto> {
     const updateEvaluadotorDto = new UpdateEvaluatorDto(evaluatorId, updateEvaluatorBodyDto)
     return this.updateEvaluatorService.update(updateEvaluadotorDto)
+  }
+
+  @Get('me')
+  public evaluatorMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorDto> {
+    return this.evaluatorMeService.me(user.id)
   }
 }
