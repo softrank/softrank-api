@@ -1,9 +1,10 @@
-import { DocumentTypeEnum } from '@modules/shared/enums'
+import { DocumentTypeEnum, EntityStatusEnum } from '@modules/shared/enums'
 import { Auditor } from '../../../auditor/entities/auditor.entity'
 
 export class AuditorDto {
   id: string
   name: string
+  status: EntityStatusEnum
   documentNumber: string
   documentType: DocumentTypeEnum
   email: string
@@ -13,6 +14,7 @@ export class AuditorDto {
     const auditorDto = new AuditorDto()
 
     auditorDto.id = auditor.id
+    auditorDto.status = auditor.status
     auditorDto.name = auditor.commonEntity.name
     auditorDto.documentNumber = auditor.commonEntity.documentNumber
     auditorDto.documentType = auditor.commonEntity.documentType
