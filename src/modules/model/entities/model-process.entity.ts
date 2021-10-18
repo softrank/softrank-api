@@ -18,7 +18,9 @@ export class ModelProcess extends AuditableEntity {
   @Column({ type: 'varchar' })
   description: string
 
-  @OneToMany(() => ExpectedResult, (expectedResult: ExpectedResult) => expectedResult.modelProcess, { cascade: true })
+  @OneToMany(() => ExpectedResult, (expectedResult: ExpectedResult) => expectedResult.modelProcess, {
+    cascade: true
+  })
   @JoinColumn({ name: 'id', referencedColumnName: 'modelProcessId' })
   expectedResults: ExpectedResult[]
 

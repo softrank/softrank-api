@@ -6,16 +6,14 @@ import {
 } from '@modules/evaluator-institution/services'
 import { EvaluatorInstitutionDto } from '@modules/shared/dtos/evaluator-institution'
 import { CreateEvaluatorInstitutionDto } from '@modules/evaluator-institution/dtos'
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post } from '@nestjs/common'
 import { AuthorizedUserDto } from '@modules/shared/dtos/public'
 import { AuthorizedUser } from '@modules/shared/decorators'
-import { AuthorizationGuard } from '@modules/public/guards'
-import { ApiBearerAuth } from '@nestjs/swagger'
 import { uuidParamValidation } from '../../../utils/validations/uuid-param.validation'
+import { RouteGuards } from '../../shared/decorators/route-guards.decorator'
 
-@Controller('evaluator-institution')
-@UseGuards(AuthorizationGuard)
-@ApiBearerAuth()
+@Controller('evaluator-institutions')
+@RouteGuards()
 export class EvaluatorInstitutionController {
   constructor(
     private readonly createEvaluatorInstitutionService: CreateEvaluatorInstitutionService,
