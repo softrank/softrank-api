@@ -1,13 +1,17 @@
-import { JoinColumn, OneToOne, PrimaryColumn, Entity, OneToMany } from 'typeorm'
+import { JoinColumn, OneToOne, PrimaryColumn, Entity, OneToMany, Column } from 'typeorm'
 import { EvaluatorInstitutionAddress } from '@modules/evaluator-institution/entities'
 import { AuditableEntity } from '@modules/shared/entities'
 import { CommonEntity } from '@modules/public/entities'
 import { Evaluator } from '@modules/evaluator/entities'
+import { EntityStatusEnum } from '@modules/shared/enums'
 
 @Entity({ schema: 'evaluatorInstitution' })
 export class EvaluatorInstitution extends AuditableEntity {
   @PrimaryColumn('uuid')
   id: string
+
+  @Column('varchar', { default: EntityStatusEnum.PENDING })
+  status: EntityStatusEnum
 
   @OneToMany(
     () => EvaluatorInstitutionAddress,

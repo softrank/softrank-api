@@ -2,15 +2,15 @@ import { Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne, ManyTo
 import { EvaluatorInstitution } from '@modules/evaluator-institution/entities'
 import { EvaluatorLicense } from '@modules/evaluator/entities'
 import { CommonEntity } from '@modules/public/entities'
-import { EvaluatorStatusEnum } from '../enums'
+import { EntityStatusEnum } from '@modules/shared/enums'
 
 @Entity({ schema: 'evaluator' })
 export class Evaluator {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column('varchar')
-  status: EvaluatorStatusEnum
+  @Column('varchar', { default: EntityStatusEnum.PENDING })
+  status: EntityStatusEnum
 
   @OneToMany(() => EvaluatorLicense, (license) => license.evaluator, { cascade: true })
   @JoinColumn({ name: 'id', referencedColumnName: 'evaluatorId' })

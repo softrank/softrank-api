@@ -13,6 +13,7 @@ import { EvaluatorInstitutionAlreadyExistsError } from '../errors/evaluator-inst
 import { CreateUserRoleService } from '../../public/services/create-user-role.service'
 import { ManagedService } from '../../shared/services/managed.service'
 import { UserRoleEnum } from '@modules/shared/enums'
+import { EntityStatusEnum } from '../../shared/enums/entity-status.enum'
 
 @Injectable()
 export class CreateEvaluatorInstitutionService extends ManagedService {
@@ -123,6 +124,7 @@ export class CreateEvaluatorInstitutionService extends ManagedService {
   ): Promise<EvaluatorInstitution> {
     const evaluatorInstitution = new EvaluatorInstitution()
 
+    evaluatorInstitution.status = EntityStatusEnum.PENDING
     evaluatorInstitution.addresses = this.buildEvaluatorInstitutionAddressEntity(
       createEvaluatorInstitutionDto.address
     )

@@ -7,7 +7,7 @@ import { CommonEntity } from '@modules/public/entities'
 import { Auditor } from '../entities/auditor.entity'
 import { AuditorAlreadyExists } from '../errors'
 import { CreateUserRoleService } from '../../public/services/create-user-role.service'
-import { UserRoleEnum } from '@modules/shared/enums'
+import { EntityStatusEnum, UserRoleEnum } from '@modules/shared/enums'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
@@ -90,6 +90,7 @@ export class CreateAuditorService extends ManagedService {
   ): Promise<Auditor> {
     const auditor = new Auditor()
 
+    auditor.status = EntityStatusEnum.PENDING
     auditor.commonEntity = commonEntity || (await this.createCommonEntity(createAuditorDto))
 
     return auditor

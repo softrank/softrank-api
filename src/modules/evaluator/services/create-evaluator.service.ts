@@ -12,10 +12,10 @@ import { CommonEntity } from '@modules/public/entities'
 import { ModelLevel } from '@modules/model/entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { EvaluatorAlreadyExistsError } from '../errors'
-import { EvaluatorStatusEnum } from '../enums'
 import { CreateUserRoleService } from '../../public/services/create-user-role.service'
 import { UserRoleEnum } from '@modules/shared/enums'
 import { ManagedService } from '../../shared/services/managed.service'
+import { EntityStatusEnum } from '../../shared/enums/entity-status.enum'
 
 export class CreateEvaluatorService extends ManagedService {
   constructor(
@@ -124,7 +124,7 @@ export class CreateEvaluatorService extends ManagedService {
 
     const evaluator = new Evaluator()
 
-    evaluator.status = EvaluatorStatusEnum.PENDING
+    evaluator.status = EntityStatusEnum.PENDING
     evaluator.licenses = licenses
     evaluator.commonEntity = commonEntity || (await this.createCommonEntity(createEvaluatorDto, userId))
     evaluator.evaluatorInstitution = evaluatorInstitution
