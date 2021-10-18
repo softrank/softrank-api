@@ -37,15 +37,15 @@ export class EvaluatorInstitutionController {
     return this.listEvaluatorInstitutionsService.list()
   }
 
+  @Get('me')
+  public evaluatorInstitutionMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorInstitutionDto> {
+    return this.evaluatorInstitutionMeService.me(user.id)
+  }
+
   @Get('/:id')
   public findEvaluatorInstitution(
     @Param('id', uuidParamValidation()) evaluatorInstitutionId: string
   ): Promise<EvaluatorInstitutionDto> {
     return this.findEvaluatorInstitutionService.findById(evaluatorInstitutionId)
-  }
-
-  @Get('me')
-  public evaluatorInstitutionMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorInstitutionDto> {
-    return this.evaluatorInstitutionMeService.me(user.id)
   }
 }

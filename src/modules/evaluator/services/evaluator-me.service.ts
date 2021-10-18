@@ -19,7 +19,9 @@ export class EvaluatorMeService {
     const evaluator = await this.evaluatorRepository
       .createQueryBuilder('evaluator')
       .leftJoinAndSelect('evaluator.commonEntity', 'commonEntity')
-      .leftJoinAndSelect('evaluator.commonEntity', 'evaluatorInstitution')
+      .leftJoinAndSelect('evaluator.evaluatorInstitution', 'evaluatorInstitution')
+      .leftJoinAndSelect('evaluator.licenses', 'license')
+      .leftJoinAndSelect('license.modelLevel', 'modelLevel')
       .where('evaluator.id = :evaluatorId', { evaluatorId })
       .getOne()
 

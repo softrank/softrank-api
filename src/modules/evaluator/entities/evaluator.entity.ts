@@ -17,7 +17,7 @@ export class Evaluator {
   licenses: EvaluatorLicense[]
 
   @OneToOne(() => CommonEntity)
-  @JoinColumn({ name: 'commonEntityId', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'id', referencedColumnName: 'id' })
   commonEntity: CommonEntity
 
   @ManyToOne(() => EvaluatorInstitution, (evaluatorInstitution) => evaluatorInstitution.id)

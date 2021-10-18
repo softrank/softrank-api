@@ -47,6 +47,11 @@ export class EvaluatorController {
     return this.getEvaluatorsService.getEvaluators()
   }
 
+  @Get('me')
+  public evaluatorMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorDto> {
+    return this.evaluatorMeService.me(user.id)
+  }
+
   @Get(':id')
   @GetEvaluatorDocumentation()
   public getEvaluator(@Param('id', uuidParamValidation()) evaluatorId: string): Promise<EvaluatorDto> {
@@ -61,10 +66,5 @@ export class EvaluatorController {
   ): Promise<EvaluatorDto> {
     const updateEvaluadotorDto = new UpdateEvaluatorDto(evaluatorId, updateEvaluatorBodyDto)
     return this.updateEvaluatorService.update(updateEvaluadotorDto)
-  }
-
-  @Get('me')
-  public evaluatorMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorDto> {
-    return this.evaluatorMeService.me(user.id)
   }
 }
