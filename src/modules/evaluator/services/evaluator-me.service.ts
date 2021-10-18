@@ -3,7 +3,9 @@ import { Evaluator } from '../entities/evaluator.entity'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { EvaluatorNotFoundError } from '../errors/evaluator.errors'
+import { Injectable } from '@nestjs/common'
 
+@Injectable()
 export class EvaluatorMeService {
   constructor(@InjectRepository(Evaluator) private readonly evaluatorRepository: Repository<Evaluator>) {}
 

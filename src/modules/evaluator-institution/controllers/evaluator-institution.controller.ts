@@ -2,7 +2,8 @@ import { CreateEvaluatorInstitutionDocumentation } from '@modules/evaluator-inst
 import {
   CreateEvaluatorInstitutionService,
   FindEvaluatorInstitution,
-  ListEvaluatorInstitutionsService
+  ListEvaluatorInstitutionsService,
+  EvaluatorInstitutionMeService
 } from '@modules/evaluator-institution/services'
 import { EvaluatorInstitutionDto } from '@modules/shared/dtos/evaluator-institution'
 import { CreateEvaluatorInstitutionDto } from '@modules/evaluator-institution/dtos'
@@ -18,7 +19,8 @@ export class EvaluatorInstitutionController {
   constructor(
     private readonly createEvaluatorInstitutionService: CreateEvaluatorInstitutionService,
     private readonly findEvaluatorInstitutionService: FindEvaluatorInstitution,
-    private readonly listEvaluatorInstitutionsService: ListEvaluatorInstitutionsService
+    private readonly listEvaluatorInstitutionsService: ListEvaluatorInstitutionsService,
+    private readonly evaluatorInstitutionMeService: EvaluatorInstitutionMeService
   ) {}
 
   @Post()
@@ -40,5 +42,10 @@ export class EvaluatorInstitutionController {
     @Param('id', uuidParamValidation()) evaluatorInstitutionId: string
   ): Promise<EvaluatorInstitutionDto> {
     return this.findEvaluatorInstitutionService.findById(evaluatorInstitutionId)
+  }
+
+  @Get('me')
+  public evaluatorInstitutionMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorInstitutionDto> {
+    return this.evaluatorInstitutionMeService.me(user.id)
   }
 }
