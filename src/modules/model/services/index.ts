@@ -7,6 +7,7 @@ export * from './create-model-manager.service'
 
 // get services
 export * from './get-model.service'
+export * from './model-manager-me.service'
 
 // update services
 export * from './update-expected-result.service'

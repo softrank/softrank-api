@@ -8,7 +8,8 @@ import {
   UpdateModelProcessService,
   UpdateModelLevelService,
   UpdateExpectedResultService,
-  CreateModelManagerService
+  CreateModelManagerService,
+  ModelManagerMeService
 } from '@modules/model/services'
 import { ExpectedResult, ModelProcess, ModelLevel, Model } from '@modules/model/entities'
 import { ModelRepository } from '@modules/model/repositories'
@@ -41,7 +42,8 @@ import { ModelManager } from './entities/model-manager.entity'
     UpdateModelProcessService,
     UpdateModelLevelService,
     UpdateExpectedResultService,
-    CreateModelManagerService
+    CreateModelManagerService,
+    ModelManagerMeService
   ],
   exports: [TypeOrmModule]
 })
