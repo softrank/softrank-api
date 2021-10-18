@@ -4,7 +4,8 @@ import { ModelModule } from '@modules/model'
 import { Module } from '@nestjs/common'
 import { PublicModule } from '@modules/public/public.module'
 import { EvaluatorModule } from '@modules/evaluator/evaluator.module'
-import { EvaluatorInstitutionModule } from './modules/evaluator-institution/evaluator-institution.module'
+import { EvaluatorInstitutionModule } from '@modules/evaluator-institution/evaluator-institution.module'
+import { AuditorModule } from '@modules/auditor/auditor.module'
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { EvaluatorInstitutionModule } from './modules/evaluator-institution/eval
     ModelModule,
     PublicModule,
     EvaluatorModule,
-    EvaluatorInstitutionModule
+    EvaluatorInstitutionModule,
+    AuditorModule
   ]
 })
 export class AppModule {}
