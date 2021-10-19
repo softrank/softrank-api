@@ -1,11 +1,10 @@
 import {
   CreateEvaluatorService,
-  GetEvaluatorsService,
-  GetEvaluatorService,
+  FindEvaluatorsService,
+  FindEvaluatorByIdService,
   CreateEvaluatorLicenseService,
   UpdateEvaluatorService,
-  UpdateEvaluatorLicenseService,
-  EvaluatorMeService
+  UpdateEvaluatorLicenseService
 } from '@modules/evaluator/services'
 import { Evaluator, EvaluatorLicense } from '@modules/evaluator/entities'
 import { EvaluatorRepository } from '@modules/evaluator/repositories'
@@ -25,12 +24,11 @@ import { forwardRef, Module } from '@nestjs/common'
   ],
   providers: [
     CreateEvaluatorService,
-    GetEvaluatorsService,
-    GetEvaluatorService,
+    FindEvaluatorsService,
+    FindEvaluatorByIdService,
     CreateEvaluatorLicenseService,
     UpdateEvaluatorService,
-    UpdateEvaluatorLicenseService,
-    EvaluatorMeService
+    UpdateEvaluatorLicenseService
   ],
   controllers: [EvaluatorController],
   exports: [TypeOrmModule]

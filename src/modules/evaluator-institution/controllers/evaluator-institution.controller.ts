@@ -7,11 +7,12 @@ import {
 } from '@modules/evaluator-institution/services'
 import { EvaluatorInstitutionDto } from '@modules/shared/dtos/evaluator-institution'
 import { CreateEvaluatorInstitutionDto } from '@modules/evaluator-institution/dtos'
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
 import { AuthorizedUserDto } from '@modules/shared/dtos/public'
 import { AuthorizedUser } from '@modules/shared/decorators'
 import { uuidParamValidation } from '../../../utils/validations/uuid-param.validation'
 import { RouteGuards } from '../../shared/decorators/route-guards.decorator'
+import { ListEvaluatorInstitutionQueryDto } from '../dtos/list-evaluator-institution-query.dto'
 
 @Controller('evaluator-institutions')
 @RouteGuards()
@@ -33,8 +34,10 @@ export class EvaluatorInstitutionController {
   }
 
   @Get()
-  public listEvaluatorInstitution(): Promise<EvaluatorInstitutionDto[]> {
-    return this.listEvaluatorInstitutionsService.list()
+  public listEvaluatorInstitution(
+    @Query() query: ListEvaluatorInstitutionQueryDto
+  ): Promise<EvaluatorInstitutionDto[]> {
+    return this.listEvaluatorInstitutionsService.list(query)
   }
 
   @Get('me')

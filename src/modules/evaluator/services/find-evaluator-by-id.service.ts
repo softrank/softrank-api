@@ -1,17 +1,16 @@
-import { EvaluatorDto } from '../../shared/dtos/evaluator/evaluator.dto'
-import { Evaluator } from '../entities/evaluator.entity'
+import { EvaluatorNotFoundError } from '@modules/evaluator/errors'
+import { EvaluatorDto } from '@modules/shared/dtos/evaluator'
+import { Evaluator } from '@modules/evaluator/entities'
+import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { EvaluatorNotFoundError } from '../errors/evaluator.errors'
-import { Injectable } from '@nestjs/common'
 
 @Injectable()
-export class EvaluatorMeService {
+export class FindEvaluatorByIdService {
   constructor(@InjectRepository(Evaluator) private readonly evaluatorRepository: Repository<Evaluator>) {}
 
-  public async me(evaluatorId: string): Promise<EvaluatorDto> {
+  public async find(evaluatorId: string): Promise<EvaluatorDto> {
     const evaluator = await this.findEvaluatorById(evaluatorId)
-
     return EvaluatorDto.fromEntity(evaluator)
   }
 

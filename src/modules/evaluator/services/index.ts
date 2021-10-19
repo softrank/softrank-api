@@ -3,9 +3,8 @@ export * from './create-evaluator-license.service'
 export * from './create-evaluator.service'
 
 // get services
-export * from './get-evaluators.service'
-export * from './get-evaluator.service'
-export * from './evaluator-me.service'
+export * from './find-evaluators.service'
+export * from './find-evaluator-by-id.service'
 
 // update services
 export * from './update-evaluator-license.service'

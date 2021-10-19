@@ -8,7 +8,7 @@ import { CreateAuditorService, FindAuditorByIdService, FindAuditorsService } fro
 import { uuidParamValidation } from '../../../utils/validations/uuid-param.validation'
 import { FindAuditorQueryDto } from '../dtos/find-auditors-query.dto'
 
-@Controller('auditor')
+@Controller('auditors')
 @ApiTags('Auditor')
 @RouteGuards()
 export class AuditorController {
