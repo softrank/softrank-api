@@ -172,7 +172,8 @@ export class CreateModelService extends ManagedService {
     createExpectedResultDto: CreateExpectedResultDto,
     model: Model
   ): ExpectedResult {
-    const maxLevel = this.getModelLevelByInitial(model, createExpectedResultDto.maxLevel)
+    const maxLevel =
+      createExpectedResultDto.maxLevel && this.getModelLevelByInitial(model, createExpectedResultDto.maxLevel)
     const minLevel = this.getModelLevelByInitial(model, createExpectedResultDto.minLevel)
     const expectedResult = new ExpectedResult()
 

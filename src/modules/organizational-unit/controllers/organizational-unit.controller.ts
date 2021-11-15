@@ -15,7 +15,6 @@ import { ApiTags } from '@nestjs/swagger'
 
 @Controller('organizational-unit')
 @ApiTags('Organizational Unit')
-@RouteGuards()
 export class OrganizationalUnitController {
   constructor(
     private readonly createOrganizationalUnitService: CreateOrganizationalUnitService,
@@ -23,6 +22,7 @@ export class OrganizationalUnitController {
   ) {}
 
   @Post('')
+  @RouteGuards()
   public createOrganizationalUnit(
     @AuthorizedUser() user: AuthorizedUserDto,
     @Body() createOrganizationalUnitBodyDto: CreateOrganizationalUnitBodyDto

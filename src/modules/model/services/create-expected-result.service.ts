@@ -83,7 +83,9 @@ export class CreateExpectedResultService {
     createExpectedResultDto: CreateExpectedResultDto,
     modelProcess: ModelProcess
   ): ExpectedResult {
-    const maxLevel = this.getModelLevelByInitial(modelProcess.model, createExpectedResultDto.maxLevel)
+    const maxLevel =
+      createExpectedResultDto.maxLevel &&
+      this.getModelLevelByInitial(modelProcess.model, createExpectedResultDto.maxLevel)
     const minLevel = this.getModelLevelByInitial(modelProcess.model, createExpectedResultDto.minLevel)
     const expectedResult = new ExpectedResult()
 

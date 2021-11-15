@@ -26,7 +26,6 @@ import { RouteGuards } from '../../shared/decorators/route-guards.decorator'
 
 @Controller('evaluators')
 @ApiTags('Evaluator')
-@RouteGuards()
 export class EvaluatorController {
   constructor(
     private readonly createEvaluatorService: CreateEvaluatorService,
@@ -36,6 +35,7 @@ export class EvaluatorController {
   ) {}
 
   @Post()
+  @RouteGuards()
   @CreateEvaluatorDcoumentation()
   public createEvaluator(
     @Body() createEvaluatorDto: CreateEvaluatorDto,
@@ -51,6 +51,7 @@ export class EvaluatorController {
   }
 
   @Get('me')
+  @RouteGuards()
   public evaluatorMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorDto> {
     return this.findEvaluatorByIdService.find(user.id)
   }
@@ -62,6 +63,7 @@ export class EvaluatorController {
   }
 
   @Put(':id')
+  @RouteGuards()
   @UpdateEvaluatorDocumentation()
   public updateEvaluator(
     @Param('id', uuidParamValidation()) evaluatorId: string,

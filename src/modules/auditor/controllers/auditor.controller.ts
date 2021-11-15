@@ -10,7 +10,6 @@ import { FindAuditorQueryDto } from '../dtos/find-auditors-query.dto'
 
 @Controller('auditors')
 @ApiTags('Auditor')
-@RouteGuards()
 export class AuditorController {
   constructor(
     private readonly createAuditorService: CreateAuditorService,
@@ -19,6 +18,7 @@ export class AuditorController {
   ) {}
 
   @Post()
+  @RouteGuards()
   public createAuditor(
     @Body() createAuditorBodyDto: CreateAuditorBodyDto,
     @AuthorizedUser() user: AuthorizedUserDto
@@ -33,6 +33,7 @@ export class AuditorController {
   }
 
   @Get('me')
+  @RouteGuards()
   public auditorMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<AuditorDto> {
     return this.findAuditorByIdService.find(user.id)
   }

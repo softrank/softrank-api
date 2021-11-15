@@ -83,7 +83,7 @@ export class GenerateEvaluationIndicatorsService extends ManagedService {
     if (modelLevel) {
       evaluationModelLevels.push(modelLevel)
       if (modelLevel.predecessor) {
-        this.recursiveCall(expectedModelLevel, modelLevels, evaluationModelLevels)
+        evaluationModelLevels.push(...this.recursiveCall(modelLevel, modelLevels, []))
       }
     }
     return evaluationModelLevels

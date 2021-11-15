@@ -13,9 +13,10 @@ import { AuthorizedUser } from '@modules/shared/decorators'
 import { uuidParamValidation } from '../../../utils/validations/uuid-param.validation'
 import { RouteGuards } from '../../shared/decorators/route-guards.decorator'
 import { ListEvaluatorInstitutionQueryDto } from '../dtos/list-evaluator-institution-query.dto'
+import { ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Evaluator Institution')
 @Controller('evaluator-institutions')
-@RouteGuards()
 export class EvaluatorInstitutionController {
   constructor(
     private readonly createEvaluatorInstitutionService: CreateEvaluatorInstitutionService,
@@ -25,6 +26,7 @@ export class EvaluatorInstitutionController {
   ) {}
 
   @Post()
+  @RouteGuards()
   @CreateEvaluatorInstitutionDocumentation()
   public createEvaluatorInstitution(
     @Body() createEvaluatorInstitutionDto: CreateEvaluatorInstitutionDto,
@@ -41,6 +43,7 @@ export class EvaluatorInstitutionController {
   }
 
   @Get('me')
+  @RouteGuards()
   public evaluatorInstitutionMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorInstitutionDto> {
     return this.evaluatorInstitutionMeService.me(user.id)
   }

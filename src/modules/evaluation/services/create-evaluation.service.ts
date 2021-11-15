@@ -129,11 +129,6 @@ export class CreateEvaluationService extends ManagedService {
   }
 
   private verifyEvaluator(evaluator: Evaluator, evaluatorInstitutionId: string): void | never {
-    console.log(
-      evaluator.evaluatorInstitution.id === evaluatorInstitutionId,
-      evaluator.evaluatorInstitution.id,
-      evaluatorInstitutionId
-    )
     if (evaluator.evaluatorInstitution.id !== evaluatorInstitutionId) {
       throw new Error()
     }
