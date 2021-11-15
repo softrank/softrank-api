@@ -1,15 +1,15 @@
-import { UserRoleDto } from './user-role.dto'
-import { User } from '../entities/user.entity'
+import { UserRoleEnum } from '@modules/shared/enums'
+import { User } from '@modules/public/entities'
 
 export class LoginResponseDto {
   authToken: string
-  roles: UserRoleDto[]
+  roles: UserRoleEnum[]
 
   static fromEntity(user: User, authToken: string): LoginResponseDto {
     const loginResponseDto = new LoginResponseDto()
 
     loginResponseDto.authToken = authToken
-    loginResponseDto.roles = user.roles?.map((role) => UserRoleDto.fromEntity(role))
+    loginResponseDto.roles = user.roles?.map((role) => role.role)
 
     return loginResponseDto
   }

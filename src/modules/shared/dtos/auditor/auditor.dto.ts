@@ -1,5 +1,5 @@
 import { DocumentTypeEnum, EntityStatusEnum } from '@modules/shared/enums'
-import { Auditor } from '../../../auditor/entities/auditor.entity'
+import { Auditor } from '@modules/auditor/entities'
 
 export class AuditorDto {
   id: string

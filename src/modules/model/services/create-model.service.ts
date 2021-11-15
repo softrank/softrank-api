@@ -14,6 +14,7 @@ import { ModelProcess } from '../entities/model-process.entity'
 import { CreateExpectedResultDto } from '../dtos/create-expected-result.dto'
 import { ExpectedResult } from '../entities/expected-result.entity'
 import { ModelNotFoundError } from '../errors/model-not-found.error'
+import { ModelLevelNotFoundError } from '../errors/model-level.errors'
 
 @Injectable()
 export class CreateModelService extends ManagedService {
@@ -27,17 +28,20 @@ export class CreateModelService extends ManagedService {
   }
 
   public async create(createModelDto: CreateModelDto, userId: string): Promise<ModelDto> {
-    return await getConnection().transaction(async (manager: EntityManager) => {
+    const model = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithManager(createModelDto, userId, manager)
     })
+
+    return ModelDto.fromEntity(model)
   }
 
   public async createWithManager(
     createModelDto: CreateModelDto,
     userId: string,
     manager: EntityManager
-  ): Promise<ModelDto> {
+  ): Promise<Model> {
     this.setManager(manager)
+
     const modelManager = await this.findModelManagerById(userId)
     await this.checkModelConflicts(createModelDto)
     const model = await this.createModel(createModelDto, modelManager)
@@ -46,16 +50,17 @@ export class CreateModelService extends ManagedService {
       await this.createModelLevel(createModelDto.modelLevels, model)
     }
 
+    const modelWithLevels = await this.findFullModelById(model.id)
+
     if (createModelDto?.modelProcesses?.length) {
-      await this.createModelProcesses(createModelDto.modelProcesses, model)
+      await this.createModelProcesses(createModelDto.modelProcesses, modelWithLevels)
     }
 
     const savedModel = await this.findFullModelById(model.id)
-    const modelDto = this.mapToDto(savedModel)
 
     this.cleanManager()
 
-    return modelDto
+    return savedModel
   }
 
   private async findFullModelById(modelId: string): Promise<Model> {
@@ -64,6 +69,8 @@ export class CreateModelService extends ManagedService {
       .leftJoinAndSelect('model.modelLevels', 'modelLevel')
       .leftJoinAndSelect('model.modelProcesses', 'modelProcess')
       .leftJoinAndSelect('modelProcess.expectedResults', 'expectedResult')
+      .leftJoinAndSelect('expectedResult.maxLevel', 'maxLevel')
+      .leftJoinAndSelect('expectedResult.minLevel', 'minLevel')
       .where('model.id = :modelId', { modelId })
       .getOne()
 
@@ -144,30 +151,48 @@ export class CreateModelService extends ManagedService {
     modelProcess.model = model
 
     if (createModelProcessDto?.expectedResults?.length) {
-      modelProcess.expectedResults = this.createExpectedResults(createModelProcessDto.expectedResults)
+      modelProcess.expectedResults = this.createExpectedResults(createModelProcessDto.expectedResults, model)
     }
 
     return modelProcess
   }
 
-  private createExpectedResults(createExpectedResultDtos: CreateExpectedResultDto[]): ExpectedResult[] {
+  private createExpectedResults(
+    createExpectedResultDtos: CreateExpectedResultDto[],
+    model: Model
+  ): ExpectedResult[] {
     const expectedResultsToCreate = createExpectedResultDtos.map((createExpectedResultDto) => {
-      return this.buildExpectedResultEntity(createExpectedResultDto)
+      return this.buildExpectedResultEntity(createExpectedResultDto, model)
     })
 
     return expectedResultsToCreate
   }
 
-  private buildExpectedResultEntity(createExpectedResultDto: CreateExpectedResultDto): ExpectedResult {
+  private buildExpectedResultEntity(
+    createExpectedResultDto: CreateExpectedResultDto,
+    model: Model
+  ): ExpectedResult {
+    const maxLevel = this.getModelLevelByInitial(model, createExpectedResultDto.maxLevel)
+    const minLevel = this.getModelLevelByInitial(model, createExpectedResultDto.minLevel)
     const expectedResult = new ExpectedResult()
 
     expectedResult.initial = createExpectedResultDto.initial
     expectedResult.name = createExpectedResultDto.name
     expectedResult.description = createExpectedResultDto.description
-    expectedResult.maxLevel = createExpectedResultDto.maxLevel
-    expectedResult.minLevel = createExpectedResultDto.minLevel
+    expectedResult.maxLevel = maxLevel
+    expectedResult.minLevel = minLevel
 
     return expectedResult
+  }
+
+  private getModelLevelByInitial(model: Model, initial: string): ModelLevel {
+    const modelLevel = model?.modelLevels?.find((modelLevel) => modelLevel.initial === initial)
+
+    if (!modelLevel) {
+      throw new ModelLevelNotFoundError()
+    }
+
+    return modelLevel
   }
 
   private buildModelEntity(createModelDto: CreateModelDto, modelManager: ModelManager): Model {
@@ -179,10 +204,5 @@ export class CreateModelService extends ManagedService {
     model.modelManager = modelManager
 
     return model
-  }
-
-  private mapToDto(model: Model): ModelDto {
-    const modelDto = ModelDto.fromEntity(model)
-    return modelDto
   }
 }

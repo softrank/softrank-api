@@ -39,7 +39,7 @@ export class UpdateModelProcessService {
 
     const modelProcess = await this.findModelProcessById(updateModelProcessDto.id)
     await this.verifyModelProcessConflicts(updateModelProcessDto, modelProcess.model.id)
-    const modelProcessToUpdate = this.updateModelProcessData(modelProcess, modelProcess)
+    const modelProcessToUpdate = this.updateModelProcessData(modelProcess, updateModelProcessDto)
     const updatedModelProcess = await this.manager.save(modelProcessToUpdate)
     await this.createOrUpdateExpectedResults(updateModelProcessDto)
 

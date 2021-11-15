@@ -3,13 +3,13 @@ import { User } from '../entities'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserNotFoundError } from '../errors/user.errors'
-import { UserRoleDto } from '../dtos/user-role.dto'
+import { UserRoleEnum } from '@modules/shared/enums'
 
 @Injectable()
 export class UserMeService {
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
-  public async me(userId: string): Promise<UserRoleDto[]> {
+  public async me(userId: string): Promise<UserRoleEnum[]> {
     const user = await this.findUserById(userId)
     const mappedRoles = this.mapToDto(user)
 
@@ -29,7 +29,7 @@ export class UserMeService {
     return user
   }
 
-  private mapToDto(user: User): UserRoleDto[] {
-    return user.roles.map((role) => UserRoleDto.fromEntity(role))
+  private mapToDto(user: User): UserRoleEnum[] {
+    return user.roles.map((role) => role.role)
   }
 }

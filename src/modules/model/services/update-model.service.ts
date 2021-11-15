@@ -1,4 +1,8 @@
-import { CreateModelLevelService, UpdateModelProcessService, CreateModelProcessService } from '@modules/model/services'
+import {
+  CreateModelLevelService,
+  UpdateModelProcessService,
+  CreateModelProcessService
+} from '@modules/model/services'
 import { ModelNameAlreadyExistsError, ModelNotFoundError } from '@modules/model/errors'
 import { UpdateModelLevelService } from '@modules/model/services'
 import { ModelRepository } from '@modules/model/repositories'
@@ -82,7 +86,11 @@ export class UpdateModelService {
       if (modelLevelDto.id) {
         return this.updateModelLevelService.updateWithTransaction(modelLevelDto, this.manager)
       }
-      return this.createModelLevelService.createWithTransaction(modelLevelDto, updateModelDto.id, this.manager)
+      return this.createModelLevelService.createWithTransaction(
+        modelLevelDto,
+        updateModelDto.id,
+        this.manager
+      )
     })
 
     if (promises?.length) {
@@ -95,7 +103,11 @@ export class UpdateModelService {
       if (modelProcessDto.id) {
         return this.updateModelProcessService.updateWithTransaction(modelProcessDto, this.manager)
       }
-      return this.createModelProcessService.createWithTransaction(modelProcessDto, updateModelDto.id, this.manager)
+      return this.createModelProcessService.createWithTransaction(
+        modelProcessDto,
+        updateModelDto.id,
+        this.manager
+      )
     })
 
     if (promises?.length) {

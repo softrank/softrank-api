@@ -27,6 +27,7 @@ export class UpdateModelProcessDto {
 
   @ApiProperty({ type: () => [UpdateExpectedResultDto] })
   @Type(() => UpdateExpectedResultDto)
+  @IsOptional()
   @ArrayNotEmpty()
   @ValidateNested()
   expectedResults: UpdateExpectedResultDto[]

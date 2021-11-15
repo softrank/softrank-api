@@ -44,17 +44,4 @@ export class CreateModelDto {
   @ValidateNested()
   @Validate(ModelExpectedResultValidator)
   modelProcesses: CreateModelProcessDto[]
-
-  static toEntity(createModelDto: CreateModelDto, modelManager: ModelManager): Model {
-    const entity = new Model()
-
-    entity.name = createModelDto.name
-    entity.year = createModelDto.year
-    entity.description = createModelDto.description
-    entity.modelLevels = createModelDto.modelLevels?.map(CreateModelLevelDto.toEntity)
-    entity.modelProcesses = createModelDto.modelProcesses?.map(CreateModelProcessDto.toEntity)
-    entity.modelManager = modelManager
-
-    return entity
-  }
 }

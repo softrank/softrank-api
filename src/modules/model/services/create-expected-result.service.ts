@@ -5,6 +5,9 @@ import { EntityManager, getConnection } from 'typeorm'
 import { ExpectedResult } from '@modules/model/entities'
 import { ModelProcess } from '../entities/model-process.entity'
 import { ModelProcessNotFoundError } from '../errors/model-process.errors'
+import { Model } from '../entities/model.entity'
+import { ModelLevel } from '../entities/model-level.entity'
+import { ModelLevelNotFoundError } from '../errors/model-level.errors'
 
 export class CreateExpectedResultService {
   private manager: EntityManager
@@ -45,7 +48,12 @@ export class CreateExpectedResultService {
   }
 
   private async findExpectedResultById(modelProcessId: string): Promise<ModelProcess> {
-    const modelProcess = await this.manager.findOne(ModelProcess, { where: { id: modelProcessId } })
+    const modelProcess = await this.manager
+      .createQueryBuilder(ModelProcess, 'modelProcess')
+      .leftJoinAndSelect('modelProcess.model', 'model')
+      .leftJoinAndSelect('model.modelLevels', 'modelLevel')
+      .where('modelProcess.id = :modelProcessId', { modelProcessId })
+      .getOne()
 
     if (!modelProcess) {
       throw new ModelProcessNotFoundError()
@@ -75,16 +83,28 @@ export class CreateExpectedResultService {
     createExpectedResultDto: CreateExpectedResultDto,
     modelProcess: ModelProcess
   ): ExpectedResult {
+    const maxLevel = this.getModelLevelByInitial(modelProcess.model, createExpectedResultDto.maxLevel)
+    const minLevel = this.getModelLevelByInitial(modelProcess.model, createExpectedResultDto.minLevel)
     const expectedResult = new ExpectedResult()
 
     expectedResult.initial = createExpectedResultDto.initial
     expectedResult.name = createExpectedResultDto.name
-    expectedResult.maxLevel = createExpectedResultDto.maxLevel
-    expectedResult.minLevel = createExpectedResultDto.minLevel
+    expectedResult.maxLevel = maxLevel
+    expectedResult.minLevel = minLevel
     expectedResult.description = createExpectedResultDto.description
     expectedResult.modelProcess = modelProcess
 
     return expectedResult
+  }
+
+  private getModelLevelByInitial(model: Model, initial: string): ModelLevel {
+    const modelLevel = model?.modelLevels?.find((modelLevel) => modelLevel.initial === initial)
+
+    if (!modelLevel) {
+      throw new ModelLevelNotFoundError()
+    }
+
+    return modelLevel
   }
 
   private transformToExpectedResultDto(expectedResult: ExpectedResult): ExpectedResultDto {

@@ -25,15 +25,4 @@ export class CreateModelProcessDto {
   @IsOptional()
   @ValidateNested()
   expectedResults: CreateExpectedResultDto[]
-
-  static toEntity(createModelProcessDto: CreateModelProcessDto): ModelProcess {
-    const entity = new ModelProcess()
-
-    entity.initial = createModelProcessDto.initial
-    entity.name = createModelProcessDto.name
-    entity.description = createModelProcessDto.description
-    entity.expectedResults = createModelProcessDto.expectedResults?.map(CreateExpectedResultDto.toEntity)
-
-    return entity
-  }
 }

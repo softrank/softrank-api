@@ -2,23 +2,17 @@ import { ModelProcessAlreadyExistsError, ModelNotFoundError } from '@modules/mod
 import { Model } from '@modules/model/entities/model.entity'
 import { ModelProcessDto } from '@modules/shared/dtos/model'
 import { CreateModelProcessDto } from '@modules/model/dtos'
+import { ManagedService } from '@modules/shared/services'
 import { EntityManager, getConnection } from 'typeorm'
 import { ModelProcess } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
-export class CreateModelProcessService {
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
-  public async create(createModelProcessDto: CreateModelProcessDto, modelId: string): Promise<ModelProcessDto> {
+export class CreateModelProcessService extends ManagedService {
+  public async create(
+    createModelProcessDto: CreateModelProcessDto,
+    modelId: string
+  ): Promise<ModelProcessDto> {
     const createdModelProcess = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createModelProcessDto, modelId, manager)
     })
@@ -33,11 +27,13 @@ export class CreateModelProcessService {
     manager: EntityManager
   ): Promise<ModelProcess> {
     this.setManager(manager)
+
     const model = await this.findModelById(modelId)
     await this.verifyModelProcessConflicts(createModelProcessDto, modelId)
     const modelProcessToCreate = this.buildModelProcessData(createModelProcessDto, model)
     const createdModelProcess = await this.manager.save(modelProcessToCreate)
     await this.createOrCreateExpectedResults(createModelProcessDto)
+
     this.cleanManager()
 
     return createdModelProcess
