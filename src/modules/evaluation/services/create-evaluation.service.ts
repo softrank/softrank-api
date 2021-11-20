@@ -17,6 +17,11 @@ import { EvaluationMemberType } from '../enums/evaluation-member-type.enum'
 import { ModelLevel } from '@modules/model/entities'
 import { ModelLevelNotFoundError } from '../../model/errors/model-level.errors'
 import { GenerateEvaluationIndicatorsService } from './generate-evaluation-indicators.service'
+import { EvaluationDto } from '../../shared/dtos/evaluation/evaluation.dto'
+import { ModelLevelDto } from '@modules/shared/dtos/model'
+import { OrganizationalUnitDto } from '@modules/shared/dtos/organizational-unit'
+import { EvaluationMemberDto } from '@modules/shared/dtos/evaluation'
+import { CommonEntity } from '../../public/entities/entity.entity'
 
 @Injectable()
 export class CreateEvaluationService extends ManagedService {
@@ -27,17 +32,20 @@ export class CreateEvaluationService extends ManagedService {
     private readonly organizationalUnitRepository: OrganizationalUnitRepository,
     @InjectRepository(ModelLevel)
     private readonly modelLevelRepository: Repository<ModelLevel>,
-    private readonly generateEvaluationIndicatorsService: GenerateEvaluationIndicatorsService
+    private readonly generateEvaluationIndicatorsService: GenerateEvaluationIndicatorsService,
+    @InjectRepository(CommonEntity)
+    private readonly commonEntityRepository: Repository<CommonEntity>
   ) {
     super()
   }
 
-  public async create(createEvaluationServiceDto: CreateEvaluationServiceDto): Promise<any> {
+  public async create(createEvaluationServiceDto: CreateEvaluationServiceDto): Promise<EvaluationDto> {
     const evaluation = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createEvaluationServiceDto, manager)
     })
 
-    return evaluation
+    const evaluationDto = this.transformToEvaluationDto(evaluation)
+    return evaluationDto
   }
 
   public async createWithTransaction(
@@ -210,5 +218,45 @@ export class CreateEvaluationService extends ManagedService {
     evaluationMember.memberId = memberId
 
     return evaluationMember
+  }
+
+  private async transformToEvaluationDto(evaluation: Evaluation): Promise<EvaluationDto> {
+    const evaluationDto = new EvaluationDto()
+    const membersPromises = evaluation.evaluationMembers.map((member) => {
+      return this.transformToEvaluationMemberDto(member)
+    })
+
+    const resolvedMember = await Promise.all(membersPromises)
+
+    evaluationDto.id = evaluation.id
+    evaluationDto.expectedModelLevel = ModelLevelDto.fromEntity(evaluation.expectedModelLevel)
+    evaluationDto.orgranizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
+    evaluationDto.members = resolvedMember
+
+    return evaluationDto
+  }
+
+  private async transformToEvaluationMemberDto(
+    evaluationMember: EvaluationMember
+  ): Promise<EvaluationMemberDto> {
+    const evaluationMemberDto = new EvaluationMemberDto()
+    const commonEntity = await this.getCommonEntity(evaluationMember.memberId)
+
+    evaluationMemberDto.id = evaluationMember.id
+    evaluationMemberDto.memberId = evaluationMember.memberId
+    evaluationMemberDto.type = evaluationMember.type
+    evaluationMemberDto.name = commonEntity.name
+
+    return evaluationMemberDto
+  }
+
+  private async getCommonEntity(memberId: string): Promise<CommonEntity> {
+    const commonEntity = await this.commonEntityRepository
+      .createQueryBuilder('commonEntity')
+      .where('commonEntity.id = :memberId')
+      .setParameters({ memberId })
+      .getOne()
+
+    return commonEntity
   }
 }

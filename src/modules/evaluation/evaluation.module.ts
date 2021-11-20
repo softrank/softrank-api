@@ -7,6 +7,8 @@ import { EvaluatorModule } from '../evaluator/evaluator.module'
 import { EvaluationController } from './controllers/evaluation.controller'
 import { OrganizationalUnitModule } from '../organizational-unit/organizational-unit.module'
 import { PublicModule } from '../public/public.module'
+import { IndicatorFile } from './entities/indicator-files.entity'
+import { FindEvaluationIndicatorsService } from './services/find-evaluation-indicators.service'
 import {
   Evaluation,
   EvaluationIndicators,
@@ -24,7 +26,8 @@ import {
       EvaluationMember,
       ExpectedResultIndicator,
       Indicator,
-      IndicatorProject
+      IndicatorProject,
+      IndicatorFile
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
@@ -33,7 +36,7 @@ import {
     forwardRef(() => OrganizationalUnitModule)
   ],
   controllers: [EvaluationController],
-  providers: [CreateEvaluationService, GenerateEvaluationIndicatorsService],
+  providers: [CreateEvaluationService, GenerateEvaluationIndicatorsService, FindEvaluationIndicatorsService],
   exports: [TypeOrmModule]
 })
 export class EvaluationModule {}
