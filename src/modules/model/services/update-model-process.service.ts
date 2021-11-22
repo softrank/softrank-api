@@ -13,16 +13,6 @@ export class UpdateModelProcessService {
     private readonly updateExpectedResultService: UpdateExpectedResultService
   ) {}
 
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async update(updateModelProcessDto: UpdateModelProcessDto): Promise<ModelProcessDto> {
     const updatedModelProcess = await getConnection().transaction((manager: EntityManager) => {
       return this.updateWithTransaction(updateModelProcessDto, manager)
@@ -35,21 +25,17 @@ export class UpdateModelProcessService {
     updateModelProcessDto: UpdateModelProcessDto,
     manager: EntityManager
   ): Promise<ModelProcess> {
-    this.setManager(manager)
-
-    const modelProcess = await this.findModelProcessById(updateModelProcessDto.id)
-    await this.verifyModelProcessConflicts(updateModelProcessDto, modelProcess.model.id)
+    const modelProcess = await this.findModelProcessById(updateModelProcessDto.id, manager)
+    await this.verifyModelProcessConflicts(updateModelProcessDto, modelProcess.model.id, manager)
     const modelProcessToUpdate = this.updateModelProcessData(modelProcess, updateModelProcessDto)
-    const updatedModelProcess = await this.manager.save(modelProcessToUpdate)
-    await this.createOrUpdateExpectedResults(updateModelProcessDto)
-
-    this.cleanManager()
+    const updatedModelProcess = await manager.save(modelProcessToUpdate)
+    await this.createOrUpdateExpectedResults(updateModelProcessDto, manager)
 
     return updatedModelProcess
   }
 
-  private async findModelProcessById(modelProcessId: string): Promise<ModelProcess> {
-    const modelProcess = await this.manager.findOne(ModelProcess, {
+  private async findModelProcessById(modelProcessId: string, manager: EntityManager): Promise<ModelProcess> {
+    const modelProcess = await manager.findOne(ModelProcess, {
       where: { id: modelProcessId },
       relations: ['model']
     })
@@ -63,9 +49,10 @@ export class UpdateModelProcessService {
 
   private async verifyModelProcessConflicts(
     updateModelProcessDto: UpdateModelProcessDto,
-    modelId: string
+    modelId: string,
+    manager: EntityManager
   ): Promise<void | never> {
-    const modelProcess = await this.manager.findOne(ModelProcess, {
+    const modelProcess = await manager.findOne(ModelProcess, {
       where: {
         id: Not(updateModelProcessDto.id),
         name: updateModelProcessDto.name,
@@ -90,15 +77,18 @@ export class UpdateModelProcessService {
     return modelProcess
   }
 
-  private async createOrUpdateExpectedResults(updateModelProcessDto: UpdateModelProcessDto): Promise<void> {
+  private async createOrUpdateExpectedResults(
+    updateModelProcessDto: UpdateModelProcessDto,
+    manager: EntityManager
+  ): Promise<void> {
     const promises = updateModelProcessDto.expectedResults.map((expectedResultDto) => {
       if (expectedResultDto.id) {
-        return this.updateExpectedResultService.updateWithTransaction(expectedResultDto, this.manager)
+        return this.updateExpectedResultService.updateWithTransaction(expectedResultDto, manager)
       }
       return this.createExpectedResultService.createWithTransaction(
         expectedResultDto,
         updateModelProcessDto.id,
-        this.manager
+        manager
       )
     })
 

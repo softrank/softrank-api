@@ -5,7 +5,9 @@ interface CustomTransformFnParams extends TransformFnParams {
   value: CreateModelLevelDto[]
 }
 
-export const setPredecessorModelLevelTransformer = ({ value }: CustomTransformFnParams): CreateModelLevelDto[] => {
+export const setPredecessorModelLevelTransformer = ({
+  value
+}: CustomTransformFnParams): CreateModelLevelDto[] => {
   if (value?.length) {
     return value.map((modelLevel, index, array) => {
       modelLevel.predecessor = array[index + 1]?.initial

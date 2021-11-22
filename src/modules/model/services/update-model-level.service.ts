@@ -7,16 +7,6 @@ import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class UpdateModelLevelService {
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async update(updateModelLevelDto: UpdateModelLevelDto): Promise<ModelLevelDto> {
     const updatedModelLevel = await getConnection().transaction((manager: EntityManager) => {
       return this.updateWithTransaction(updateModelLevelDto, manager)
@@ -29,19 +19,16 @@ export class UpdateModelLevelService {
     updateModelLevelDto: UpdateModelLevelDto,
     manager: EntityManager
   ): Promise<ModelLevel> {
-    this.setManager(manager)
-
-    const modelLevel = await this.findModelLevelById(updateModelLevelDto.id)
-    await this.checkModelLevelConflicts(updateModelLevelDto, modelLevel.model.id)
+    const modelLevel = await this.findModelLevelById(updateModelLevelDto.id, manager)
+    await this.checkModelLevelConflicts(updateModelLevelDto, modelLevel.model.id, manager)
     const modelLevelToUpdate = this.updateModelLevelData(modelLevel, updateModelLevelDto)
-    const updatedModelLevel = await this.manager.save(modelLevelToUpdate)
+    const updatedModelLevel = await manager.save(modelLevelToUpdate)
 
-    this.cleanManager()
     return updatedModelLevel
   }
 
-  private async findModelLevelById(modelLevelId: string): Promise<ModelLevel> {
-    const modelLevel = await this.manager.findOne(ModelLevel, {
+  private async findModelLevelById(modelLevelId: string, manager: EntityManager): Promise<ModelLevel> {
+    const modelLevel = await manager.findOne(ModelLevel, {
       where: { id: modelLevelId },
       relations: ['model']
     })
@@ -55,9 +42,10 @@ export class UpdateModelLevelService {
 
   private async checkModelLevelConflicts(
     updateModelLevelDto: UpdateModelLevelDto,
-    modelId: string
+    modelId: string,
+    manager: EntityManager
   ): Promise<void | never> {
-    const conflictedModelLevel = await this.manager.findOne(ModelLevel, {
+    const conflictedModelLevel = await manager.findOne(ModelLevel, {
       where: {
         id: Not(updateModelLevelDto.id),
         initial: updateModelLevelDto.initial,

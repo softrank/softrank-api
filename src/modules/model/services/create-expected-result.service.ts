@@ -10,16 +10,6 @@ import { ModelLevel } from '../entities/model-level.entity'
 import { ModelLevelNotFoundError } from '../errors/model-level.errors'
 
 export class CreateExpectedResultService {
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async create(
     createExpectedResultDto: CreateExpectedResultDto,
     modelProcessId: string
@@ -37,18 +27,19 @@ export class CreateExpectedResultService {
     modelProcessId: string,
     manager: EntityManager
   ): Promise<ExpectedResult> {
-    this.setManager(manager)
-    const modelProcess = await this.findExpectedResultById(modelProcessId)
-    await this.verifyExpectedResultConflicts(createExpectedResultDto, modelProcessId)
+    const modelProcess = await this.findExpectedResultById(modelProcessId, manager)
+    await this.verifyExpectedResultConflicts(createExpectedResultDto, modelProcessId, manager)
     const expectedResultToCreate = this.buildExpectedResultData(createExpectedResultDto, modelProcess)
-    const createdExpectedResult = await this.manager.save(expectedResultToCreate)
-    this.cleanManager()
+    const createdExpectedResult = await manager.save(expectedResultToCreate)
 
     return createdExpectedResult
   }
 
-  private async findExpectedResultById(modelProcessId: string): Promise<ModelProcess> {
-    const modelProcess = await this.manager
+  private async findExpectedResultById(
+    modelProcessId: string,
+    manager: EntityManager
+  ): Promise<ModelProcess> {
+    const modelProcess = await manager
       .createQueryBuilder(ModelProcess, 'modelProcess')
       .leftJoinAndSelect('modelProcess.model', 'model')
       .leftJoinAndSelect('model.modelLevels', 'modelLevel')
@@ -64,9 +55,10 @@ export class CreateExpectedResultService {
 
   private async verifyExpectedResultConflicts(
     createExpectedResultDto: CreateExpectedResultDto,
-    modelProcessId: string
+    modelProcessId: string,
+    manager: EntityManager
   ): Promise<void | never> {
-    const expectedResult = await this.manager.findOne(ExpectedResult, {
+    const expectedResult = await manager.findOne(ExpectedResult, {
       where: {
         initial: createExpectedResultDto.initial,
         name: createExpectedResultDto.name,

@@ -8,7 +8,7 @@ import { ModelProcess } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
-export class CreateModelProcessService extends ManagedService {
+export class CreateModelProcessService {
   public async create(
     createModelProcessDto: CreateModelProcessDto,
     modelId: string
@@ -26,21 +26,17 @@ export class CreateModelProcessService extends ManagedService {
     modelId: string,
     manager: EntityManager
   ): Promise<ModelProcess> {
-    this.setManager(manager)
-
-    const model = await this.findModelById(modelId)
-    await this.verifyModelProcessConflicts(createModelProcessDto, modelId)
+    const model = await this.findModelById(modelId, manager)
+    await this.verifyModelProcessConflicts(createModelProcessDto, modelId, manager)
     const modelProcessToCreate = this.buildModelProcessData(createModelProcessDto, model)
-    const createdModelProcess = await this.manager.save(modelProcessToCreate)
+    const createdModelProcess = await manager.save(modelProcessToCreate)
     await this.createOrCreateExpectedResults(createModelProcessDto)
-
-    this.cleanManager()
 
     return createdModelProcess
   }
 
-  private async findModelById(modelId: string): Promise<Model> {
-    const model = await this.manager.findOne(Model, { where: { id: modelId } })
+  private async findModelById(modelId: string, manager: EntityManager): Promise<Model> {
+    const model = await manager.findOne(Model, { where: { id: modelId } })
 
     if (!model) {
       throw new ModelNotFoundError()
@@ -51,9 +47,10 @@ export class CreateModelProcessService extends ManagedService {
 
   private async verifyModelProcessConflicts(
     createModelProcessDto: CreateModelProcessDto,
-    modelId: string
+    modelId: string,
+    manager: EntityManager
   ): Promise<void | never> {
-    const modelProcess = await this.manager.findOne(ModelProcess, {
+    const modelProcess = await manager.findOne(ModelProcess, {
       where: {
         name: createModelProcessDto.name,
         initial: createModelProcessDto.initial,
