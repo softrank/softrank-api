@@ -2,7 +2,7 @@ import { AuthorizedUser, RouteGuards } from '@modules/shared/decorators'
 import { Body, Controller, Get, Post, Param, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { AuditorDto } from '../../shared/dtos/auditor/auditor.dto'
-import { CreateAuditorBodyDto, CreateAuditorDto } from '../dtos/create-auditor.dto'
+import { CreateAuditorDto } from '../dtos/create-auditor.dto'
 import { AuthorizedUserDto } from '../../shared/dtos/public/authorized-user.dto'
 import { CreateAuditorService, FindAuditorByIdService, FindAuditorsService } from '../services'
 import { uuidParamValidation } from '../../../utils/validations/uuid-param.validation'
@@ -18,13 +18,8 @@ export class AuditorController {
   ) {}
 
   @Post()
-  @RouteGuards()
-  public createAuditor(
-    @Body() createAuditorBodyDto: CreateAuditorBodyDto,
-    @AuthorizedUser() user: AuthorizedUserDto
-  ): Promise<AuditorDto> {
-    const createAuditorDto = new CreateAuditorDto(user.id, createAuditorBodyDto)
-    return this.createAuditorService.create(createAuditorDto)
+  public createAuditor(@Body() createAuditorBodyDto: CreateAuditorDto): Promise<AuditorDto> {
+    return this.createAuditorService.create(createAuditorBodyDto)
   }
 
   @Get()

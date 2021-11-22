@@ -5,15 +5,16 @@ import { CommonEntity, User } from '@modules/public/entities'
 import { CreateCommonEntityDto } from '@modules/public/dtos'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
+import { AuditableEntity } from '../../shared/entities/auditable.entity'
 
 @Injectable()
-export class CreateCommonEntityService {
+export class CreateCommonEntityService extends AuditableEntity {
   constructor(
     @InjectRepository(CommonEntity)
-    private readonly commonEntityRepository: Repository<CommonEntity>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>
-  ) {}
+    private readonly commonEntityRepository: Repository<CommonEntity>
+  ) {
+    super()
+  }
 
   private manager: EntityManager
   private setManager(manager: EntityManager): void {
@@ -42,7 +43,6 @@ export class CreateCommonEntityService {
     await this.checkCommonEntityConflicts(createEntityDto)
     const commonEntityToCreate = await this.buildCommonEntity(createEntityDto)
     const createdCommonEntity = await this.manager.save(commonEntityToCreate)
-
     this.cleanManager()
 
     return createdCommonEntity
@@ -78,7 +78,7 @@ export class CreateCommonEntityService {
 
   private async findUserById(userId?: string): Promise<User> {
     if (userId) {
-      const user = await this.userRepository.findOne({ where: { id: userId } })
+      const user = await this.manager.findOne(User, { where: { id: userId } })
 
       if (!user) {
         throw new UserNotFoundError()

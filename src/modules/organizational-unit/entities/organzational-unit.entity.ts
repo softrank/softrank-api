@@ -13,10 +13,11 @@ export class OrganizationalUnit {
 
   @OneToMany(
     () => OrganizationalUnitProject,
-    (organizationalUnitProject) => organizationalUnitProject.organizationalUnit
+    (organizationalUnitProject) => organizationalUnitProject.organizationalUnit,
+    { cascade: true }
   )
   @JoinColumn({ name: 'id', referencedColumnName: 'organizationalUnitId' })
-  organizationalUnitProjects: OrganizationalUnitProject[]
+  projects: OrganizationalUnitProject[]
 
   @OneToOne(() => CommonEntity, (commonEntity) => commonEntity.id)
   @JoinColumn({ name: 'id', referencedColumnName: 'id' })

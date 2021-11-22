@@ -35,13 +35,9 @@ export class EvaluatorController {
   ) {}
 
   @Post()
-  @RouteGuards()
   @CreateEvaluatorDcoumentation()
-  public createEvaluator(
-    @Body() createEvaluatorDto: CreateEvaluatorDto,
-    @AuthorizedUser() user: AuthorizedUserDto
-  ): Promise<EvaluatorDto> {
-    return this.createEvaluatorService.create(createEvaluatorDto, user.id)
+  public createEvaluator(@Body() createEvaluatorDto: CreateEvaluatorDto): Promise<EvaluatorDto> {
+    return this.createEvaluatorService.create(createEvaluatorDto)
   }
 
   @Get()

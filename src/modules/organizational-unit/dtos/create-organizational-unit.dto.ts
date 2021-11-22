@@ -1,9 +1,11 @@
-import { IsNotEmpty, IsString, Validate, IsEnum } from 'class-validator'
+import { IsNotEmpty, IsString, Validate, IsEnum, IsOptional } from 'class-validator'
 import { DocumentNumberValidator } from '@modules/shared/validators'
 import { DocumentTypeEnum } from '@modules/shared/enums'
 import { ApiProperty } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
+import { cleanNonNumberTransformer } from '@modules/shared/transformers'
 
-export class CreateOrganizationalUnitBodyDto {
+export class CreateOrganizationalUnitDto {
   @ApiProperty({ example: 'Lucas' })
   @IsNotEmpty()
   @IsString()
@@ -17,6 +19,7 @@ export class CreateOrganizationalUnitBodyDto {
   @ApiProperty({ example: '07190909974' })
   @IsNotEmpty()
   @IsString()
+  @Transform(cleanNonNumberTransformer)
   @Validate(DocumentNumberValidator)
   documentNumber: string
 
@@ -30,19 +33,14 @@ export class CreateOrganizationalUnitBodyDto {
   @IsNotEmpty()
   @IsString()
   phone: string
-}
 
-export class CreateOrganizationalUnitDto extends CreateOrganizationalUnitBodyDto {
-  constructor(userId: string, createOrganizationalUnitBodyDto: CreateOrganizationalUnitBodyDto) {
-    super()
+  @ApiProperty({ example: ['Projeto 1'] })
+  @IsOptional()
+  @IsString({ each: true })
+  projects: string[]
 
-    this.userId = userId
-    this.documentNumber = createOrganizationalUnitBodyDto.documentNumber
-    this.documentType = createOrganizationalUnitBodyDto.documentType
-    this.email = createOrganizationalUnitBodyDto.email
-    this.name = createOrganizationalUnitBodyDto.name
-    this.phone = createOrganizationalUnitBodyDto.phone
-  }
-
-  userId: string
+  @ApiProperty({ example: 'dificil123' })
+  @IsNotEmpty()
+  @IsString()
+  password: string
 }

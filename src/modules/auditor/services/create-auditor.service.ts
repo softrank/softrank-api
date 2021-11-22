@@ -9,12 +9,17 @@ import { AuditorAlreadyExists } from '../errors'
 import { CreateUserRoleService } from '../../public/services/create-user-role.service'
 import { EntityStatusEnum, UserRoleEnum } from '@modules/shared/enums'
 import { Injectable } from '@nestjs/common'
+import { CommonEntityAlreadyExistsError } from '../../public/errors/common-entity.errors'
+import { CreateUserDto } from '../../public/dtos/create-user.dto'
+import { User } from '../../public/entities/user.entity'
+import { CreateUserService } from '../../public/services/create-user.service'
 
 @Injectable()
 export class CreateAuditorService extends ManagedService {
   constructor(
     private readonly createCommonEntityService: CreateCommonEntityService,
-    private readonly createUserRoleService: CreateUserRoleService
+    private readonly createUserRoleService: CreateUserRoleService,
+    private readonly createUserService: CreateUserService
   ) {
     super()
   }
@@ -34,16 +39,9 @@ export class CreateAuditorService extends ManagedService {
     this.setManager(manager)
 
     await this.verifyAuditorConflicts(createAuditorDto)
-    const commonEntity = await this.findCommonEntity(createAuditorDto)
-    const auditor = await this.buildAuditorEntity(createAuditorDto, commonEntity)
+    const commonEntity = await this.verifyCommonEntity(createAuditorDto)
+    const auditor = await this.buildAuditorEntity(createAuditorDto)
     const createdAuditor = await this.manager.save(auditor)
-    await this.createUserRoleService.createWithTransaction(
-      {
-        userId: createAuditorDto.userId,
-        role: UserRoleEnum.AUDITOR
-      },
-      this.manager
-    )
 
     this.cleanManager()
     return createdAuditor
@@ -64,7 +62,7 @@ export class CreateAuditorService extends ManagedService {
     }
   }
 
-  private async findCommonEntity(createAuditorDto: CreateAuditorDto): Promise<CommonEntity> {
+  private async verifyCommonEntity(createAuditorDto: CreateAuditorDto): Promise<void> {
     const commonEntity = await this.manager
       .createQueryBuilder(CommonEntity, 'commonEntity')
       .where('commonEntity.documentNumber = :documentNumber', {
@@ -73,26 +71,57 @@ export class CreateAuditorService extends ManagedService {
       .orWhere('commonEntity.email = :email', { email: createAuditorDto.email })
       .getOne()
 
-    return commonEntity
+    if (commonEntity) {
+      throw new CommonEntityAlreadyExistsError()
+    }
   }
 
-  private async createCommonEntity(createAuditorDto: CreateAuditorDto): Promise<CommonEntity> {
+  private async createCommonEntity(
+    createAuditorDto: CreateAuditorDto,
+    userId: string
+  ): Promise<CommonEntity> {
     const commonEntity = await this.createCommonEntityService.createWithTransaction(
-      createAuditorDto,
+      { ...createAuditorDto, userId },
       this.manager
     )
     return commonEntity
   }
 
-  private async buildAuditorEntity(
-    createAuditorDto: CreateAuditorDto,
-    commonEntity: CommonEntity
-  ): Promise<Auditor> {
+  private async buildAuditorEntity(createAuditorDto: CreateAuditorDto): Promise<Auditor> {
+    const user = await this.createUser(createAuditorDto)
+    const commonEntity = await this.createCommonEntity(createAuditorDto, user.id)
     const auditor = new Auditor()
 
     auditor.status = EntityStatusEnum.PENDING
-    auditor.commonEntity = commonEntity || (await this.createCommonEntity(createAuditorDto))
+    auditor.commonEntity = commonEntity
 
     return auditor
+  }
+
+  private async createUser(createAuditorDto: CreateAuditorDto): Promise<User> {
+    const createUserDto = this.buildCreateUserDto(createAuditorDto)
+    const user = await this.createUserService.createWithTransaction(createUserDto, this.manager)
+    await this.createUserRole(user.id)
+
+    return user
+  }
+
+  private async createUserRole(userId: string): Promise<void> {
+    await this.createUserRoleService.createWithTransaction(
+      {
+        role: UserRoleEnum.AUDITOR,
+        userId
+      },
+      this.manager
+    )
+  }
+
+  private buildCreateUserDto(createAuditorDto: CreateAuditorDto): CreateUserDto {
+    const createUserDto = new CreateUserDto()
+
+    createUserDto.login = createAuditorDto.email
+    createUserDto.password = createAuditorDto.password
+
+    return createUserDto
   }
 }

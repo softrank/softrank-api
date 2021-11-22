@@ -41,7 +41,10 @@ export class UpdateModelLevelService {
   }
 
   private async findModelLevelById(modelLevelId: string): Promise<ModelLevel> {
-    const modelLevel = await this.manager.findOne(ModelLevel, { where: { id: modelLevelId }, relations: ['model'] })
+    const modelLevel = await this.manager.findOne(ModelLevel, {
+      where: { id: modelLevelId },
+      relations: ['model']
+    })
 
     if (!modelLevel) {
       throw new ModelLevelNotFoundError()

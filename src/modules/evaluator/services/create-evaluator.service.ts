@@ -16,6 +16,10 @@ import { CreateUserRoleService } from '../../public/services/create-user-role.se
 import { UserRoleEnum } from '@modules/shared/enums'
 import { ManagedService } from '../../shared/services/managed.service'
 import { EntityStatusEnum } from '../../shared/enums/entity-status.enum'
+import { CommonEntityAlreadyExistsError } from '../../public/errors/common-entity.errors'
+import { CreateUserDto } from '../../public/dtos/create-user.dto'
+import { User } from '../../public/entities/user.entity'
+import { CreateUserService } from '../../public/services/create-user.service'
 
 export class CreateEvaluatorService extends ManagedService {
   constructor(
@@ -24,14 +28,15 @@ export class CreateEvaluatorService extends ManagedService {
     @InjectRepository(EvaluatorInstitution)
     private readonly evaluatorInstitutionRepository: Repository<EvaluatorInstitution>,
     private readonly createCommonEntityService: CreateCommonEntityService,
-    private readonly createUserRoleService: CreateUserRoleService
+    private readonly createUserRoleService: CreateUserRoleService,
+    private readonly createUserService: CreateUserService
   ) {
     super()
   }
 
-  public async create(createEvaluatorDto: CreateEvaluatorDto, userId: string): Promise<EvaluatorDto> {
+  public async create(createEvaluatorDto: CreateEvaluatorDto): Promise<EvaluatorDto> {
     const createdEvaluator = await getConnection().transaction((manager: EntityManager) => {
-      return this.createWithTransaction(createEvaluatorDto, userId, manager)
+      return this.createWithTransaction(createEvaluatorDto, manager)
     })
 
     const evaluator = this.transformToEvaluatorDto(createdEvaluator)
@@ -40,22 +45,14 @@ export class CreateEvaluatorService extends ManagedService {
 
   public async createWithTransaction(
     createEvaluatorDto: CreateEvaluatorDto,
-    userId: string,
     manager: EntityManager
   ): Promise<Evaluator> {
     this.setManager(manager)
 
     await this.verifyEvaluatorConflicts(createEvaluatorDto)
-    const commonEntity = await this.findCommonEntity(createEvaluatorDto)
-    const evaluatorToCreate = await this.buildEvaluatorEntity(createEvaluatorDto, commonEntity, userId)
+    await this.verifyCommonEntity(createEvaluatorDto)
+    const evaluatorToCreate = await this.buildEvaluatorEntity(createEvaluatorDto)
     const createdEvaluator = await this.manager.save(evaluatorToCreate)
-    await this.createUserRoleService.createWithTransaction(
-      {
-        userId,
-        role: UserRoleEnum.EVALUATOR
-      },
-      this.manager
-    )
 
     this.cleanManager()
 
@@ -78,14 +75,16 @@ export class CreateEvaluatorService extends ManagedService {
     }
   }
 
-  private async findCommonEntity({ email, documentNumber }: CreateEvaluatorDto): Promise<CommonEntity> {
+  private async verifyCommonEntity({ email, documentNumber }: CreateEvaluatorDto): Promise<void> {
     const commonEntity = await this.manager
       .createQueryBuilder(CommonEntity, 'commonEntity')
       .where('commonEntity.documentNumber = :documentNumber', { documentNumber })
       .orWhere('commonEntity.email = :email', { email })
       .getOne()
 
-    return commonEntity
+    if (commonEntity) {
+      throw new CommonEntityAlreadyExistsError()
+    }
   }
 
   private async findModelLevel(modelLevelId: string): Promise<ModelLevel> {
@@ -112,34 +111,56 @@ export class CreateEvaluatorService extends ManagedService {
     return evaluatorInstitution
   }
 
-  private async buildEvaluatorEntity(
-    createEvaluatorDto: CreateEvaluatorDto,
-    commonEntity: CommonEntity,
-    userId: string
-  ): Promise<Evaluator> {
+  private async buildEvaluatorEntity(createEvaluatorDto: CreateEvaluatorDto): Promise<Evaluator> {
     const licenses = await this.buildEvaluatorLicences(createEvaluatorDto.licenses)
     const evaluatorInstitution = await this.findEvaluatorInstitution(
       createEvaluatorDto.evaluatorInstitutionId
     )
+    const commonEntity = await this.createCommonEntity(createEvaluatorDto)
 
     const evaluator = new Evaluator()
 
     evaluator.status = EntityStatusEnum.PENDING
     evaluator.licenses = licenses
-    evaluator.commonEntity = commonEntity || (await this.createCommonEntity(createEvaluatorDto, userId))
+    evaluator.commonEntity = commonEntity
     evaluator.evaluatorInstitution = evaluatorInstitution
 
     return evaluator
   }
 
-  private async createCommonEntity(
-    createEvaluatorDto: CreateEvaluatorDto,
-    userId: string
-  ): Promise<CommonEntity> {
-    const dto = this.transformToCreateCommonEntityDto(createEvaluatorDto, userId)
+  private async createCommonEntity(createEvaluatorDto: CreateEvaluatorDto): Promise<CommonEntity> {
+    const user = await this.createUser(createEvaluatorDto)
+    const dto = this.transformToCreateCommonEntityDto(createEvaluatorDto, user.id)
     const createdCommonEntity = await this.createCommonEntityService.createWithTransaction(dto, this.manager)
 
     return createdCommonEntity
+  }
+
+  private async createUser(createEvaluatorDto: CreateEvaluatorDto): Promise<User> {
+    const createUserDto = this.buildCreateUserDto(createEvaluatorDto)
+    const user = await this.createUserService.createWithTransaction(createUserDto, this.manager)
+    await this.createUserRole(user.id)
+
+    return user
+  }
+
+  private async createUserRole(userId: string): Promise<void> {
+    await this.createUserRoleService.createWithTransaction(
+      {
+        role: UserRoleEnum.EVALUATOR,
+        userId
+      },
+      this.manager
+    )
+  }
+
+  private buildCreateUserDto(createEvaluatorDto: CreateEvaluatorDto): CreateUserDto {
+    const createUserDto = new CreateUserDto()
+
+    createUserDto.login = createEvaluatorDto.email
+    createUserDto.password = createEvaluatorDto.password
+
+    return createUserDto
   }
 
   private transformToCreateCommonEntityDto(

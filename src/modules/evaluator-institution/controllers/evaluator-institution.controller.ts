@@ -26,13 +26,11 @@ export class EvaluatorInstitutionController {
   ) {}
 
   @Post()
-  @RouteGuards()
   @CreateEvaluatorInstitutionDocumentation()
   public createEvaluatorInstitution(
-    @Body() createEvaluatorInstitutionDto: CreateEvaluatorInstitutionDto,
-    @AuthorizedUser() user: AuthorizedUserDto
+    @Body() createEvaluatorInstitutionDto: CreateEvaluatorInstitutionDto
   ): Promise<EvaluatorInstitutionDto> {
-    return this.createEvaluatorInstitutionService.create(createEvaluatorInstitutionDto, user.id)
+    return this.createEvaluatorInstitutionService.create(createEvaluatorInstitutionDto)
   }
 
   @Get()

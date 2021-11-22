@@ -2,8 +2,10 @@ import { IsNotEmpty, IsString, Validate, IsEnum } from 'class-validator'
 import { DocumentNumberValidator } from '@modules/shared/validators'
 import { DocumentTypeEnum } from '@modules/shared/enums'
 import { ApiProperty } from '@nestjs/swagger'
+import { cleanNonNumberTransformer } from '@modules/shared/transformers'
+import { Transform } from 'class-transformer'
 
-export class CreateModelManagerBodyDto {
+export class CreateModelManagerDto {
   @ApiProperty({ example: 'Lucas' })
   @IsNotEmpty()
   @IsString()
@@ -17,6 +19,7 @@ export class CreateModelManagerBodyDto {
   @ApiProperty({ example: '07190909974' })
   @IsNotEmpty()
   @IsString()
+  @Transform(cleanNonNumberTransformer)
   @Validate(DocumentNumberValidator)
   documentNumber: string
 
@@ -30,19 +33,9 @@ export class CreateModelManagerBodyDto {
   @IsNotEmpty()
   @IsString()
   phone: string
-}
 
-export class CreateModelManagerDto extends CreateModelManagerBodyDto {
-  constructor(userId: string, createModelManagerBodyDto: CreateModelManagerBodyDto) {
-    super()
-
-    this.userId = userId
-    this.documentNumber = createModelManagerBodyDto.documentNumber
-    this.documentType = createModelManagerBodyDto.documentType
-    this.email = createModelManagerBodyDto.email
-    this.name = createModelManagerBodyDto.name
-    this.phone = createModelManagerBodyDto.phone
-  }
-
-  userId: string
+  @ApiProperty({ example: 'dificil123' })
+  @IsNotEmpty()
+  @IsString()
+  password: string
 }

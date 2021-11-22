@@ -4,7 +4,8 @@ import { DocumentTypeEnum } from '@modules/shared/enums'
 import { ApiProperty } from '@nestjs/swagger'
 import { makeFakeCnpj } from '@utils/helpers'
 import { CreateEvaluatorInsitutionAddressDto } from './create-evaluator-institution-address.dto'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
+import { cleanNonNumberTransformer } from '@modules/shared/transformers'
 
 export class CreateEvaluatorInstitutionDto {
   @ApiProperty({ example: 'Lucas' })
@@ -20,6 +21,7 @@ export class CreateEvaluatorInstitutionDto {
   @ApiProperty({ example: makeFakeCnpj() })
   @IsNotEmpty()
   @IsString()
+  @Transform(cleanNonNumberTransformer)
   @Validate(DocumentNumberValidator)
   documentNumber: string
 
@@ -33,6 +35,11 @@ export class CreateEvaluatorInstitutionDto {
   @IsNotEmpty()
   @IsString()
   phone: string
+
+  @ApiProperty({ example: 'dificil123' })
+  @IsNotEmpty()
+  @IsString()
+  password: string
 
   @ApiProperty({ type: () => CreateEvaluatorInsitutionAddressDto })
   @Type(() => CreateEvaluatorInsitutionAddressDto)

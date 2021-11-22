@@ -11,8 +11,9 @@ import { DocumentNumberValidator } from '@modules/shared/validators'
 import { CreateEvaluatorLicenseDto } from '@modules/evaluator/dtos'
 import { DocumentTypeEnum } from '@modules/shared/enums'
 import { ApiProperty } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import { v4 } from 'uuid'
+import { cleanNonNumberTransformer } from '@modules/shared/transformers'
 
 export class CreateEvaluatorDto {
   @ApiProperty({ example: 'Lucas' })
@@ -28,6 +29,7 @@ export class CreateEvaluatorDto {
   @ApiProperty({ example: '07190909974' })
   @IsNotEmpty()
   @IsString()
+  @Transform(cleanNonNumberTransformer)
   @Validate(DocumentNumberValidator)
   documentNumber: string
 
@@ -41,6 +43,11 @@ export class CreateEvaluatorDto {
   @IsNotEmpty()
   @IsString()
   phone: string
+
+  @ApiProperty({ example: 'dificil123' })
+  @IsNotEmpty()
+  @IsString()
+  password: string
 
   @ApiProperty({ example: v4() })
   @IsNotEmpty()
