@@ -2,13 +2,14 @@ import { ModelProcessAlreadyExistsError, ModelNotFoundError } from '@modules/mod
 import { Model } from '@modules/model/entities/model.entity'
 import { ModelProcessDto } from '@modules/shared/dtos/model'
 import { CreateModelProcessDto } from '@modules/model/dtos'
-import { ManagedService } from '@modules/shared/services'
 import { EntityManager, getConnection } from 'typeorm'
 import { ModelProcess } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
+import { CreateExpectedResultService } from './create-expected-result.service'
 
 @Injectable()
 export class CreateModelProcessService {
+  constructor(private readonly createExpectedResultService: CreateExpectedResultService) {}
   public async create(
     createModelProcessDto: CreateModelProcessDto,
     modelId: string
@@ -30,7 +31,7 @@ export class CreateModelProcessService {
     await this.verifyModelProcessConflicts(createModelProcessDto, modelId, manager)
     const modelProcessToCreate = this.buildModelProcessData(createModelProcessDto, model)
     const createdModelProcess = await manager.save(modelProcessToCreate)
-    await this.createOrCreateExpectedResults(createModelProcessDto)
+    await this.createOrUpdateExpectedResults(createdModelProcess.id, createModelProcessDto, manager)
 
     return createdModelProcess
   }
@@ -74,8 +75,18 @@ export class CreateModelProcessService {
     return modelProcess
   }
 
-  private async createOrCreateExpectedResults(createModelProcessDto: CreateModelProcessDto): Promise<void> {
-    createModelProcessDto
+  private async createOrUpdateExpectedResults(
+    modelProcessId: string,
+    createModelProcessDto: CreateModelProcessDto,
+    manager: EntityManager
+  ): Promise<void> {
+    const expectedResultPromises = createModelProcessDto.expectedResults?.map((expectedResult) => {
+      return this.createExpectedResultService.createWithTransaction(expectedResult, modelProcessId, manager)
+    })
+
+    if (expectedResultPromises?.length) {
+      await Promise.all(expectedResultPromises)
+    }
   }
 
   private transformToCreateModelProcessDto(modelProcess: ModelProcess): ModelProcessDto {

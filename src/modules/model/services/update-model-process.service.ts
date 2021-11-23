@@ -81,7 +81,7 @@ export class UpdateModelProcessService {
     updateModelProcessDto: UpdateModelProcessDto,
     manager: EntityManager
   ): Promise<void> {
-    const promises = updateModelProcessDto.expectedResults.map((expectedResultDto) => {
+    const promises = updateModelProcessDto.expectedResults?.map((expectedResultDto) => {
       if (expectedResultDto.id) {
         return this.updateExpectedResultService.updateWithTransaction(expectedResultDto, manager)
       }
