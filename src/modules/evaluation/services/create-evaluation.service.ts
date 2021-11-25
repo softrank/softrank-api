@@ -1,6 +1,5 @@
 import { EntityManager, getConnection, Repository } from 'typeorm'
 import { CreateEvaluationServiceDto, VerifiedCreateEvaluationDto } from '../dtos'
-import { ManagedService } from '../../shared/services/managed.service'
 import { Evaluator } from '@modules/evaluator/entities'
 import { EvaluatorRepository } from '../../evaluator/repositories/evaluator.repository'
 import { Injectable } from '@nestjs/common'
@@ -24,7 +23,7 @@ import { EvaluationMemberDto } from '@modules/shared/dtos/evaluation'
 import { CommonEntity } from '../../public/entities/entity.entity'
 
 @Injectable()
-export class CreateEvaluationService extends ManagedService {
+export class CreateEvaluationService {
   constructor(
     private readonly evaluatorRepository: EvaluatorRepository,
     @InjectRepository(Auditor)
@@ -35,9 +34,7 @@ export class CreateEvaluationService extends ManagedService {
     private readonly generateEvaluationIndicatorsService: GenerateEvaluationIndicatorsService,
     @InjectRepository(CommonEntity)
     private readonly commonEntityRepository: Repository<CommonEntity>
-  ) {
-    super()
-  }
+  ) {}
 
   public async create(createEvaluationServiceDto: CreateEvaluationServiceDto): Promise<EvaluationDto> {
     const evaluation = await getConnection().transaction((manager: EntityManager) => {
@@ -52,14 +49,11 @@ export class CreateEvaluationService extends ManagedService {
     createEvaluationServiceDto: CreateEvaluationServiceDto,
     manager: EntityManager
   ): Promise<Evaluation> {
-    this.setManager(manager)
-
     const verifiedCreateEvaluation = await this.buildVerifiedCreateEvaluationDto(createEvaluationServiceDto)
     const evaluationEntity = this.buildEvaluationEntity(verifiedCreateEvaluation)
-    const evaluation = await this.manager.save(evaluationEntity)
-    await this.generateEvaluationIndicatorsService.generateWithTransaction(evaluation.id, this.manager)
+    const evaluation = await manager.save(evaluationEntity)
+    await this.generateEvaluationIndicatorsService.generateWithTransaction(evaluation.id, manager)
 
-    this.cleanManager()
     return evaluation
   }
 
@@ -73,7 +67,7 @@ export class CreateEvaluationService extends ManagedService {
     )
     const evaluatorsAdjuncts = await this.findEvaluatorAdjuncts(
       createEvaluationServiceDto.evaluatorsIds,
-      createEvaluationServiceDto.implementationInstitutionId
+      createEvaluationServiceDto.evaluatorInstitutionId
     )
     const organizationalUnit = await this.findOrganizationalUnitById(
       createEvaluationServiceDto.organizationalUnitId
@@ -82,6 +76,11 @@ export class CreateEvaluationService extends ManagedService {
 
     const verifiedCreateEvaluationDto = new VerifiedCreateEvaluationDto()
 
+    verifiedCreateEvaluationDto.name = createEvaluationServiceDto.name
+    verifiedCreateEvaluationDto.start = createEvaluationServiceDto.start
+    verifiedCreateEvaluationDto.end = createEvaluationServiceDto.end
+    verifiedCreateEvaluationDto.implementationInstitution =
+      createEvaluationServiceDto.implementationInstitution
     verifiedCreateEvaluationDto.auditor = auditor
     verifiedCreateEvaluationDto.evaluatorLeader = evaluatorLeader
     verifiedCreateEvaluationDto.evaluatorsAdjuncts = evaluatorsAdjuncts
@@ -159,6 +158,7 @@ export class CreateEvaluationService extends ManagedService {
   private async findOrganizationalUnitById(organizationalUnitId: string): Promise<OrganizationalUnit> {
     const organizationalUnit = await this.organizationalUnitRepository
       .createQueryBuilder('organizationalUnit')
+      .leftJoinAndSelect('organizationalUnit.commonEntity', 'commonEntity')
       .where('organizationalUnit.id = :organizationalUnitId')
       .setParameters({ organizationalUnitId })
       .getOne()
@@ -174,6 +174,10 @@ export class CreateEvaluationService extends ManagedService {
     const evaluation = new Evaluation()
 
     evaluation.status = EvaluationStatusEnum.PENDING
+    evaluation.name = verifiedCreateEvaluationDto.name
+    evaluation.implementationInstitution = verifiedCreateEvaluationDto.implementationInstitution
+    evaluation.start = verifiedCreateEvaluationDto.start as any
+    evaluation.end = verifiedCreateEvaluationDto.end as any
     evaluation.expectedModelLevel = verifiedCreateEvaluationDto.expectedModelLevel
     evaluation.organizationalUnit = verifiedCreateEvaluationDto.organizationalUnit
     evaluation.evaluationMembers = this.buildEvaluationMembersEntities(verifiedCreateEvaluationDto)
@@ -229,6 +233,10 @@ export class CreateEvaluationService extends ManagedService {
     const resolvedMember = await Promise.all(membersPromises)
 
     evaluationDto.id = evaluation.id
+    evaluationDto.name = evaluation.name
+    evaluationDto.implementationInstitution = evaluation.implementationInstitution
+    evaluationDto.start = evaluation.start
+    evaluationDto.end = evaluation.end
     evaluationDto.expectedModelLevel = ModelLevelDto.fromEntity(evaluation.expectedModelLevel)
     evaluationDto.orgranizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
     evaluationDto.members = resolvedMember

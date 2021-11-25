@@ -14,6 +14,18 @@ export class Evaluation extends AuditableEntity {
   @Column('varchar')
   status: EvaluationStatusEnum
 
+  @Column('varchar')
+  name: string
+
+  @Column('date')
+  start: Date
+
+  @Column('date')
+  end: Date
+
+  @Column('varchar')
+  implementationInstitution: string
+
   @ManyToOne(() => ModelLevel)
   @JoinColumn({ name: 'expectedModelLevelId', referencedColumnName: 'id' })
   expectedModelLevel: ModelLevel

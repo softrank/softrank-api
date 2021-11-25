@@ -23,7 +23,6 @@ export class UpdateExpectedResultService {
     const expectedResult = await this.findExpectedResultById(updateExpectedResultDto.id, manager)
     await this.verifyExpectedResultConflicts(updateExpectedResultDto, expectedResult.modelProcess.id, manager)
     const expectedResultToUpdate = this.updateExpectedResultData(expectedResult, updateExpectedResultDto)
-    console.log(expectedResultToUpdate)
     const updatedExpectedResult = await manager.save(expectedResultToUpdate)
 
     return updatedExpectedResult

@@ -1,14 +1,19 @@
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Module, forwardRef } from '@nestjs/common'
-import { CreateEvaluationService, GenerateEvaluationIndicatorsService } from './services'
+import {
+  CreateEvaluationService,
+  GenerateEvaluationIndicatorsService,
+  CreateIndicatorService,
+  FindEvaluationIndicatorsService,
+  UpdateIndicatorService
+} from './services'
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
 import { EvaluatorModule } from '../evaluator/evaluator.module'
-import { EvaluationController } from './controllers/evaluation.controller'
+import { EvaluationController, IndicatorController } from './controllers'
 import { OrganizationalUnitModule } from '../organizational-unit/organizational-unit.module'
 import { PublicModule } from '../public/public.module'
 import { IndicatorFile } from './entities/indicator-files.entity'
-import { FindEvaluationIndicatorsService } from './services/find-evaluation-indicators.service'
 import {
   Evaluation,
   EvaluationIndicators,
@@ -35,8 +40,14 @@ import {
     forwardRef(() => EvaluatorModule),
     forwardRef(() => OrganizationalUnitModule)
   ],
-  controllers: [EvaluationController],
-  providers: [CreateEvaluationService, GenerateEvaluationIndicatorsService, FindEvaluationIndicatorsService],
+  controllers: [EvaluationController, IndicatorController],
+  providers: [
+    CreateEvaluationService,
+    GenerateEvaluationIndicatorsService,
+    FindEvaluationIndicatorsService,
+    CreateIndicatorService,
+    UpdateIndicatorService
+  ],
   exports: [TypeOrmModule]
 })
 export class EvaluationModule {}

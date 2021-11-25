@@ -1,5 +1,5 @@
+import { IsNotEmpty, IsUUID, ArrayNotEmpty, IsString, IsDateString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsUUID, ArrayNotEmpty } from 'class-validator'
 
 export class CreateEvaluationServiceBodyDto {
   @ApiProperty()
@@ -22,10 +22,30 @@ export class CreateEvaluationServiceBodyDto {
   @IsUUID('4')
   evaluatorInstitutionId: string
 
-  @ApiProperty()
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // @IsUUID('4')
+  // implementationInstitutionId: string
+
+  @ApiProperty({ example: '2021/12/25' })
   @IsNotEmpty()
-  @IsUUID('4')
-  implementationInstitutionId: string
+  @IsDateString({ strict: true })
+  start: string
+
+  @ApiProperty({ example: '2021/12/26' })
+  @IsNotEmpty()
+  @IsDateString({ strict: true })
+  end: string
+
+  @ApiProperty({ example: 'Instituição implementadora' })
+  @IsNotEmpty()
+  @IsString()
+  implementationInstitution: string
+
+  @ApiProperty({ example: 'Avaliação do Jorginho' })
+  @IsNotEmpty()
+  @IsString()
+  name: string
 
   @ApiProperty()
   @ArrayNotEmpty()
@@ -41,8 +61,11 @@ export class CreateEvaluationServiceDto extends CreateEvaluationServiceBodyDto {
     this.evaluatorInstitutionId = createEvaluationServiceBodyDto.evaluatorInstitutionId
     this.evaluatorsIds = createEvaluationServiceBodyDto.evaluatorsIds
     this.expectedModelLevelId = createEvaluationServiceBodyDto.expectedModelLevelId
-    this.implementationInstitutionId = createEvaluationServiceBodyDto.implementationInstitutionId
+    this.implementationInstitution = createEvaluationServiceBodyDto.implementationInstitution
     this.organizationalUnitId = createEvaluationServiceBodyDto.organizationalUnitId
+    this.name = createEvaluationServiceBodyDto.name
+    this.start = createEvaluationServiceBodyDto.start
+    this.end = createEvaluationServiceBodyDto.end
     this.userId = userId
   }
 

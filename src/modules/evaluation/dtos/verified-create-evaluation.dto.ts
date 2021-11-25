@@ -11,4 +11,8 @@ export class VerifiedCreateEvaluationDto {
   organizationalUnit: OrganizationalUnit
   auditor: Auditor
   expectedModelLevel: ModelLevel
+  name: string
+  implementationInstitution: string
+  start: string
+  end: string
 }

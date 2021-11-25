@@ -1,9 +1,8 @@
 import { Evaluation, EvaluationIndicators, ExpectedResultIndicator } from '@modules/evaluation/entities'
 import { ExpectedResult, ModelProcess, ModelLevel, Model } from '@modules/model/entities'
-import { ManagedService } from '@modules/shared/services'
 import { EntityManager, getConnection } from 'typeorm'
 
-export class GenerateEvaluationIndicatorsService extends ManagedService {
+export class GenerateEvaluationIndicatorsService {
   public async generate(evaluationId: string): Promise<void> {
     await getConnection().transaction((manager: EntityManager) => {
       return this.generateWithTransaction(evaluationId, manager)
@@ -11,17 +10,13 @@ export class GenerateEvaluationIndicatorsService extends ManagedService {
   }
 
   public async generateWithTransaction(evaluationId: string, manager: EntityManager): Promise<void> {
-    this.setManager(manager)
-
-    const evaluation = await this.findEvaluationById(evaluationId)
+    const evaluation = await this.findEvaluationById(evaluationId, manager)
     const evaluationIndicators = await this.buildEvaluationIndicatorsEntity(evaluation)
-    await this.manager.save(evaluationIndicators)
-
-    this.cleanManager()
+    await manager.save(evaluationIndicators)
   }
 
-  private async findEvaluationById(evaluationId: string): Promise<Evaluation> {
-    const evaluation = await this.manager
+  private async findEvaluationById(evaluationId: string, manager: EntityManager): Promise<Evaluation> {
+    const evaluation = await manager
       .createQueryBuilder(Evaluation, 'evaluation')
       .leftJoinAndSelect('evaluation.expectedModelLevel', 'expectedModelLevel')
       .leftJoinAndSelect('expectedModelLevel.model', 'model')
