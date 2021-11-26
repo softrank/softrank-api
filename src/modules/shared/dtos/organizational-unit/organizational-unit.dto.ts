@@ -1,5 +1,6 @@
 import { DocumentTypeEnum, EntityStatusEnum } from '@modules/shared/enums'
 import { OrganizationalUnit } from '@modules/organizational-unit/entities'
+import { OrganizationalUnitProjectDto } from '.'
 
 export class OrganizationalUnitDto {
   id: string
@@ -9,6 +10,7 @@ export class OrganizationalUnitDto {
   documentType: DocumentTypeEnum
   email: string
   phone: string
+  projects: OrganizationalUnitProjectDto[]
 
   static fromEntity(organizationalUnit: OrganizationalUnit): OrganizationalUnitDto {
     const auditorDto = new OrganizationalUnitDto()
@@ -20,6 +22,7 @@ export class OrganizationalUnitDto {
     auditorDto.documentType = organizationalUnit.commonEntity.documentType
     auditorDto.email = organizationalUnit.commonEntity.email
     auditorDto.phone = organizationalUnit.commonEntity.phone
+    auditorDto.projects = organizationalUnit.projects?.map(OrganizationalUnitProjectDto.fromEntity)
 
     return auditorDto
   }

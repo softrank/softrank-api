@@ -1,4 +1,8 @@
-import { CreateOrganizationalUnitService, FindOrganizationalUnitByIdService } from './services'
+import {
+  CreateOrganizationalUnitService,
+  FindOrganizationalUnitByIdService,
+  ListOrganizationalUnitService
+} from './services'
 import { OrganizationalUnitRepository } from './repositories'
 import { OrganizationalUnitController } from './controllers'
 import { PublicModule } from '@modules/public/public.module'
@@ -12,7 +16,11 @@ import { Module } from '@nestjs/common'
     PublicModule
   ],
   controllers: [OrganizationalUnitController],
-  providers: [CreateOrganizationalUnitService, FindOrganizationalUnitByIdService],
+  providers: [
+    CreateOrganizationalUnitService,
+    FindOrganizationalUnitByIdService,
+    ListOrganizationalUnitService
+  ],
   exports: [TypeOrmModule]
 })
 export class OrganizationalUnitModule {}
