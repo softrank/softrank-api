@@ -7,15 +7,6 @@ import { EntityManager, getConnection } from 'typeorm'
 import { ModelLevel } from '@modules/model/entities'
 
 export class CreateEvaluatorLicenseService {
-  private manager: EntityManager
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async create(
     createEvaluatorLicenseDto: CreateEvaluatorLicenseDto,
     evaluatorId: string
@@ -31,23 +22,20 @@ export class CreateEvaluatorLicenseService {
     evaluatorId: string,
     manager: EntityManager
   ): Promise<EvaluatorLicense> {
-    this.setManager(manager)
-
-    const evaluator = await this.findEvaluatorById(evaluatorId)
-    const modelLevel = await this.findModelLevelById(createEvaluatorLicenseDto.modelLevelId)
+    const evaluator = await this.findEvaluatorById(evaluatorId, manager)
+    const modelLevel = await this.findModelLevelById(createEvaluatorLicenseDto.modelLevelId, manager)
     const evaluatorLicenseToCreate = this.buildEvaluatorLicenseEntity(
       createEvaluatorLicenseDto,
       evaluator,
       modelLevel
     )
-    const createdEvaluatorLicense = this.manager.save(evaluatorLicenseToCreate)
+    const createdEvaluatorLicense = manager.save(evaluatorLicenseToCreate)
 
-    this.cleanManager()
     return createdEvaluatorLicense
   }
 
-  private async findModelLevelById(modelLevelId: string): Promise<ModelLevel> {
-    const modelLevel = await this.manager.findOne(ModelLevel, { where: { id: modelLevelId } })
+  private async findModelLevelById(modelLevelId: string, manager: EntityManager): Promise<ModelLevel> {
+    const modelLevel = await manager.findOne(ModelLevel, { where: { id: modelLevelId } })
 
     if (!modelLevel) {
       throw new ModelLevelNotFoundError()
@@ -56,8 +44,8 @@ export class CreateEvaluatorLicenseService {
     return modelLevel
   }
 
-  private async findEvaluatorById(evaluatorId: string): Promise<Evaluator> {
-    const evaluator = await this.manager.findOne(Evaluator, { where: { id: evaluatorId } })
+  private async findEvaluatorById(evaluatorId: string, manager: EntityManager): Promise<Evaluator> {
+    const evaluator = await manager.findOne(Evaluator, { where: { id: evaluatorId } })
 
     if (!evaluator) {
       throw new EvaluatorNotFoundError()
@@ -74,6 +62,7 @@ export class CreateEvaluatorLicenseService {
     const evaluatorLicense = new EvaluatorLicense()
 
     evaluatorLicense.expiration = createEvaluatorLicenseDto.expiration
+    evaluatorLicense.type = createEvaluatorLicenseDto.type
     evaluatorLicense.isActive = true
     evaluatorLicense.modelLevel = modelLevel
     evaluatorLicense.evaluator = evaluator

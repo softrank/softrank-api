@@ -1,15 +1,21 @@
-import { IsDateString, IsNotEmpty, IsString } from 'class-validator'
+import { IsDateString, IsNotEmpty, IsString, IsEnum } from 'class-validator'
 import { EvaluatorLicense } from '@modules/evaluator/entities'
 import { ModelLevel } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
 import { stringDate } from '@utils/helpers'
 import { v4 } from 'uuid'
+import { EvaluatorLicenseType } from '@modules/evaluator/enums'
 
 export class CreateEvaluatorLicenseDto {
   @ApiProperty({ example: stringDate() })
   @IsDateString()
   @IsNotEmpty()
   expiration: Date
+
+  @ApiProperty({ example: EvaluatorLicenseType.LEADER })
+  @IsDateString()
+  @IsEnum(EvaluatorLicenseType)
+  type: EvaluatorLicenseType
 
   @ApiProperty({ example: v4() })
   @IsNotEmpty()
@@ -25,6 +31,7 @@ export class CreateEvaluatorLicenseDto {
     entity.expiration = createEvaluatorLicenseDto.expiration
     entity.isActive = true
     entity.modelLevel = modelLevel
+    entity.type = createEvaluatorLicenseDto.type
 
     return entity
   }

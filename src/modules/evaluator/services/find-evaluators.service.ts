@@ -41,6 +41,10 @@ export class FindEvaluatorsService {
       })
     }
 
+    if (findEvaluatorQueryDto.type) {
+      queryBuilder.andWhere('license.type = :type', { type: findEvaluatorQueryDto.type })
+    }
+
     const evaluators = await queryBuilder.getMany()
 
     return evaluators

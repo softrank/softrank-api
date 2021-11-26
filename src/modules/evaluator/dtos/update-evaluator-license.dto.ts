@@ -1,7 +1,8 @@
-import { IsDateString, IsNotEmpty, IsString, IsOptional, IsUUID } from 'class-validator'
+import { IsDateString, IsNotEmpty, IsString, IsOptional, IsUUID, IsEnum } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { stringDate } from '@utils/helpers'
 import { v4 } from 'uuid'
+import { EvaluatorLicenseType } from '../enums'
 
 export class UpdateEvaluatorLicenseDto {
   @ApiProperty({ example: v4() })
@@ -13,6 +14,11 @@ export class UpdateEvaluatorLicenseDto {
   @IsDateString()
   @IsNotEmpty()
   expiration: Date
+
+  @ApiProperty({ example: EvaluatorLicenseType.LEADER })
+  @IsDateString()
+  @IsEnum(EvaluatorLicenseType)
+  type: EvaluatorLicenseType
 
   @ApiProperty({ example: v4() })
   @IsNotEmpty()
