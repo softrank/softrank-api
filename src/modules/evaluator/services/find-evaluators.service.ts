@@ -23,16 +23,14 @@ export class FindEvaluatorsService {
       .leftJoinAndSelect('evaluator.licenses', 'license')
       .leftJoinAndSelect('license.modelLevel', 'modelLevel')
 
-    if (findEvaluatorQueryDto.name) {
-      queryBuilder.andWhere('unaccent(commonEntity.name) ilike unaccent(:name)', {
-        name: `%${findEvaluatorQueryDto.name}%`
-      })
-    }
-
-    if (findEvaluatorQueryDto.documentNumber) {
-      queryBuilder.andWhere('commonEntity.documentNumber like :documentNumber', {
-        documentNumber: `${findEvaluatorQueryDto.documentNumber}%`
-      })
+    if (findEvaluatorQueryDto.search) {
+      queryBuilder
+        .andWhere('unaccent(commonEntity.name) ilike unaccent(:name)', {
+          name: `%${findEvaluatorQueryDto.search}%`
+        })
+        .andWhere('commonEntity.documentNumber like :documentNumber', {
+          documentNumber: `${findEvaluatorQueryDto.search}%`
+        })
     }
 
     if (findEvaluatorQueryDto.status) {
