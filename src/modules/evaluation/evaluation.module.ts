@@ -21,7 +21,8 @@ import {
   EvaluationMember,
   ExpectedResultIndicator,
   Indicator,
-  IndicatorProject
+  IndicatorProject,
+  EvaluationProject
 } from './entities'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 
@@ -34,7 +35,8 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
       ExpectedResultIndicator,
       Indicator,
       IndicatorProject,
-      IndicatorFile
+      IndicatorFile,
+      EvaluationProject
     ]),
     PublicModule,
     forwardRef(() => ModelModule),

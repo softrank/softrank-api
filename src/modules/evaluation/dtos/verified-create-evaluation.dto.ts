@@ -15,4 +15,5 @@ export class VerifiedCreateEvaluationDto {
   implementationInstitution: string
   start: string
   end: string
+  projects: string[]
 }

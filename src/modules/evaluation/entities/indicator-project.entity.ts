@@ -1,8 +1,8 @@
-import { OrganizationalUnitProject } from '@modules/organizational-unit/entities'
 import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { AuditableEntity } from '@modules/shared/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Indicator } from './indicator.entity'
+import { EvaluationProject } from '.'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class IndicatorProject extends AuditableEntity {
@@ -13,7 +13,7 @@ export class IndicatorProject extends AuditableEntity {
   @JoinColumn({ name: 'indicatorId', referencedColumnName: 'id' })
   indicator: Indicator
 
-  @ManyToOne(() => OrganizationalUnitProject)
+  @ManyToOne(() => EvaluationProject)
   @JoinColumn({ name: 'projectId', referencedColumnName: 'id' })
-  project: OrganizationalUnitProject
+  project: EvaluationProject
 }

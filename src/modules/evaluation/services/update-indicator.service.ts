@@ -1,4 +1,3 @@
-import { OrganizationalUnitProject } from '@modules/organizational-unit/entities'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { EntityManager, Repository, getConnection } from 'typeorm'
@@ -13,13 +12,14 @@ import { IndicatorProject } from '../entities/indicator-project.entity'
 import { IndicatorFile } from '../entities/indicator-files.entity'
 import { IndicatorNotFoundError } from '../errors'
 import { OrganizationalUnitProjectNotFoundError } from '@modules/organizational-unit/errors'
+import { EvaluationProject } from '../entities/evaluation-project.entity'
 
 @Injectable()
 export class UpdateIndicatorService {
   constructor(
     @InjectRepository(Indicator) private readonly indicatorRepository: Repository<Indicator>,
-    @InjectRepository(OrganizationalUnitProject)
-    private readonly organizationalUnitProjectRepository: Repository<OrganizationalUnitProject>
+    @InjectRepository(EvaluationProject)
+    private readonly evaluationProjectRepository: Repository<EvaluationProject>
   ) {}
 
   public async update(updateIndicatorDto: UpdateIndicatorDto): Promise<EvaluationIndicatorsIndicatorDto> {
@@ -88,8 +88,8 @@ export class UpdateIndicatorService {
     return indicatorProject
   }
 
-  private async findOrganizationalUnitProjectById(projectId: string): Promise<OrganizationalUnitProject> {
-    const project = await this.organizationalUnitProjectRepository
+  private async findOrganizationalUnitProjectById(projectId: string): Promise<EvaluationProject> {
+    const project = await this.evaluationProjectRepository
       .createQueryBuilder('project')
       .where('project.id = :projectId')
       .setParameters({ projectId })

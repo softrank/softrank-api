@@ -5,6 +5,7 @@ import { AuditableEntity } from '../../shared/entities/auditable.entity'
 import { EvaluationMember } from './evaluation.member.entity'
 import { OrganizationalUnit } from '../../organizational-unit/entities/organzational-unit.entity'
 import { EvaluationStatusEnum } from '../enums'
+import { EvaluationProject } from '.'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class Evaluation extends AuditableEntity {
@@ -37,4 +38,8 @@ export class Evaluation extends AuditableEntity {
   @ManyToOne(() => OrganizationalUnit)
   @JoinColumn({ name: 'organizationalUnitId', referencedColumnName: 'id' })
   organizationalUnit: OrganizationalUnit
+
+  @OneToMany(() => EvaluationProject, (evaluationProject) => evaluationProject.evaluation, { cascade: true })
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  projects: EvaluationProject[]
 }

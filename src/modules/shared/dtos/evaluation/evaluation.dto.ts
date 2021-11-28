@@ -1,4 +1,4 @@
-import { EvaluationMemberDto } from '.'
+import { EvaluationMemberDto, EvaluationProjectDto } from '.'
 import { ModelLevelDto } from '../model'
 import { OrganizationalUnitDto } from '../organizational-unit'
 
@@ -11,4 +11,5 @@ export class EvaluationDto {
   orgranizationalUnit: OrganizationalUnitDto
   expectedModelLevel: ModelLevelDto
   members: EvaluationMemberDto[]
+  projects: EvaluationProjectDto[]
 }

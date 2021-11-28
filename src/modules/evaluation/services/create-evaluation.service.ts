@@ -1,27 +1,29 @@
+import {
+  EvaluationMemberStatusEnum,
+  EvaluationStatusEnum,
+  EvaluationMemberType
+} from '@modules/evaluation/enums'
+import { EvaluationMemberDto, EvaluationProjectDto, EvaluationDto } from '@modules/shared/dtos/evaluation'
+import { CreateEvaluationServiceDto, VerifiedCreateEvaluationDto } from '@modules/evaluation/dtos'
+import { Evaluation, EvaluationMember, EvaluationProject } from '@modules/evaluation/entities'
+import { OrganizationalUnitRepository } from '@modules/organizational-unit/repositories'
+import { OrganizationalUnitDto } from '@modules/shared/dtos/organizational-unit'
+import { OrganizationalUnitNotFound } from '@modules/organizational-unit/errors'
+import { AuditorNotFoundError } from '@modules/auditor/errors/auditor.errors'
+import { OrganizationalUnit } from '@modules/organizational-unit/entities'
+import { EvaluatorCantBeChooseError } from '@modules/evaluation/errors'
+import { EvaluatorRepository } from '@modules/evaluator/repositories'
 import { EntityManager, getConnection, Repository } from 'typeorm'
-import { CreateEvaluationServiceDto, VerifiedCreateEvaluationDto } from '../dtos'
+import { EvaluatorNotFoundError } from '@modules/evaluator/errors'
+import { ModelLevelNotFoundError } from '@modules/model/errors'
+import { ModelLevelDto } from '@modules/shared/dtos/model'
+import { GenerateEvaluationIndicatorsService } from '.'
 import { Evaluator } from '@modules/evaluator/entities'
-import { EvaluatorRepository } from '../../evaluator/repositories/evaluator.repository'
-import { Injectable } from '@nestjs/common'
-import { EvaluatorNotFoundError } from '../../evaluator/errors/evaluator.errors'
-import { Evaluation, EvaluationMember } from '../entities'
-import { EvaluationMemberStatusEnum, EvaluationStatusEnum } from '../enums'
+import { CommonEntity } from '@modules/public/entities'
+import { ModelLevel } from '@modules/model/entities'
 import { Auditor } from '@modules/auditor/entities'
 import { InjectRepository } from '@nestjs/typeorm'
-import { AuditorNotFoundError } from '../../auditor/errors/auditor.errors'
-import { OrganizationalUnit } from '@modules/organizational-unit/entities'
-import { OrganizationalUnitRepository } from '../../organizational-unit/repositories/organizational-unit.repository'
-import { OrganizationalUnitNotFound } from '../../organizational-unit/errors/organizational-unit.errors'
-import { EvaluationMemberType } from '../enums/evaluation-member-type.enum'
-import { ModelLevel } from '@modules/model/entities'
-import { ModelLevelNotFoundError } from '../../model/errors/model-level.errors'
-import { GenerateEvaluationIndicatorsService } from './generate-evaluation-indicators.service'
-import { EvaluationDto } from '../../shared/dtos/evaluation/evaluation.dto'
-import { ModelLevelDto } from '@modules/shared/dtos/model'
-import { OrganizationalUnitDto } from '@modules/shared/dtos/organizational-unit'
-import { EvaluationMemberDto } from '@modules/shared/dtos/evaluation'
-import { CommonEntity } from '../../public/entities/entity.entity'
-import { EvaluatorCantBeChooseError } from '../errors'
+import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class CreateEvaluationService {
@@ -87,6 +89,7 @@ export class CreateEvaluationService {
     verifiedCreateEvaluationDto.evaluatorsAdjuncts = evaluatorsAdjuncts
     verifiedCreateEvaluationDto.organizationalUnit = organizationalUnit
     verifiedCreateEvaluationDto.expectedModelLevel = expectedModelLevel
+    verifiedCreateEvaluationDto.projects = createEvaluationServiceDto.projects
 
     return verifiedCreateEvaluationDto
   }
@@ -182,8 +185,22 @@ export class CreateEvaluationService {
     evaluation.expectedModelLevel = verifiedCreateEvaluationDto.expectedModelLevel
     evaluation.organizationalUnit = verifiedCreateEvaluationDto.organizationalUnit
     evaluation.evaluationMembers = this.buildEvaluationMembersEntities(verifiedCreateEvaluationDto)
+    evaluation.projects = this.buildEvaluationProjects(verifiedCreateEvaluationDto.projects)
 
     return evaluation
+  }
+
+  private buildEvaluationProjects(projectNames: string[]): EvaluationProject[] {
+    const evaluationProjects = projectNames.map(this.buildEvaluationProject)
+    return evaluationProjects
+  }
+
+  private buildEvaluationProject(projectName: string): EvaluationProject {
+    const evaluationProject = new EvaluationProject()
+
+    evaluationProject.name = projectName
+
+    return evaluationProject
   }
 
   private buildEvaluationMembersEntities(
@@ -241,8 +258,23 @@ export class CreateEvaluationService {
     evaluationDto.expectedModelLevel = ModelLevelDto.fromEntity(evaluation.expectedModelLevel)
     evaluationDto.orgranizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
     evaluationDto.members = resolvedMember
+    evaluationDto.projects = this.buildEvaluationProjectsDtos(evaluation.projects)
 
     return evaluationDto
+  }
+
+  private buildEvaluationProjectsDtos(evaluationProjects: EvaluationProject[]): EvaluationProjectDto[] {
+    const evaluationProjectDtos = evaluationProjects.map(this.buildEvaluationProjectDto)
+    return evaluationProjectDtos
+  }
+
+  private buildEvaluationProjectDto(evaluationProject: EvaluationProject): EvaluationProjectDto {
+    const evaluationProjectDto = new EvaluationProjectDto()
+
+    evaluationProjectDto.id = evaluationProject.id
+    evaluationProjectDto.name = evaluationProject.name
+
+    return evaluationProjectDto
   }
 
   private async transformToEvaluationMemberDto(

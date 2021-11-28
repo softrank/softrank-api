@@ -51,6 +51,11 @@ export class CreateEvaluationServiceBodyDto {
   @ArrayNotEmpty()
   @IsUUID('4', { each: true })
   evaluatorsIds: string[]
+
+  @ApiProperty({ example: ['Meu primeiro projeto'] })
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  projects: string[]
 }
 
 export class CreateEvaluationServiceDto extends CreateEvaluationServiceBodyDto {
@@ -63,6 +68,7 @@ export class CreateEvaluationServiceDto extends CreateEvaluationServiceBodyDto {
     this.expectedModelLevelId = createEvaluationServiceBodyDto.expectedModelLevelId
     this.implementationInstitution = createEvaluationServiceBodyDto.implementationInstitution
     this.organizationalUnitId = createEvaluationServiceBodyDto.organizationalUnitId
+    this.projects = createEvaluationServiceBodyDto.projects
     this.name = createEvaluationServiceBodyDto.name
     this.start = createEvaluationServiceBodyDto.start
     this.end = createEvaluationServiceBodyDto.end
