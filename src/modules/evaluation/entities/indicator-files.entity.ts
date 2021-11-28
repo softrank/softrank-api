@@ -14,6 +14,9 @@ export class IndicatorFile extends AuditableEntity {
   @Column('varchar')
   source: string
 
+  @Column('varchar')
+  mimetype: string
+
   @ManyToOne(() => Indicator)
   @JoinColumn({ name: 'indicatorId', referencedColumnName: 'id' })
   indicator: Indicator

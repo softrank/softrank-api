@@ -1,12 +1,12 @@
 import { EvaluationIndicatorsFileDto } from '@modules/evaluation/dtos/evaluation-indicators'
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
-import { Indicator, IndicatorFile } from '@modules/evaluation/entities'
 import { FileManagerAdapterService } from '@modules/file-manager/services'
-import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
+import { Indicator, IndicatorFile } from '@modules/evaluation/entities'
 import { IndicatorNotFoundError } from '@modules/evaluation/errors'
+import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
 import { UploadFileDto } from '@modules/file-manager/dtos'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable } from '@nestjs/common'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class UploadIndicatorFileService {
@@ -66,6 +66,7 @@ export class UploadIndicatorFileService {
     indicatorFile.indicator = indicator
     indicatorFile.source = url
     indicatorFile.name = uploadIndicatorFileDto.originalname
+    indicatorFile.mimetype = uploadIndicatorFileDto.mimetype
 
     return indicatorFile
   }
@@ -76,6 +77,7 @@ export class UploadIndicatorFileService {
     evaluationIndicatorsFileDto.id = indicatorFile.id
     evaluationIndicatorsFileDto.name = indicatorFile.name
     evaluationIndicatorsFileDto.source = indicatorFile.source
+    evaluationIndicatorsFileDto.mimetype = indicatorFile.mimetype
 
     return evaluationIndicatorsFileDto
   }
