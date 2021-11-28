@@ -5,3 +5,9 @@ export class EvaluationNotFoundError extends HttpException {
     super('Evaluation not found', HttpStatus.NOT_FOUND)
   }
 }
+
+export class EvaluatorCantBeChooseError extends HttpException {
+  constructor() {
+    super('Evaluator can not be choose', HttpStatus.CONFLICT)
+  }
+}

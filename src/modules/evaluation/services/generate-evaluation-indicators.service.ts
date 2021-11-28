@@ -1,6 +1,7 @@
 import { Evaluation, EvaluationIndicators, ExpectedResultIndicator } from '@modules/evaluation/entities'
 import { ExpectedResult, ModelProcess, ModelLevel, Model } from '@modules/model/entities'
 import { EntityManager, getConnection } from 'typeorm'
+import { EvaluationNotFoundError } from '../errors'
 
 export class GenerateEvaluationIndicatorsService {
   public async generate(evaluationId: string): Promise<void> {
@@ -30,7 +31,7 @@ export class GenerateEvaluationIndicatorsService {
       .getOne()
 
     if (!evaluation) {
-      throw new Error()
+      throw new EvaluationNotFoundError()
     }
 
     return evaluation

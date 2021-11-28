@@ -8,12 +8,12 @@ import { EvaluatorLicenseType } from '@modules/evaluator/enums'
 
 export class CreateEvaluatorLicenseDto {
   @ApiProperty({ example: stringDate() })
-  @IsDateString()
+  @IsDateString({ strict: true })
   @IsNotEmpty()
   expiration: Date
 
   @ApiProperty({ example: EvaluatorLicenseType.LEADER })
-  @IsDateString()
+  @IsNotEmpty()
   @IsEnum(EvaluatorLicenseType)
   type: EvaluatorLicenseType
 

@@ -5,7 +5,8 @@ import {
   GenerateEvaluationIndicatorsService,
   CreateIndicatorService,
   FindEvaluationIndicatorsService,
-  UpdateIndicatorService
+  UpdateIndicatorService,
+  UploadIndicatorFileService
 } from './services'
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
@@ -22,6 +23,7 @@ import {
   Indicator,
   IndicatorProject
 } from './entities'
+import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 
 @Module({
   imports: [
@@ -38,7 +40,8 @@ import {
     forwardRef(() => ModelModule),
     forwardRef(() => AuditorModule),
     forwardRef(() => EvaluatorModule),
-    forwardRef(() => OrganizationalUnitModule)
+    forwardRef(() => OrganizationalUnitModule),
+    FileManagerModule
   ],
   controllers: [EvaluationController, IndicatorController],
   providers: [
@@ -46,7 +49,8 @@ import {
     GenerateEvaluationIndicatorsService,
     FindEvaluationIndicatorsService,
     CreateIndicatorService,
-    UpdateIndicatorService
+    UpdateIndicatorService,
+    UploadIndicatorFileService
   ],
   exports: [TypeOrmModule]
 })

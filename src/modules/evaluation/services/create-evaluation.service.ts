@@ -21,6 +21,7 @@ import { ModelLevelDto } from '@modules/shared/dtos/model'
 import { OrganizationalUnitDto } from '@modules/shared/dtos/organizational-unit'
 import { EvaluationMemberDto } from '@modules/shared/dtos/evaluation'
 import { CommonEntity } from '../../public/entities/entity.entity'
+import { EvaluatorCantBeChooseError } from '../errors'
 
 @Injectable()
 export class CreateEvaluationService {
@@ -137,7 +138,7 @@ export class CreateEvaluationService {
 
   private verifyEvaluator(evaluator: Evaluator, evaluatorInstitutionId: string): void | never {
     if (evaluator.evaluatorInstitution.id !== evaluatorInstitutionId) {
-      throw new Error()
+      throw new EvaluatorCantBeChooseError()
     }
   }
 

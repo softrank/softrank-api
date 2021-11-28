@@ -1,9 +1,13 @@
-import { RouteGuards } from '@modules/shared/decorators'
-import { Body, Controller, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { CreateIndicatorService, UpdateIndicatorService } from '@modules/evaluation/services'
+import { EvaluationIndicatorsFileDto } from '@modules/evaluation/dtos/evaluation-indicators'
+import { UpdateIndicatorBodyDto, UpdateIndicatorDto } from '@modules/evaluation/dtos'
+import { buildImageFileInterceptor } from '@modules/file-manager/decorators'
+import { UploadIndicatorFileService } from '@modules/evaluation/services'
+import { AuthorizedUser, RouteGuards, SwaggerUploadFileDecorator } from '@modules/shared/decorators'
+import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
+import { AuthorizedUserDto } from '@modules/shared/dtos/public'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateIndicatorService } from '../services/create-indicator.service'
-import { UpdateIndicatorBodyDto, UpdateIndicatorDto } from '../dtos/update-indicator.dto'
-import { UpdateIndicatorService } from '../services/update-indicator.service'
 
 @ApiTags('Indicator')
 @Controller('indicator')
@@ -11,7 +15,8 @@ import { UpdateIndicatorService } from '../services/update-indicator.service'
 export class IndicatorController {
   constructor(
     private readonly createIndicatorService: CreateIndicatorService,
-    private readonly updateIndicatorService: UpdateIndicatorService
+    private readonly updateIndicatorService: UpdateIndicatorService,
+    private readonly uploadIndicatorFileService: UploadIndicatorFileService
   ) {}
 
   @Post(':expectedResultId')
@@ -26,5 +31,17 @@ export class IndicatorController {
   ) {
     const updateIndicatorDto = new UpdateIndicatorDto(indicatorId, updateIndicatorBodyDto)
     return this.updateIndicatorService.update(updateIndicatorDto)
+  }
+
+  @Post(':indicatorId/file')
+  @UseInterceptors(buildImageFileInterceptor('file'))
+  @SwaggerUploadFileDecorator()
+  public uploadIndicatorFIle(
+    @UploadedFile() expressFile: Express.Multer.File,
+    @Param('indicatorId') indicatorId: string,
+    @AuthorizedUser() user: AuthorizedUserDto
+  ): Promise<EvaluationIndicatorsFileDto> {
+    const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, user.id, expressFile)
+    return this.uploadIndicatorFileService.upload(uploadIndicatorFileDto)
   }
 }
