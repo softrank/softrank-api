@@ -66,6 +66,7 @@ export class FindEvaluationIndicatorsService {
     const evaluationIndicators = await this.evaluationIndicatorsRepository
       .createQueryBuilder('evaluationIndicators')
       .leftJoinAndSelect('evaluationIndicators.expectedResultIndicators', 'expectedResultIndicator')
+      .innerJoinAndSelect('evaluationIndicators.evaluation', 'evaluation')
       .leftJoinAndSelect('expectedResultIndicator.expectedResult', 'expectedResult')
       .leftJoinAndSelect('expectedResult.minLevel', 'minModelLevel')
       .leftJoinAndSelect('expectedResult.modelProcess', 'modelProcess')
@@ -118,6 +119,8 @@ export class FindEvaluationIndicatorsService {
     const evaluationIndicatorsDto = new EvaluationIndicatorsDto()
 
     evaluationIndicatorsDto.id = evaluationIndicators.id
+    evaluationIndicatorsDto.evaluationId = evaluationIndicators.evaluation.id
+    evaluationIndicatorsDto.status = evaluationIndicators.evaluation.status
     evaluationIndicatorsDto.modelLevels =
       this.buildEvaluationIndicatorsModelLevelsDtos(reducedEvaluationIndicators)
 
@@ -180,6 +183,7 @@ export class FindEvaluationIndicatorsService {
       const {
         expectedResult: { modelProcess }
       } = expectedResultIndicator
+
       return modelProcess.id === modelProcessId
     })
 
