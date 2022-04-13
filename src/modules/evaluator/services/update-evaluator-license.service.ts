@@ -1,21 +1,12 @@
-import { EvaluatorLicenseAlreadyExistsError, EvaluatorLicenseNotFoundError } from '@modules/evaluator/errors'
+import { EvaluatorLicenseNotFoundError } from '@modules/evaluator/errors'
 import { EvaluatorLicenseDto } from '@modules/shared/dtos/evaluator'
 import { UpdateEvaluatorLicenseDto } from '@modules/evaluator/dtos'
 import { ModelLevelNotFoundError } from '@modules/model/errors'
 import { EvaluatorLicense } from '@modules/evaluator/entities'
-import { EntityManager, getConnection, Not } from 'typeorm'
+import { EntityManager, getConnection } from 'typeorm'
 import { ModelLevel } from '@modules/model/entities'
 
 export class UpdateEvaluatorLicenseService {
-  private manager: EntityManager
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async update(updateEvaluatorLicenseDto: UpdateEvaluatorLicenseDto): Promise<EvaluatorLicenseDto> {
     const updatedEvaluatorLicense = await getConnection().transaction((manager: EntityManager) => {
       return this.updateWithTransaction(updateEvaluatorLicenseDto, manager)
@@ -27,23 +18,23 @@ export class UpdateEvaluatorLicenseService {
     updateEvaluatorLicenseDto: UpdateEvaluatorLicenseDto,
     manager: EntityManager
   ): Promise<EvaluatorLicense> {
-    this.setManager(manager)
-
-    const evaluatorLicense = await this.findEvaluatorLicenseById(updateEvaluatorLicenseDto.id)
-    const modelLevel = await this.findModelLevelById(updateEvaluatorLicenseDto.modelLevelId)
+    const evaluatorLicense = await this.findEvaluatorLicenseById(updateEvaluatorLicenseDto.id, manager)
+    const modelLevel = await this.findModelLevelById(updateEvaluatorLicenseDto.modelLevelId, manager)
     const evaluatorLicenseToUpdate = this.updateEvaluatorLicenseData(
       evaluatorLicense,
       updateEvaluatorLicenseDto,
       modelLevel
     )
-    const updatedEvaluatorLicense = this.manager.save(evaluatorLicenseToUpdate)
+    const updatedEvaluatorLicense = manager.save(evaluatorLicenseToUpdate)
 
-    this.cleanManager()
     return updatedEvaluatorLicense
   }
 
-  private async findEvaluatorLicenseById(evaluatorLicenseId: string): Promise<EvaluatorLicense> {
-    const evaluatorLicense = await this.manager.findOne(EvaluatorLicense, {
+  private async findEvaluatorLicenseById(
+    evaluatorLicenseId: string,
+    manager: EntityManager
+  ): Promise<EvaluatorLicense> {
+    const evaluatorLicense = await manager.findOne(EvaluatorLicense, {
       where: { id: evaluatorLicenseId },
       relations: ['evaluator', 'modelLevel']
     })
@@ -55,8 +46,8 @@ export class UpdateEvaluatorLicenseService {
     return evaluatorLicense
   }
 
-  private async findModelLevelById(modelLevelId: string): Promise<ModelLevel> {
-    const modelLevel = await this.manager.findOne(ModelLevel, { where: { id: modelLevelId } })
+  private async findModelLevelById(modelLevelId: string, manager: EntityManager): Promise<ModelLevel> {
+    const modelLevel = await manager.findOne(ModelLevel, { where: { id: modelLevelId } })
 
     if (!modelLevel) {
       throw new ModelLevelNotFoundError()
@@ -71,6 +62,7 @@ export class UpdateEvaluatorLicenseService {
     modelLevel: ModelLevel
   ): EvaluatorLicense {
     evaluatorLicense.expiration = updateEvaluatorLicenseDto.expiration
+    evaluatorLicense.type = updateEvaluatorLicenseDto.type
     evaluatorLicense.isActive = true
     evaluatorLicense.modelLevel = modelLevel
 

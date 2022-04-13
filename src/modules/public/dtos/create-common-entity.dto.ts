@@ -6,5 +6,6 @@ export class CreateCommonEntityDto {
   email: string
   documentNumber: string
   documentType: DocumentTypeEnum
+  password?: string
   userId?: string
 }

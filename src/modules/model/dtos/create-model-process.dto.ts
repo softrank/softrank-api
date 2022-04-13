@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString, ValidateNested, IsOptional } from 'class-validator'
+import { IsNotEmpty, IsString, ValidateNested, IsOptional, IsEnum } from 'class-validator'
 import { CreateExpectedResultDto } from '@modules/model/dtos'
-import { ModelProcess } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
+import { ModelProcessTypeEnum } from '../enum'
 
 export class CreateModelProcessDto {
   @ApiProperty({ example: 'Gerencia de Projetos' })
@@ -20,20 +20,14 @@ export class CreateModelProcessDto {
   @IsString()
   description: string
 
+  @ApiProperty({ example: ModelProcessTypeEnum.PROJECT })
+  @IsNotEmpty()
+  @IsEnum(ModelProcessTypeEnum, { message: 'Um belo erro $value' })
+  type: ModelProcessTypeEnum
+
   @ApiProperty({ type: () => [CreateExpectedResultDto] })
   @Type(() => CreateExpectedResultDto)
   @IsOptional()
   @ValidateNested()
   expectedResults: CreateExpectedResultDto[]
-
-  static toEntity(createModelProcessDto: CreateModelProcessDto): ModelProcess {
-    const entity = new ModelProcess()
-
-    entity.initial = createModelProcessDto.initial
-    entity.name = createModelProcessDto.name
-    entity.description = createModelProcessDto.description
-    entity.expectedResults = createModelProcessDto.expectedResults?.map(CreateExpectedResultDto.toEntity)
-
-    return entity
-  }
 }

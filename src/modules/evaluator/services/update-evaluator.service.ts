@@ -13,15 +13,6 @@ export class UpdateEvaluatorService {
     private readonly createEvaluatorLicenseService: CreateEvaluatorLicenseService,
     private readonly updateEvaluatorLicenseService: UpdateEvaluatorLicenseService
   ) {}
-  private manager: EntityManager
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async update(updateEvaluatorDto: UpdateEvaluatorDto): Promise<EvaluatorDto> {
     const updatedEvaluator = await getConnection().transaction((manager: EntityManager) => {
       return this.updateWithTransaction(updateEvaluatorDto, manager)
@@ -34,20 +25,20 @@ export class UpdateEvaluatorService {
     updateEvaluatorDto: UpdateEvaluatorDto,
     manager: EntityManager
   ): Promise<Evaluator> {
-    this.setManager(manager)
-
-    const evaluator = await this.findEvaluatorById(updateEvaluatorDto.id)
+    const evaluator = await this.findEvaluatorById(updateEvaluatorDto.id, manager)
     const evaluatorToUpdate = this.updateEvaluatorData(evaluator, updateEvaluatorDto)
-    await this.manager.save(evaluatorToUpdate)
-    await this.createOrUpdateEvaluatorLicenses(updateEvaluatorDto)
-    const fullEvaluator = await this.findFullEvaluator(updateEvaluatorDto.id)
+    await manager.save(evaluatorToUpdate)
+    await this.createOrUpdateEvaluatorLicenses(updateEvaluatorDto, manager)
+    const fullEvaluator = await this.findFullEvaluator(updateEvaluatorDto.id, manager)
 
-    this.cleanManager()
     return fullEvaluator
   }
 
-  private async findEvaluatorById(evaluatorId: string): Promise<Evaluator> {
-    const evaluator = await this.manager.findOne(Evaluator, { where: { id: evaluatorId }, relations: ['commonEntity'] })
+  private async findEvaluatorById(evaluatorId: string, manager: EntityManager): Promise<Evaluator> {
+    const evaluator = await manager.findOne(Evaluator, {
+      where: { id: evaluatorId },
+      relations: ['commonEntity']
+    })
 
     if (!evaluator) {
       throw new EvaluatorNotFoundError()
@@ -63,12 +54,19 @@ export class UpdateEvaluatorService {
     return evaluator
   }
 
-  private async createOrUpdateEvaluatorLicenses(updateEvaluatorDto: UpdateEvaluatorDto): Promise<void> {
+  private async createOrUpdateEvaluatorLicenses(
+    updateEvaluatorDto: UpdateEvaluatorDto,
+    manager: EntityManager
+  ): Promise<void> {
     const promises = updateEvaluatorDto?.licenses.map((licenseDto) => {
       if (licenseDto.id) {
-        return this.updateEvaluatorLicenseService.updateWithTransaction(licenseDto, this.manager)
+        return this.updateEvaluatorLicenseService.updateWithTransaction(licenseDto, manager)
       }
-      return this.createEvaluatorLicenseService.createWithTransaction(licenseDto, updateEvaluatorDto.id, this.manager)
+      return this.createEvaluatorLicenseService.createWithTransaction(
+        licenseDto,
+        updateEvaluatorDto.id,
+        manager
+      )
     })
 
     if (promises?.length) {
@@ -76,8 +74,10 @@ export class UpdateEvaluatorService {
     }
   }
 
-  private async findFullEvaluator(evaluatorId: string): Promise<Evaluator> {
-    const evaluator = await this.manager.getCustomRepository(EvaluatorRepository).findFullEvaluatorById(evaluatorId)
+  private async findFullEvaluator(evaluatorId: string, manager: EntityManager): Promise<Evaluator> {
+    const evaluator = await manager
+      .getCustomRepository(EvaluatorRepository)
+      .findFullEvaluatorById(evaluatorId)
 
     return evaluator
   }

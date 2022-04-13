@@ -1,7 +1,7 @@
 import {
   CreateEvaluatorService,
-  GetEvaluatorsService,
-  GetEvaluatorService,
+  FindEvaluatorsService,
+  FindEvaluatorByIdService,
   CreateEvaluatorLicenseService,
   UpdateEvaluatorService,
   UpdateEvaluatorLicenseService
@@ -24,8 +24,8 @@ import { forwardRef, Module } from '@nestjs/common'
   ],
   providers: [
     CreateEvaluatorService,
-    GetEvaluatorsService,
-    GetEvaluatorService,
+    FindEvaluatorsService,
+    FindEvaluatorByIdService,
     CreateEvaluatorLicenseService,
     UpdateEvaluatorService,
     UpdateEvaluatorLicenseService

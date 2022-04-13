@@ -53,6 +53,7 @@ export class UpdateModelDto extends UpdateModelBodyDto {
     this.year = updateModelDto.year
     this.description = updateModelDto.description
     this.modelLevels = updateModelDto.modelLevels
+    this.modelProcesses = updateModelDto.modelProcesses
   }
 
   id: string

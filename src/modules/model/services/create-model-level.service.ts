@@ -8,16 +8,6 @@ import { ModelLevelAlreadyExistsError } from '../errors'
 
 @Injectable()
 export class CreateModelLevelService {
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async create(createModelLevelDto: CreateModelLevelDto, modelId: string): Promise<ModelLevelDto> {
     const createdModelLevel = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createModelLevelDto, modelId, manager)
@@ -32,19 +22,16 @@ export class CreateModelLevelService {
     modelId: string,
     manager: EntityManager
   ): Promise<ModelLevel> {
-    this.setManager(manager)
-
-    await this.checkModelLevelConflicts(createModelLevelDto, modelId)
-    const model = await this.findModelById(modelId)
+    await this.checkModelLevelConflicts(createModelLevelDto, modelId, manager)
+    const model = await this.findModelById(modelId, manager)
     const modelLevelToCreate = this.buildModelLevelEntity(model, createModelLevelDto)
-    const createdModelLevel = await this.manager.save(modelLevelToCreate)
+    const createdModelLevel = await manager.save(modelLevelToCreate)
 
-    this.cleanManager()
     return createdModelLevel
   }
 
-  private async findModelById(modelLevelId: string): Promise<Model> {
-    const modelLevel = await this.manager.findOne(Model, { where: { id: modelLevelId } })
+  private async findModelById(modelLevelId: string, manager: EntityManager): Promise<Model> {
+    const modelLevel = await manager.findOne(Model, { where: { id: modelLevelId } })
 
     if (!modelLevel) {
       throw new ModelNotFoundError()
@@ -55,9 +42,10 @@ export class CreateModelLevelService {
 
   private async checkModelLevelConflicts(
     createModelLevelDto: CreateModelLevelDto,
-    modelId: string
+    modelId: string,
+    manager: EntityManager
   ): Promise<void | never> {
-    const conflictedModelLevel = await this.manager.findOne(ModelLevel, {
+    const conflictedModelLevel = await manager.findOne(ModelLevel, {
       where: {
         initial: createModelLevelDto.initial,
         name: createModelLevelDto.name,

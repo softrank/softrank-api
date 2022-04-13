@@ -1,31 +1,29 @@
 import { ModelNotFoundError } from '@modules/model/errors'
 import { ModelDto } from '@modules/shared/dtos/model'
-import { InjectRepository } from '@nestjs/typeorm'
 import { Model } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
-import { Repository } from 'typeorm'
+import { ModelRepository } from '../repositories/model-repository'
 
 @Injectable()
 export class GetModelService {
-  constructor(
-    @InjectRepository(Model)
-    private readonly modelRepository: Repository<Model>
-  ) {}
+  constructor(private readonly modelRepository: ModelRepository) {}
 
   public async listModels(): Promise<ModelDto[]> {
-    const models = await this.modelRepository.find({
-      relations: ['modelProcesses', 'modelLevels', 'modelProcesses.expectedResults']
-    })
+    const models = await this.modelRepository
+      .createQueryBuilder('model')
+      .leftJoinAndSelect('model.modelLevels', 'modelLevel')
+      .leftJoinAndSelect('model.modelProcesses', 'modelProcess')
+      .leftJoinAndSelect('modelProcess.expectedResults', 'expectedResult')
+      .leftJoinAndSelect('expectedResult.maxLevel', 'maxLevel')
+      .leftJoinAndSelect('expectedResult.minLevel', 'minLevel')
+      .getMany()
 
     const modelsDto = this.mapToDto(models)
     return modelsDto
   }
 
   public async getById(id: string): Promise<ModelDto> {
-    const model = await this.modelRepository.findOne({
-      where: { id },
-      relations: ['modelProcesses', 'modelLevels', 'modelProcesses.expectedResults']
-    })
+    const model = await this.modelRepository.findFullModelById(id)
 
     if (!model) {
       throw new ModelNotFoundError()

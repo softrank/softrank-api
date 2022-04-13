@@ -17,14 +17,4 @@ export class CreateModelLevelDto {
   @IsOptional()
   @IsString()
   predecessor: string
-
-  static toEntity(createModelLevelDto: CreateModelLevelDto): ModelLevel {
-    const entity = new ModelLevel()
-
-    entity.initial = createModelLevelDto.initial
-    entity.name = createModelLevelDto.name
-    entity.predecessor = createModelLevelDto.predecessor
-
-    return entity
-  }
 }

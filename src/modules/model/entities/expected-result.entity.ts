@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm'
 import { AuditableEntity } from '@modules/shared/entities'
 import { ModelProcess } from '@modules/model/entities'
+import { ModelLevel } from './model-level.entity'
 
 @Entity({ schema: 'model' })
 @Unique(['name', 'initial', 'modelProcess'])
@@ -17,11 +18,13 @@ export class ExpectedResult extends AuditableEntity {
   @Column({ type: 'varchar' })
   description: string
 
-  @Column({ type: 'char' })
-  minLevel: string
+  @ManyToOne(() => ModelLevel)
+  @JoinColumn({ name: 'minLevelId', referencedColumnName: 'id' })
+  minLevel: ModelLevel
 
-  @Column({ type: 'char', nullable: true })
-  maxLevel: string
+  @ManyToOne(() => ModelLevel)
+  @JoinColumn({ name: 'maxLevelId', referencedColumnName: 'id' })
+  maxLevel: ModelLevel
 
   @ManyToOne(() => ModelProcess, (modelProcess: ModelProcess) => modelProcess.id)
   @JoinColumn({ name: 'modelProcessId', referencedColumnName: 'id' })

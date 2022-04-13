@@ -5,20 +5,15 @@ import { CreateModelProcessDto } from '@modules/model/dtos'
 import { EntityManager, getConnection } from 'typeorm'
 import { ModelProcess } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
+import { CreateExpectedResultService } from './create-expected-result.service'
 
 @Injectable()
 export class CreateModelProcessService {
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
-  public async create(createModelProcessDto: CreateModelProcessDto, modelId: string): Promise<ModelProcessDto> {
+  constructor(private readonly createExpectedResultService: CreateExpectedResultService) {}
+  public async create(
+    createModelProcessDto: CreateModelProcessDto,
+    modelId: string
+  ): Promise<ModelProcessDto> {
     const createdModelProcess = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createModelProcessDto, modelId, manager)
     })
@@ -32,19 +27,17 @@ export class CreateModelProcessService {
     modelId: string,
     manager: EntityManager
   ): Promise<ModelProcess> {
-    this.setManager(manager)
-    const model = await this.findModelById(modelId)
-    await this.verifyModelProcessConflicts(createModelProcessDto, modelId)
+    const model = await this.findModelById(modelId, manager)
+    await this.verifyModelProcessConflicts(createModelProcessDto, modelId, manager)
     const modelProcessToCreate = this.buildModelProcessData(createModelProcessDto, model)
-    const createdModelProcess = await this.manager.save(modelProcessToCreate)
-    await this.createOrCreateExpectedResults(createModelProcessDto)
-    this.cleanManager()
+    const createdModelProcess = await manager.save(modelProcessToCreate)
+    await this.createOrUpdateExpectedResults(createdModelProcess.id, createModelProcessDto, manager)
 
     return createdModelProcess
   }
 
-  private async findModelById(modelId: string): Promise<Model> {
-    const model = await this.manager.findOne(Model, { where: { id: modelId } })
+  private async findModelById(modelId: string, manager: EntityManager): Promise<Model> {
+    const model = await manager.findOne(Model, { where: { id: modelId } })
 
     if (!model) {
       throw new ModelNotFoundError()
@@ -55,9 +48,10 @@ export class CreateModelProcessService {
 
   private async verifyModelProcessConflicts(
     createModelProcessDto: CreateModelProcessDto,
-    modelId: string
+    modelId: string,
+    manager: EntityManager
   ): Promise<void | never> {
-    const modelProcess = await this.manager.findOne(ModelProcess, {
+    const modelProcess = await manager.findOne(ModelProcess, {
       where: {
         name: createModelProcessDto.name,
         initial: createModelProcessDto.initial,
@@ -76,13 +70,24 @@ export class CreateModelProcessService {
     modelProcess.initial = createModelProcessDto.initial
     modelProcess.name = createModelProcessDto.name
     modelProcess.description = createModelProcessDto.description
+    modelProcess.type = createModelProcessDto.type
     modelProcess.model = model
 
     return modelProcess
   }
 
-  private async createOrCreateExpectedResults(createModelProcessDto: CreateModelProcessDto): Promise<void> {
-    createModelProcessDto
+  private async createOrUpdateExpectedResults(
+    modelProcessId: string,
+    createModelProcessDto: CreateModelProcessDto,
+    manager: EntityManager
+  ): Promise<void> {
+    const expectedResultPromises = createModelProcessDto.expectedResults?.map((expectedResult) => {
+      return this.createExpectedResultService.createWithTransaction(expectedResult, modelProcessId, manager)
+    })
+
+    if (expectedResultPromises?.length) {
+      await Promise.all(expectedResultPromises)
+    }
   }
 
   private transformToCreateModelProcessDto(modelProcess: ModelProcess): ModelProcessDto {

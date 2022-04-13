@@ -3,18 +3,11 @@ import { ExpectedResultDto } from '@modules/shared/dtos/model'
 import { UpdateExpectedResultDto } from '@modules/model/dtos'
 import { EntityManager, getConnection, Not } from 'typeorm'
 import { ExpectedResult } from '@modules/model/entities'
+import { Model } from '../entities/model.entity'
+import { ModelLevel } from '../entities/model-level.entity'
+import { ModelLevelNotFoundError } from '../errors/model-level.errors'
 
 export class UpdateExpectedResultService {
-  private manager: EntityManager
-
-  private setManager(manager: EntityManager): void {
-    this.manager = manager
-  }
-
-  private cleanManager(): void {
-    this.manager = null
-  }
-
   public async update(updateExpectedResultDto: UpdateExpectedResultDto): Promise<ExpectedResultDto> {
     const updatedExpectedResult = await getConnection().transaction((manager: EntityManager) => {
       return this.updateWithTransaction(updateExpectedResultDto, manager)
@@ -27,23 +20,25 @@ export class UpdateExpectedResultService {
     updateExpectedResultDto: UpdateExpectedResultDto,
     manager: EntityManager
   ): Promise<ExpectedResult> {
-    this.setManager(manager)
-
-    const expectedResult = await this.findExpectedResultById(updateExpectedResultDto.id)
-    await this.verifyExpectedResultConflicts(updateExpectedResultDto, expectedResult.modelProcess.id)
+    const expectedResult = await this.findExpectedResultById(updateExpectedResultDto.id, manager)
+    await this.verifyExpectedResultConflicts(updateExpectedResultDto, expectedResult.modelProcess.id, manager)
     const expectedResultToUpdate = this.updateExpectedResultData(expectedResult, updateExpectedResultDto)
-    const updatedExpectedResult = await this.manager.save(expectedResultToUpdate)
-
-    this.cleanManager()
+    const updatedExpectedResult = await manager.save(expectedResultToUpdate)
 
     return updatedExpectedResult
   }
 
-  private async findExpectedResultById(expectedResultId: string): Promise<ExpectedResult> {
-    const expectedResult = await this.manager.findOne(ExpectedResult, {
-      where: { id: expectedResultId },
-      relations: ['modelProcess']
-    })
+  private async findExpectedResultById(
+    expectedResultId: string,
+    manager: EntityManager
+  ): Promise<ExpectedResult> {
+    const expectedResult = await manager
+      .createQueryBuilder(ExpectedResult, 'expectedResult')
+      .leftJoinAndSelect('expectedResult.modelProcess', 'modelProcess')
+      .leftJoinAndSelect('modelProcess.model', 'model')
+      .leftJoinAndSelect('model.modelLevels', 'modelLevel')
+      .where('expectedResult.id = :expectedResultId', { expectedResultId })
+      .getOne()
 
     if (!expectedResult) {
       throw new ExpectedResultNotFoundError()
@@ -54,9 +49,10 @@ export class UpdateExpectedResultService {
 
   private async verifyExpectedResultConflicts(
     updateExpectedResultDto: UpdateExpectedResultDto,
-    modelProcessId: string
+    modelProcessId: string,
+    manager: EntityManager
   ): Promise<void | never> {
-    const expectedResult = await this.manager.findOne(ExpectedResult, {
+    const expectedResult = await manager.findOne(ExpectedResult, {
       where: {
         id: Not(updateExpectedResultDto.id),
         initial: updateExpectedResultDto.initial,
@@ -74,12 +70,30 @@ export class UpdateExpectedResultService {
     expectedResult: ExpectedResult,
     updateExpectedResultDto: UpdateExpectedResultDto
   ): ExpectedResult {
-    expectedResult.initial = updateExpectedResultDto.initial
+    const maxLevel =
+      updateExpectedResultDto.maxLevel &&
+      this.getModelLevelByInitial(expectedResult.modelProcess.model, updateExpectedResultDto.maxLevel)
+
+    const minLevel = this.getModelLevelByInitial(
+      expectedResult.modelProcess.model,
+      updateExpectedResultDto.minLevel
+    )
+
     expectedResult.name = updateExpectedResultDto.name
-    expectedResult.maxLevel = updateExpectedResultDto.maxLevel
-    expectedResult.minLevel = updateExpectedResultDto.minLevel
+    expectedResult.maxLevel = maxLevel
+    expectedResult.minLevel = minLevel
     expectedResult.description = updateExpectedResultDto.description
 
     return expectedResult
+  }
+
+  private getModelLevelByInitial(model: Model, initial: string): ModelLevel {
+    const modelLevel = model?.modelLevels?.find((modelLevel) => modelLevel.initial === initial)
+
+    if (!modelLevel) {
+      throw new ModelLevelNotFoundError()
+    }
+
+    return modelLevel
   }
 }

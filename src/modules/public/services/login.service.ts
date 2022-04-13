@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { LoginDto } from '@modules/public/dtos'
 import { User } from '@modules/public/entities'
 import { Repository } from 'typeorm'
+import { LoginResponseDto } from '../dtos/login-response.dto'
 
 export class LoginService {
   constructor(
@@ -13,19 +14,20 @@ export class LoginService {
     private readonly encrypterService: EncrypterService
   ) {}
 
-  public async login(loginDto: LoginDto): Promise<string> {
+  public async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.findUserByLogin(loginDto.login)
 
     this.verifyPassword(loginDto.password, user.passwordHash)
 
     const authorizationToken = this.generateAuthorizationToken(user.id)
 
-    return authorizationToken
+    return LoginResponseDto.fromEntity(user, authorizationToken)
   }
 
   private async findUserByLogin(login: string): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { login }
+      where: { login },
+      relations: ['roles']
     })
 
     if (!user) {
