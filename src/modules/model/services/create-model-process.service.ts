@@ -70,6 +70,7 @@ export class CreateModelProcessService {
     modelProcess.initial = createModelProcessDto.initial
     modelProcess.name = createModelProcessDto.name
     modelProcess.description = createModelProcessDto.description
+    modelProcess.type = createModelProcessDto.type
     modelProcess.model = model
 
     return modelProcess

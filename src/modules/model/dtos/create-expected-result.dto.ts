@@ -1,6 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { ExpectedResult } from '../entities/expected-result.entity'
 
 export class CreateExpectedResultDto {
   @ApiProperty({ example: 'O escopo do trabalho para o projeto é definido' })

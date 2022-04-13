@@ -148,6 +148,7 @@ export class CreateModelService extends ManagedService {
     modelProcess.initial = createModelProcessDto.initial
     modelProcess.name = createModelProcessDto.name
     modelProcess.description = createModelProcessDto.description
+    modelProcess.type = createModelProcessDto.type
     modelProcess.model = model
 
     if (createModelProcessDto?.expectedResults?.length) {

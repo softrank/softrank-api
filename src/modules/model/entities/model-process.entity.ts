@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColum
 import { AuditableEntity } from '@modules/shared/entities'
 import { ExpectedResult } from '@modules/model/entities'
 import { Model } from '@modules/model/entities'
+import { ModelProcessTypeEnum } from '../enum'
 
 @Entity({ schema: 'model' })
 @Unique(['name', 'initial', 'model'])
@@ -17,6 +18,9 @@ export class ModelProcess extends AuditableEntity {
 
   @Column({ type: 'varchar' })
   description: string
+
+  @Column({ type: 'varchar' })
+  type: ModelProcessTypeEnum
 
   @OneToMany(() => ExpectedResult, (expectedResult: ExpectedResult) => expectedResult.modelProcess, {
     cascade: true

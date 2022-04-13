@@ -93,7 +93,7 @@ export class CreateModelManagerService extends ManagedService {
   private async createUserRole(userId: string): Promise<void> {
     await this.createUserRoleService.createWithTransaction(
       {
-        role: UserRoleEnum.EVALUATOR_INSTITUTION,
+        role: UserRoleEnum.MODEL_MANAGER,
         userId
       },
       this.manager

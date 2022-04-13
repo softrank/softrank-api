@@ -1,6 +1,7 @@
 import { ExpectedResultDto } from '@modules/shared/dtos/model'
 import { ModelProcess } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
+import { ModelProcessTypeEnum } from '@modules/model/enum'
 
 export class ModelProcessDto {
   @ApiProperty()
@@ -15,6 +16,9 @@ export class ModelProcessDto {
   @ApiProperty()
   description: string
 
+  @ApiProperty()
+  type: ModelProcessTypeEnum
+
   @ApiProperty({ type: () => [ExpectedResultDto] })
   expectedResults: ExpectedResultDto[]
 
@@ -25,6 +29,7 @@ export class ModelProcessDto {
     dto.name = modelProcess.name
     dto.initial = modelProcess.initial
     dto.description = modelProcess.description
+    dto.type = modelProcess.type
     dto.expectedResults = modelProcess.expectedResults?.map(ExpectedResultDto.fromEntity)
 
     return dto

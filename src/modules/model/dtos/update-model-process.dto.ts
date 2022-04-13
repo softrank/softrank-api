@@ -1,8 +1,17 @@
-import { ArrayNotEmpty, IsNotEmpty, IsString, ValidateNested, IsOptional, IsUUID } from 'class-validator'
+import {
+  ArrayNotEmpty,
+  IsNotEmpty,
+  IsString,
+  ValidateNested,
+  IsOptional,
+  IsUUID,
+  IsEnum
+} from 'class-validator'
 import { UpdateExpectedResultDto } from '@modules/model/dtos'
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { v4 } from 'uuid'
+import { ModelProcessTypeEnum } from '../enum'
 
 export class UpdateModelProcessDto {
   @ApiProperty({ example: v4(), required: false })
@@ -24,6 +33,11 @@ export class UpdateModelProcessDto {
   @IsNotEmpty()
   @IsString()
   description: string
+
+  @ApiProperty({ example: ModelProcessTypeEnum.PROJECT })
+  @IsNotEmpty()
+  @IsEnum(ModelProcessTypeEnum)
+  type: ModelProcessTypeEnum
 
   @ApiProperty({ type: () => [UpdateExpectedResultDto] })
   @Type(() => UpdateExpectedResultDto)
