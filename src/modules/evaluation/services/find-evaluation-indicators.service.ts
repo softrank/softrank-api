@@ -196,6 +196,7 @@ export class FindEvaluationIndicatorsService {
     evaluationIndicatorsModelProcessDto.name = modelProcess.name
     evaluationIndicatorsModelProcessDto.initial = modelProcess.initial
     evaluationIndicatorsModelProcessDto.description = modelProcess.description
+    evaluationIndicatorsModelProcessDto.type = modelProcess.type
     evaluationIndicatorsModelProcessDto.expectedResults =
       this.buildEvaluationIndicatorsExpectedResultsDtos(expectedResultIndicators)
 
@@ -220,7 +221,8 @@ export class FindEvaluationIndicatorsService {
     const { expectedResult } = expectedResultIndicator
     const evaluationIndicatorsExpectedResultDto = new EvaluationIndicatorsExpectedResultDto()
 
-    evaluationIndicatorsExpectedResultDto.id = expectedResult.id
+    evaluationIndicatorsExpectedResultDto.id = expectedResultIndicator.id
+    evaluationIndicatorsExpectedResultDto.expectedResultId = expectedResult.id
     evaluationIndicatorsExpectedResultDto.name = expectedResult.name
     evaluationIndicatorsExpectedResultDto.initial = expectedResult.initial
     evaluationIndicatorsExpectedResultDto.description = expectedResult.description

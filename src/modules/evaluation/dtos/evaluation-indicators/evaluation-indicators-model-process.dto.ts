@@ -1,3 +1,4 @@
+import { ModelProcessTypeEnum } from '@modules/model/enum'
 import { EvaluationIndicatorsExpectedResultDto } from '.'
 
 export class EvaluationIndicatorsModelProcessDto {
@@ -6,4 +7,5 @@ export class EvaluationIndicatorsModelProcessDto {
   initial: string
   description: string
   expectedResults: EvaluationIndicatorsExpectedResultDto[]
+  type: ModelProcessTypeEnum
 }
