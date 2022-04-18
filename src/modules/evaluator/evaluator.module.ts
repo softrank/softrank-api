@@ -14,13 +14,15 @@ import { EvaluatorInstitutionModule } from '@modules/evaluator-institution/evalu
 import { ModelModule } from '@modules/model/model.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { forwardRef, Module } from '@nestjs/common'
+import { EvaluationModule } from '@modules/evaluation/evaluation.module'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Evaluator, EvaluatorLicense, EvaluatorRepository]),
     PublicModule,
     ModelModule,
-    forwardRef(() => EvaluatorInstitutionModule)
+    forwardRef(() => EvaluatorInstitutionModule),
+    forwardRef(() => EvaluationModule)
   ],
   providers: [
     CreateEvaluatorService,

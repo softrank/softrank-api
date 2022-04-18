@@ -1,6 +1,8 @@
 export enum EvaluationStatusEnum {
   PENDING = 'pending',
-  ACCEPTED = 'accepted',
   REFUSED = 'refused',
+  ASSESSING = 'assessing',
+  IMPROVMENT = 'improvement',
+  FILLING = 'filling',
   FINISHED = 'finished'
 }

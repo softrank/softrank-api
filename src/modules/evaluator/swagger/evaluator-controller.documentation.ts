@@ -3,10 +3,11 @@ import {
   ApiCreatedResponse,
   ApiOperation,
   ApiBadRequestResponse,
-  ApiOkResponse
+  ApiOkResponse,
+  ApiQuery
 } from '@nestjs/swagger'
-import { applyDecorators } from '@nestjs/common'
 import { ApiNotFoundResponse } from '@nestjs/swagger'
+import { applyDecorators } from '@nestjs/common'
 
 export function CreateEvaluatorDcoumentation(): MethodDecorator {
   const decorators = [
@@ -45,6 +46,17 @@ export function UpdateEvaluatorDocumentation(): MethodDecorator {
     ApiNotFoundResponse({ description: 'Algum recurso requerido não encontrado' }),
     ApiConflictResponse({ description: 'Licença de avaliador já existente' }),
     ApiBadRequestResponse({ description: 'Erro de requisição por parte do front-end' })
+  ]
+
+  return applyDecorators(...decorators)
+}
+
+export function ListEvaluatorEvaluationsDocumentation(): MethodDecorator {
+  const decorators = [
+    ApiOperation({ summary: 'Rota para listar avaliações do avaliador logado' }),
+    ApiOkResponse({ description: 'avaliações listadas com sucesso' }),
+    ApiQuery({ name: 'page', required: false, type: 'string' }),
+    ApiQuery({ name: 'limit', required: false, type: 'string' })
   ]
 
   return applyDecorators(...decorators)

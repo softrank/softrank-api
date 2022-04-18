@@ -2,7 +2,8 @@ import {
   CreateEvaluatorDcoumentation,
   GetEvaluatorsDocumentation,
   GetEvaluatorDocumentation,
-  UpdateEvaluatorDocumentation
+  UpdateEvaluatorDocumentation,
+  ListEvaluatorEvaluationsDocumentation
 } from '@modules/evaluator/swagger'
 import {
   CreateEvaluatorService,
@@ -23,6 +24,8 @@ import { AuthorizedUser } from '@modules/shared/decorators'
 import { ApiTags } from '@nestjs/swagger'
 import { uuidParamValidation } from '@utils/validations'
 import { RouteGuards } from '../../shared/decorators/route-guards.decorator'
+import { ListEvaluationsService } from '@modules/evaluation/services'
+import { ListEvaluationResponseDto, ListEvaluationsQueryDto } from '@modules/evaluation/dtos'
 
 @Controller('evaluators')
 @ApiTags('Evaluator')
@@ -31,7 +34,8 @@ export class EvaluatorController {
     private readonly createEvaluatorService: CreateEvaluatorService,
     private readonly getEvaluatorsService: FindEvaluatorsService,
     private readonly findEvaluatorByIdService: FindEvaluatorByIdService,
-    private readonly updateEvaluatorService: UpdateEvaluatorService
+    private readonly updateEvaluatorService: UpdateEvaluatorService,
+    private readonly listEvaluationsService: ListEvaluationsService
   ) {}
 
   @Post()
@@ -50,6 +54,23 @@ export class EvaluatorController {
   @RouteGuards()
   public evaluatorMe(@AuthorizedUser() user: AuthorizedUserDto): Promise<EvaluatorDto> {
     return this.findEvaluatorByIdService.find(user.id)
+  }
+
+  @Get('evaluations')
+  @RouteGuards()
+  @ListEvaluatorEvaluationsDocumentation()
+  public listEvaluatorEvaluations(
+    @Query() query: ListEvaluationsQueryDto,
+    @AuthorizedUser() user: AuthorizedUserDto
+  ): Promise<ListEvaluationResponseDto[]> {
+    const listEvaluationsQueryDto = new ListEvaluationsQueryDto({
+      evaluatorId: user.id,
+      search: query.search,
+      limit: query.limit,
+      page: query.page
+    })
+
+    return this.listEvaluationsService.list(listEvaluationsQueryDto)
   }
 
   @Get(':id')
