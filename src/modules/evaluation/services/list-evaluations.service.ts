@@ -53,7 +53,7 @@ export class ListEvaluationsService {
 
     if (listEvaluationsQueryDto.search) {
       evaluationsQueryBuilder
-        .andWhere("unaccent(evaluation.name) ilike unaccent(concat('%', :search, '%')) ")
+        .andWhere("unaccent(evaluation.name) ilike unaccent(concat('%', :search::varchar, '%')) ")
         .setParameters({
           search: listEvaluationsQueryDto.search
         })

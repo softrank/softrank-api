@@ -6,8 +6,8 @@ import {
   ApiOkResponse,
   ApiQuery
 } from '@nestjs/swagger'
-import { applyDecorators, Param, Query } from '@nestjs/common'
 import { ApiNotFoundResponse } from '@nestjs/swagger'
+import { applyDecorators } from '@nestjs/common'
 
 export function CreateEvaluatorDcoumentation(): MethodDecorator {
   const decorators = [

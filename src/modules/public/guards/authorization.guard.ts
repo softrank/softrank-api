@@ -15,7 +15,6 @@ export class AuthorizationGuard implements CanActivate {
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('oi')
     const authorizationToken = this.getAuthorizationTokenFromRequest(context)
     const authorizedUser = this.decodeAuthorizationToken(authorizationToken)
     await this.verifyUserId(authorizedUser.id)
