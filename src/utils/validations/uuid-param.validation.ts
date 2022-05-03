@@ -1,5 +1,7 @@
 import { ParseUUIDPipe } from '@nestjs/common'
 
-export const uuidParamValidation = () => {
-  return new ParseUUIDPipe({ version: '4' })
+type UuidVersions = '3' | '4' | '5'
+
+export const uuidParamValidation = (version: UuidVersions = '4') => {
+  return new ParseUUIDPipe({ version })
 }
