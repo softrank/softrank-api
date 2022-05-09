@@ -5,6 +5,7 @@ import { ModelNotFoundError } from '@modules/model/errors'
 import { Evaluation } from '@modules/evaluation/entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { UserIsNotAllowedToAccessThisEvaluationError } from '../errors'
 
 export class ListEvaluationProcessesService {
   constructor(
@@ -14,6 +15,7 @@ export class ListEvaluationProcessesService {
     @InjectRepository(ModelProcess)
     private readonly modelProcessRepository: Repository<ModelProcess>
   ) {}
+
   public async list(listEvaluationProcessesQueryDto: ListEvaluationProcessesQueryDto): Promise<ListEvaluationProcessesResponseDto[]> {
     await this.verifyIfUserIsAllowed(listEvaluationProcessesQueryDto)
     const modelId = await this.findModelIdByEvaluationId(listEvaluationProcessesQueryDto.evaluationId)
@@ -33,7 +35,7 @@ export class ListEvaluationProcessesService {
       .getOne()
 
     if (!evaluation) {
-      throw new Error()
+      throw new UserIsNotAllowedToAccessThisEvaluationError()
     }
   }
 
@@ -56,29 +58,23 @@ export class ListEvaluationProcessesService {
   private async findEvaluationProcesses(evaluationId: string, modelId: string): Promise<ModelProcess[]> {
     const modelProcesses = await this.modelProcessRepository
       .createQueryBuilder('modelProcess')
+      .innerJoinAndSelect('modelProcess.expectedResults', 'expectedResult')
+      .innerJoinAndSelect('expectedResult.expectedResultIndicators', 'expectedResultIndicator')
+      .leftJoinAndSelect('expectedResultIndicator.indicators', 'indicator')
+      .leftJoinAndSelect('indicator.files', 'indicatorFiles')
       .where('"modelProcess"."modelId" = :modelId')
       .andWhere(
         `
-        exists (
-          select
-            1
-          from
-            model.expected_result expectedResult
-          where
-            expectedResult."modelProcessId" = "modelProcess".id
-            and exists (
-              select
-                1
-              from
-                evaluation.expected_result_indicator expectedResultIndicator
-              join
-                evaluation.evaluation_indicators evaluationIndicators
-                  on evaluationIndicators.id = expectedResultIndicator."evaluationIndicatorsId"
-              where
-                expectedResultIndicator."expectedResultId" = expectedResult.id
-                and evaluationIndicators."evaluationId" = :evaluationId
-            )
-        )
+          exists (
+            select
+              1
+            from
+              evaluation.evaluation_indicators evaluationIndicators
+            where
+              "expectedResultIndicator"."expectedResultId" = expectedResult.id
+              and evaluationIndicators.id = "expectedResultIndicator"."evaluationIndicatorsId"
+              and evaluationIndicators."evaluationId" = :evaluationId
+          )
       `
       )
       .setParameters({ modelId, evaluationId })

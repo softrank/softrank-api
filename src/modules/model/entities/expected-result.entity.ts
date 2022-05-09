@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm'
 import { AuditableEntity } from '@modules/shared/entities'
 import { ModelProcess } from '@modules/model/entities'
 import { ModelLevel } from './model-level.entity'
@@ -32,9 +32,8 @@ export class ExpectedResult extends AuditableEntity {
   @JoinColumn({ name: 'modelProcessId', referencedColumnName: 'id' })
   modelProcess: ModelProcess
 
-  @ManyToOne(
-    () => ExpectedResultIndicator,
-    (expectedResultIndicator) => expectedResultIndicator.expectedResult
-  )
-  expectedResultIndicator: ExpectedResultIndicator
+  @OneToMany(() => ExpectedResultIndicator, (expectedResultIndicator) => expectedResultIndicator.expectedResult, {
+    createForeignKeyConstraints: false
+  })
+  expectedResultIndicators: ExpectedResultIndicator[]
 }

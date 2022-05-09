@@ -11,3 +11,9 @@ export class EvaluatorCantBeChooseError extends HttpException {
     super('Evaluator can not be choose', HttpStatus.CONFLICT)
   }
 }
+
+export class UserIsNotAllowedToAccessThisEvaluationError extends HttpException {
+  constructor() {
+    super('User is not allowed to access this evaluation', HttpStatus.FORBIDDEN)
+  }
+}
