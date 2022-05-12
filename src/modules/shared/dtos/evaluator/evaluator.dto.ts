@@ -1,6 +1,7 @@
 import { EvaluatorLicenseDto } from '@modules/shared/dtos/evaluator'
 import { DocumentTypeEnum, EntityStatusEnum } from '@modules/shared/enums'
 import { Evaluator } from '@modules/evaluator/entities'
+import { LoginResponseDto } from '@modules/public/dtos'
 
 export class EvaluatorDto {
   id: string
@@ -11,8 +12,9 @@ export class EvaluatorDto {
   documentType: DocumentTypeEnum
   phone: string
   licenses: EvaluatorLicenseDto[]
+  authorization: LoginResponseDto
 
-  static fromEntity(evaluator: Evaluator): EvaluatorDto {
+  static fromEntity(evaluator: Evaluator, authorization?: LoginResponseDto): EvaluatorDto {
     const dto = new EvaluatorDto()
 
     dto.id = evaluator.id
@@ -23,6 +25,7 @@ export class EvaluatorDto {
     dto.documentNumber = evaluator.commonEntity.documentNumber
     dto.documentType = evaluator.commonEntity.documentType
     dto.licenses = evaluator.licenses.map(EvaluatorLicenseDto.fromEntity)
+    dto.authorization = authorization
 
     return dto
   }

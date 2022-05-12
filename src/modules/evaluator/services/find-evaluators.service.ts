@@ -10,7 +10,7 @@ export class FindEvaluatorsService {
   constructor(@InjectRepository(Evaluator) private readonly evaluatorRepository: Repository<Evaluator>) {}
   public async find(findEvaluatorQueryDto: FindEvaluatorQueryDto): Promise<EvaluatorDto[]> {
     const evaluators = await this.findEvaluatorsByQuery(findEvaluatorQueryDto)
-    const evaluatorsDto = evaluators?.map(EvaluatorDto.fromEntity)
+    const evaluatorsDto = evaluators?.map((evaluator) => EvaluatorDto.fromEntity(evaluator))
 
     return evaluatorsDto
   }

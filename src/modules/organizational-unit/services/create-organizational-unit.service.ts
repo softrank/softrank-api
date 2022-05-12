@@ -1,4 +1,4 @@
-import { CreateCommonEntityService, CreateUserService, CreateUserRoleService } from '@modules/public/services'
+import { CreateCommonEntityService, CreateUserService, CreateUserRoleService, LoginAfterCreateService } from '@modules/public/services'
 import { OrganizationalUnit, OrganizationalUnitProject } from '@modules/organizational-unit/entities'
 import { OrganizationalUnitAlreadyExist } from '@modules/organizational-unit/errors'
 import { CreateOrganizationalUnitDto } from '@modules/organizational-unit/dtos'
@@ -7,7 +7,7 @@ import { EntityStatusEnum, UserRoleEnum } from '@modules/shared/enums'
 import { CommonEntity, User } from '@modules/public/entities'
 import { ManagedService } from '@modules/shared/services'
 import { EntityManager, getConnection } from 'typeorm'
-import { CreateUserDto } from '@modules/public/dtos'
+import { CreateUserDto, LoginResponseDto } from '@modules/public/dtos'
 import { Injectable } from '@nestjs/common'
 import { OrganizationalUnitDto } from '../../shared/dtos/organizational-unit/organizational-unit.dto'
 
@@ -16,19 +16,24 @@ export class CreateOrganizationalUnitService extends ManagedService {
   constructor(
     private readonly createCommonEntityService: CreateCommonEntityService,
     private readonly createUserService: CreateUserService,
-    private readonly createUserRoleService: CreateUserRoleService
+    private readonly createUserRoleService: CreateUserRoleService,
+    private readonly loginAfterCreateService: LoginAfterCreateService
   ) {
     super()
   }
 
-  public async create(
-    createOrganizationalUnitDto: CreateOrganizationalUnitDto
-  ): Promise<OrganizationalUnitDto> {
+  public async create(createOrganizationalUnitDto: CreateOrganizationalUnitDto): Promise<OrganizationalUnitDto> {
     const organizationalUnit = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createOrganizationalUnitDto, manager)
     })
 
-    return OrganizationalUnitDto.fromEntity(organizationalUnit)
+    const authorizationDto = await this.loginAfterCreate(organizationalUnit.id)
+    return OrganizationalUnitDto.fromEntity(organizationalUnit, authorizationDto)
+  }
+
+  private loginAfterCreate(userId: string): Promise<LoginResponseDto> {
+    const loginResponse = this.loginAfterCreateService.login(userId)
+    return loginResponse
   }
 
   public async createWithTransaction(
@@ -45,9 +50,7 @@ export class CreateOrganizationalUnitService extends ManagedService {
     return createdOrganizationalUnit
   }
 
-  private async verifyOrganizationalUnitConflicts(
-    createOrganizationalUnitDto: CreateOrganizationalUnitDto
-  ): Promise<void | never> {
+  private async verifyOrganizationalUnitConflicts(createOrganizationalUnitDto: CreateOrganizationalUnitDto): Promise<void | never> {
     const organizationalUnit = await this.manager
       .createQueryBuilder(OrganizationalUnit, 'organzationalUnit')
       .leftJoin('organzationalUnit.commonEntity', 'commonEntity')
@@ -80,9 +83,7 @@ export class CreateOrganizationalUnitService extends ManagedService {
     }
   }
 
-  private async buildOrganizationalUnitEntity(
-    createOrganizationalUnitDto: CreateOrganizationalUnitDto
-  ): Promise<OrganizationalUnit> {
+  private async buildOrganizationalUnitEntity(createOrganizationalUnitDto: CreateOrganizationalUnitDto): Promise<OrganizationalUnit> {
     const commonEntity = await this.createCommonEntity(createOrganizationalUnitDto)
     const urganizationalUnit = new OrganizationalUnit()
 
@@ -106,9 +107,7 @@ export class CreateOrganizationalUnitService extends ManagedService {
     return organizationalUnitProject
   }
 
-  private async createCommonEntity(
-    createOrganizationalUnitDto: CreateOrganizationalUnitDto
-  ): Promise<CommonEntity> {
+  private async createCommonEntity(createOrganizationalUnitDto: CreateOrganizationalUnitDto): Promise<CommonEntity> {
     const user = await this.createUser(createOrganizationalUnitDto)
     const commonEntity = this.createCommonEntityService.createWithTransaction(
       { ...createOrganizationalUnitDto, userId: user.id },

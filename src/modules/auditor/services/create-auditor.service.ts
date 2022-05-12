@@ -13,42 +13,43 @@ import { CommonEntityAlreadyExistsError } from '../../public/errors/common-entit
 import { CreateUserDto } from '../../public/dtos/create-user.dto'
 import { User } from '../../public/entities/user.entity'
 import { CreateUserService } from '../../public/services/create-user.service'
+import { LoginAfterCreateService } from '@modules/public/services'
+import { LoginResponseDto } from '@modules/public/dtos'
 
 @Injectable()
-export class CreateAuditorService extends ManagedService {
+export class CreateAuditorService {
   constructor(
     private readonly createCommonEntityService: CreateCommonEntityService,
     private readonly createUserRoleService: CreateUserRoleService,
-    private readonly createUserService: CreateUserService
-  ) {
-    super()
-  }
+    private readonly createUserService: CreateUserService,
+    private readonly loginAfterCreateService: LoginAfterCreateService
+  ) {}
 
   public async create(createAuditorDto: CreateAuditorDto): Promise<AuditorDto> {
     const auditor = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createAuditorDto, manager)
     })
 
-    return AuditorDto.fromEntity(auditor)
+    const authorizationDto = await this.loginAfterCreate(auditor.id)
+    return AuditorDto.fromEntity(auditor, authorizationDto)
   }
 
-  public async createWithTransaction(
-    createAuditorDto: CreateAuditorDto,
-    manager: EntityManager
-  ): Promise<Auditor> {
-    this.setManager(manager)
+  private loginAfterCreate(userId: string): Promise<LoginResponseDto> {
+    const loginResponse = this.loginAfterCreateService.login(userId)
+    return loginResponse
+  }
 
-    await this.verifyAuditorConflicts(createAuditorDto)
-    const commonEntity = await this.verifyCommonEntity(createAuditorDto)
-    const auditor = await this.buildAuditorEntity(createAuditorDto)
-    const createdAuditor = await this.manager.save(auditor)
+  public async createWithTransaction(createAuditorDto: CreateAuditorDto, manager: EntityManager): Promise<Auditor> {
+    await this.verifyAuditorConflicts(createAuditorDto, manager)
+    await this.verifyCommonEntity(createAuditorDto, manager)
+    const auditor = await this.buildAuditorEntity(createAuditorDto, manager)
+    const createdAuditor = await manager.save(auditor)
 
-    this.cleanManager()
     return createdAuditor
   }
 
-  private async verifyAuditorConflicts(createAuditorDto: CreateAuditorDto): Promise<void | never> {
-    const auditor = await this.manager
+  private async verifyAuditorConflicts(createAuditorDto: CreateAuditorDto, manager: EntityManager): Promise<void | never> {
+    const auditor = await manager
       .createQueryBuilder(Auditor, 'auditor')
       .leftJoinAndSelect('auditor.commonEntity', 'commonEntity')
       .where('commonEntity.documentNumber = :documentNumber', {
@@ -62,8 +63,8 @@ export class CreateAuditorService extends ManagedService {
     }
   }
 
-  private async verifyCommonEntity(createAuditorDto: CreateAuditorDto): Promise<void> {
-    const commonEntity = await this.manager
+  private async verifyCommonEntity(createAuditorDto: CreateAuditorDto, manager: EntityManager): Promise<void> {
+    const commonEntity = await manager
       .createQueryBuilder(CommonEntity, 'commonEntity')
       .where('commonEntity.documentNumber = :documentNumber', {
         documentNumber: createAuditorDto.documentNumber
@@ -76,20 +77,14 @@ export class CreateAuditorService extends ManagedService {
     }
   }
 
-  private async createCommonEntity(
-    createAuditorDto: CreateAuditorDto,
-    userId: string
-  ): Promise<CommonEntity> {
-    const commonEntity = await this.createCommonEntityService.createWithTransaction(
-      { ...createAuditorDto, userId },
-      this.manager
-    )
+  private async createCommonEntity(createAuditorDto: CreateAuditorDto, userId: string, manager: EntityManager): Promise<CommonEntity> {
+    const commonEntity = await this.createCommonEntityService.createWithTransaction({ ...createAuditorDto, userId }, manager)
     return commonEntity
   }
 
-  private async buildAuditorEntity(createAuditorDto: CreateAuditorDto): Promise<Auditor> {
-    const user = await this.createUser(createAuditorDto)
-    const commonEntity = await this.createCommonEntity(createAuditorDto, user.id)
+  private async buildAuditorEntity(createAuditorDto: CreateAuditorDto, manager: EntityManager): Promise<Auditor> {
+    const user = await this.createUser(createAuditorDto, manager)
+    const commonEntity = await this.createCommonEntity(createAuditorDto, user.id, manager)
     const auditor = new Auditor()
 
     auditor.status = EntityStatusEnum.PENDING
@@ -98,21 +93,21 @@ export class CreateAuditorService extends ManagedService {
     return auditor
   }
 
-  private async createUser(createAuditorDto: CreateAuditorDto): Promise<User> {
+  private async createUser(createAuditorDto: CreateAuditorDto, manager: EntityManager): Promise<User> {
     const createUserDto = this.buildCreateUserDto(createAuditorDto)
-    const user = await this.createUserService.createWithTransaction(createUserDto, this.manager)
-    await this.createUserRole(user.id)
+    const user = await this.createUserService.createWithTransaction(createUserDto, manager)
+    await this.createUserRole(user.id, manager)
 
     return user
   }
 
-  private async createUserRole(userId: string): Promise<void> {
+  private async createUserRole(userId: string, manager: EntityManager): Promise<void> {
     await this.createUserRoleService.createWithTransaction(
       {
         role: UserRoleEnum.AUDITOR,
         userId
       },
-      this.manager
+      manager
     )
   }
 

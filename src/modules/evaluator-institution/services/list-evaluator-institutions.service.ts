@@ -11,12 +11,8 @@ export class ListEvaluatorInstitutionsService {
     @InjectRepository(EvaluatorInstitution)
     private readonly evaluatorInstitutionRepository: Repository<EvaluatorInstitution>
   ) {}
-  public async list(
-    listEvaluatorInstitutionQueryDto: ListEvaluatorInstitutionQueryDto
-  ): Promise<EvaluatorInstitutionDto[]> {
-    const evaluatorInstitutions = await this.listEvaluatorInstitutionsByQuery(
-      listEvaluatorInstitutionQueryDto
-    )
+  public async list(listEvaluatorInstitutionQueryDto: ListEvaluatorInstitutionQueryDto): Promise<EvaluatorInstitutionDto[]> {
+    const evaluatorInstitutions = await this.listEvaluatorInstitutionsByQuery(listEvaluatorInstitutionQueryDto)
     const mappedEvaluatorInstitution = this.mapToEvaluatorInstitutionDto(evaluatorInstitutions)
 
     return mappedEvaluatorInstitution
@@ -52,9 +48,7 @@ export class ListEvaluatorInstitutionsService {
     return evaluatorInstitutions
   }
 
-  private mapToEvaluatorInstitutionDto(
-    evaluatorInstitutions: EvaluatorInstitution[]
-  ): EvaluatorInstitutionDto[] {
-    return evaluatorInstitutions.map(EvaluatorInstitutionDto.fromEntity)
+  private mapToEvaluatorInstitutionDto(evaluatorInstitutions: EvaluatorInstitution[]): EvaluatorInstitutionDto[] {
+    return evaluatorInstitutions.map((evaluatiorInstitution) => EvaluatorInstitutionDto.fromEntity(evaluatiorInstitution))
   }
 }
