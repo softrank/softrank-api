@@ -15,9 +15,7 @@ export class FindAuditorsService {
   }
 
   private async findAuditorByQuery(findAuditorQueryDto: FindAuditorQueryDto): Promise<Auditor[]> {
-    const queryBuilder = this.auditorRepository
-      .createQueryBuilder('auditor')
-      .leftJoinAndSelect('auditor.commonEntity', 'commonEntity')
+    const queryBuilder = this.auditorRepository.createQueryBuilder('auditor').leftJoinAndSelect('auditor.commonEntity', 'commonEntity')
 
     if (findAuditorQueryDto.name) {
       queryBuilder.andWhere('unaccent(commonEntity.name) ilike unaccent(:name)', {
@@ -43,6 +41,6 @@ export class FindAuditorsService {
   }
 
   private mapToDto(auditors: Auditor[]): AuditorDto[] {
-    return auditors.map(AuditorDto.fromEntity)
+    return auditors.map((auditor) => AuditorDto.fromEntity(auditor))
   }
 }

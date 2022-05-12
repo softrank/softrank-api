@@ -5,7 +5,8 @@ import {
   EncrypterService,
   HasherService,
   LoginService,
-  UserMeService
+  UserMeService,
+  LoginAfterCreateService
 } from '@modules/public/services'
 import { User, CommonEntity } from '@modules/public/entities'
 import { UserController } from '@modules/public/controller'
@@ -25,7 +26,8 @@ import { UserRole } from './entities/user-role.entity'
     LoginService,
     AuthorizationGuard,
     CreateUserRoleService,
-    UserMeService
+    UserMeService,
+    LoginAfterCreateService
   ],
   controllers: [UserController],
   exports: [
@@ -34,7 +36,8 @@ import { UserRole } from './entities/user-role.entity'
     CreateUserService,
     AuthorizationGuard,
     EncrypterService,
-    CreateUserRoleService
+    CreateUserRoleService,
+    LoginAfterCreateService
   ]
 })
 export class PublicModule {}

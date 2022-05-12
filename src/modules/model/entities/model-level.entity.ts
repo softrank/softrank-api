@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm'
-import { Model } from '@modules/model/entities'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm'
 import { AuditableEntity } from '../../shared/entities/auditable.entity'
+import { Evaluation } from '@modules/evaluation/entities'
+import { Model } from '@modules/model/entities'
 
 @Entity({ schema: 'model' })
 @Unique(['initial', 'name', 'model'])
@@ -20,4 +21,7 @@ export class ModelLevel extends AuditableEntity {
   @ManyToOne(() => Model, (model: Model) => model.id)
   @JoinColumn({ name: 'modelId', referencedColumnName: 'id' })
   model: Model
+
+  @OneToMany(() => Evaluation, (evaluation) => evaluation.expectedModelLevel)
+  evaluations: Evaluation[]
 }

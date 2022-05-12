@@ -1,11 +1,8 @@
-import {
-  CreateEvaluatorInsitutionAddressDto,
-  CreateEvaluatorInstitutionDto
-} from '@modules/evaluator-institution/dtos'
+import { CreateEvaluatorInsitutionAddressDto, CreateEvaluatorInstitutionDto } from '@modules/evaluator-institution/dtos'
 import { EvaluatorInstitutionAddress, EvaluatorInstitution } from '@modules/evaluator-institution/entities'
 import { EvaluatorInstitutionDto } from '@modules/shared/dtos/evaluator-institution'
-import { CreateCommonEntityService } from '@modules/public/services'
-import { CreateCommonEntityDto } from '@modules/public/dtos'
+import { CreateCommonEntityService, LoginAfterCreateService } from '@modules/public/services'
+import { CreateCommonEntityDto, LoginResponseDto } from '@modules/public/dtos'
 import { CommonEntity } from '@modules/public/entities'
 import { EntityManager, getConnection } from 'typeorm'
 import { Injectable } from '@nestjs/common'
@@ -24,19 +21,24 @@ export class CreateEvaluatorInstitutionService extends ManagedService {
   constructor(
     private readonly createCommonEntityService: CreateCommonEntityService,
     private readonly createUserRoleService: CreateUserRoleService,
-    private readonly createUserService: CreateUserService
+    private readonly createUserService: CreateUserService,
+    private readonly loginAfterCreateService: LoginAfterCreateService
   ) {
     super()
   }
 
-  public async create(
-    createEvaluatorInstitutionDto: CreateEvaluatorInstitutionDto
-  ): Promise<EvaluatorInstitutionDto> {
+  public async create(createEvaluatorInstitutionDto: CreateEvaluatorInstitutionDto): Promise<EvaluatorInstitutionDto> {
     const createdEvaluatorInstitution = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createEvaluatorInstitutionDto, manager)
     })
 
-    return EvaluatorInstitutionDto.fromEntity(createdEvaluatorInstitution)
+    const authorizationDto = await this.loginAfterCreate(createdEvaluatorInstitution.id)
+    return EvaluatorInstitutionDto.fromEntity(createdEvaluatorInstitution, authorizationDto)
+  }
+
+  private loginAfterCreate(userId: string): Promise<LoginResponseDto> {
+    const loginResponse = this.loginAfterCreateService.login(userId)
+    return loginResponse
   }
 
   public async createWithTransaction(
@@ -47,19 +49,14 @@ export class CreateEvaluatorInstitutionService extends ManagedService {
 
     await this.verifyEvaluatorInstitutionConflicts(createEvaluatorInstitutionDto)
     await this.verifyCommonEntity(createEvaluatorInstitutionDto)
-    const builtEvaluatorInstitution = await this.buildEvaluatorInstitutionEntity(
-      createEvaluatorInstitutionDto
-    )
+    const builtEvaluatorInstitution = await this.buildEvaluatorInstitutionEntity(createEvaluatorInstitutionDto)
     const createdEvaluatorInstitution = await this.manager.save(builtEvaluatorInstitution)
 
     this.cleanManager()
     return createdEvaluatorInstitution
   }
 
-  private async verifyEvaluatorInstitutionConflicts({
-    documentNumber,
-    email
-  }: CreateEvaluatorInstitutionDto): Promise<void | never> {
+  private async verifyEvaluatorInstitutionConflicts({ documentNumber, email }: CreateEvaluatorInstitutionDto): Promise<void | never> {
     const evaluatorInstitution = await this.manager
       .createQueryBuilder(EvaluatorInstitution, 'evaluatorInstitution')
       .leftJoin('evaluatorInstitution.commonEntity', 'commonEntity')
@@ -84,9 +81,7 @@ export class CreateEvaluatorInstitutionService extends ManagedService {
     }
   }
 
-  private async createCommonEntity(
-    createEvaluatorInstitutionDto: CreateEvaluatorInstitutionDto
-  ): Promise<CommonEntity> {
+  private async createCommonEntity(createEvaluatorInstitutionDto: CreateEvaluatorInstitutionDto): Promise<CommonEntity> {
     const user = await this.createUser(createEvaluatorInstitutionDto)
     const dto = this.transformToCreateCommonEntityDto(createEvaluatorInstitutionDto, user.id)
     const createdCommonEntity = await this.createCommonEntityService.createWithTransaction(dto, this.manager)
@@ -144,9 +139,7 @@ export class CreateEvaluatorInstitutionService extends ManagedService {
     const evaluatorInstitution = new EvaluatorInstitution()
 
     evaluatorInstitution.status = EntityStatusEnum.PENDING
-    evaluatorInstitution.addresses = this.buildEvaluatorInstitutionAddressEntity(
-      createEvaluatorInstitutionDto.address
-    )
+    evaluatorInstitution.addresses = this.buildEvaluatorInstitutionAddressEntity(createEvaluatorInstitutionDto.address)
     evaluatorInstitution.commonEntity = commonEntity
 
     return evaluatorInstitution

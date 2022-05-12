@@ -1,8 +1,4 @@
-import {
-  EvaluationMemberStatusEnum,
-  EvaluationStatusEnum,
-  EvaluationMemberType
-} from '@modules/evaluation/enums'
+import { EvaluationMemberStatusEnum, EvaluationStatusEnum, EvaluationMemberType } from '@modules/evaluation/enums'
 import { EvaluationMemberDto, EvaluationProjectDto, EvaluationDto } from '@modules/shared/dtos/evaluation'
 import { CreateEvaluationServiceDto, VerifiedCreateEvaluationDto } from '@modules/evaluation/dtos'
 import { Evaluation, EvaluationMember, EvaluationProject } from '@modules/evaluation/entities'
@@ -48,10 +44,7 @@ export class CreateEvaluationService {
     return evaluationDto
   }
 
-  public async createWithTransaction(
-    createEvaluationServiceDto: CreateEvaluationServiceDto,
-    manager: EntityManager
-  ): Promise<Evaluation> {
+  public async createWithTransaction(createEvaluationServiceDto: CreateEvaluationServiceDto, manager: EntityManager): Promise<Evaluation> {
     const verifiedCreateEvaluation = await this.buildVerifiedCreateEvaluationDto(createEvaluationServiceDto)
     const evaluationEntity = this.buildEvaluationEntity(verifiedCreateEvaluation)
     const evaluation = await manager.save(evaluationEntity)
@@ -72,9 +65,7 @@ export class CreateEvaluationService {
       createEvaluationServiceDto.evaluatorsIds,
       createEvaluationServiceDto.evaluatorInstitutionId
     )
-    const organizationalUnit = await this.findOrganizationalUnitById(
-      createEvaluationServiceDto.organizationalUnitId
-    )
+    const organizationalUnit = await this.findOrganizationalUnitById(createEvaluationServiceDto.organizationalUnitId)
     const expectedModelLevel = await this.findModelLevelById(createEvaluationServiceDto.expectedModelLevelId)
 
     const verifiedCreateEvaluationDto = new VerifiedCreateEvaluationDto()
@@ -82,8 +73,7 @@ export class CreateEvaluationService {
     verifiedCreateEvaluationDto.name = createEvaluationServiceDto.name
     verifiedCreateEvaluationDto.start = createEvaluationServiceDto.start
     verifiedCreateEvaluationDto.end = createEvaluationServiceDto.end
-    verifiedCreateEvaluationDto.implementationInstitution =
-      createEvaluationServiceDto.implementationInstitution
+    verifiedCreateEvaluationDto.implementationInstitution = createEvaluationServiceDto.implementationInstitution
     verifiedCreateEvaluationDto.auditor = auditor
     verifiedCreateEvaluationDto.evaluatorLeader = evaluatorLeader
     verifiedCreateEvaluationDto.evaluatorsAdjuncts = evaluatorsAdjuncts
@@ -94,10 +84,7 @@ export class CreateEvaluationService {
     return verifiedCreateEvaluationDto
   }
 
-  private async findEvaluatorAdjuncts(
-    evaluatorsIds: string[],
-    evaluatorInstitutionId: string
-  ): Promise<Evaluator[]> {
+  private async findEvaluatorAdjuncts(evaluatorsIds: string[], evaluatorInstitutionId: string): Promise<Evaluator[]> {
     const evaluatorsPromises = evaluatorsIds.map((evaluatorId: string) => {
       return this.findEvaluatorById(evaluatorId, evaluatorInstitutionId)
     })
@@ -203,17 +190,12 @@ export class CreateEvaluationService {
     return evaluationProject
   }
 
-  private buildEvaluationMembersEntities(
-    verifiedCreateEvaluationDto: VerifiedCreateEvaluationDto
-  ): EvaluationMember[] {
+  private buildEvaluationMembersEntities(verifiedCreateEvaluationDto: VerifiedCreateEvaluationDto): EvaluationMember[] {
     const evaluationMembers: EvaluationMember[] = []
 
     evaluationMembers.push(
       this.buildEvaluationMemberEntity(verifiedCreateEvaluationDto.auditor.id, EvaluationMemberType.AUDITOR),
-      this.buildEvaluationMemberEntity(
-        verifiedCreateEvaluationDto.evaluatorLeader.id,
-        EvaluationMemberType.EVALUATOR_LEADER
-      ),
+      this.buildEvaluationMemberEntity(verifiedCreateEvaluationDto.evaluatorLeader.id, EvaluationMemberType.EVALUATOR_LEADER),
       this.buildEvaluationMemberEntity(
         verifiedCreateEvaluationDto.evaluatorLeader.evaluatorInstitution.id,
         EvaluationMemberType.EVALUATOR_INSTITUTION
@@ -221,18 +203,13 @@ export class CreateEvaluationService {
     )
 
     verifiedCreateEvaluationDto.evaluatorsAdjuncts.forEach((evaluatorAdjunct) => {
-      evaluationMembers.push(
-        this.buildEvaluationMemberEntity(evaluatorAdjunct.id, EvaluationMemberType.EVALUATOR_ADJUNCT)
-      )
+      evaluationMembers.push(this.buildEvaluationMemberEntity(evaluatorAdjunct.id, EvaluationMemberType.EVALUATOR_ADJUNCT))
     })
 
     return evaluationMembers
   }
 
-  private buildEvaluationMemberEntity(
-    memberId: string,
-    evaluationMemberType: EvaluationMemberType
-  ): EvaluationMember {
+  private buildEvaluationMemberEntity(memberId: string, evaluationMemberType: EvaluationMemberType): EvaluationMember {
     const evaluationMember = new EvaluationMember()
 
     evaluationMember.status = EvaluationMemberStatusEnum.ACTIVE
@@ -243,12 +220,13 @@ export class CreateEvaluationService {
   }
 
   private async transformToEvaluationDto(evaluation: Evaluation): Promise<EvaluationDto> {
-    const evaluationDto = new EvaluationDto()
     const membersPromises = evaluation.evaluationMembers.map((member) => {
       return this.transformToEvaluationMemberDto(member)
     })
 
     const resolvedMember = await Promise.all(membersPromises)
+
+    const evaluationDto = new EvaluationDto()
 
     evaluationDto.id = evaluation.id
     evaluationDto.name = evaluation.name
@@ -277,9 +255,7 @@ export class CreateEvaluationService {
     return evaluationProjectDto
   }
 
-  private async transformToEvaluationMemberDto(
-    evaluationMember: EvaluationMember
-  ): Promise<EvaluationMemberDto> {
+  private async transformToEvaluationMemberDto(evaluationMember: EvaluationMember): Promise<EvaluationMemberDto> {
     const evaluationMemberDto = new EvaluationMemberDto()
     const commonEntity = await this.getCommonEntity(evaluationMember.memberId)
 

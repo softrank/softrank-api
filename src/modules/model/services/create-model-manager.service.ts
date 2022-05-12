@@ -9,16 +9,18 @@ import { CreateUserRoleService } from '../../public/services/create-user-role.se
 import { UserRoleEnum } from '@modules/shared/enums'
 import { ModelManagerDto } from '../../shared/dtos/model/model-manager.dto'
 import { Injectable } from '@nestjs/common'
-import { CreateUserDto } from '@modules/public/dtos'
+import { CreateUserDto, LoginResponseDto } from '@modules/public/dtos'
 import { User } from '../../public/entities/user.entity'
 import { CreateUserService } from '../../public/services/create-user.service'
+import { LoginAfterCreateService } from '@modules/public/services'
 
 @Injectable()
 export class CreateModelManagerService extends ManagedService {
   constructor(
     private readonly createCommonEntityService: CreateCommonEntityService,
     private readonly createUserRoleService: CreateUserRoleService,
-    private readonly createUserService: CreateUserService
+    private readonly createUserService: CreateUserService,
+    private readonly loginAfterCreateService: LoginAfterCreateService
   ) {
     super()
   }
@@ -28,13 +30,16 @@ export class CreateModelManagerService extends ManagedService {
       return this.createWithTransaction(createModelManagerDto, manager)
     })
 
-    return ModelManagerDto.fromEntity(createdModelManager)
+    const authorizationDto = await this.loginAfterCreate(createdModelManager.id)
+    return ModelManagerDto.fromEntity(createdModelManager, authorizationDto)
   }
 
-  public async createWithTransaction(
-    createModelManagerDto: CreateModelManagerDto,
-    manager: EntityManager
-  ): Promise<ModelManager> {
+  private loginAfterCreate(userId: string): Promise<LoginResponseDto> {
+    const loginResponse = this.loginAfterCreateService.login(userId)
+    return loginResponse
+  }
+
+  public async createWithTransaction(createModelManagerDto: CreateModelManagerDto, manager: EntityManager): Promise<ModelManager> {
     this.setManager(manager)
 
     await this.verifyModelManagerConflicts(createModelManagerDto)
@@ -47,9 +52,7 @@ export class CreateModelManagerService extends ManagedService {
     return createdModelManager
   }
 
-  private async verifyModelManagerConflicts(
-    createModelManagerDto: CreateModelManagerDto
-  ): Promise<void | never> {
+  private async verifyModelManagerConflicts(createModelManagerDto: CreateModelManagerDto): Promise<void | never> {
     const modelManager = await this.manager
       .createQueryBuilder(ModelManager, 'modelManager')
       .leftJoin('modelManager.commonEntity', 'commonEntity')

@@ -11,5 +11,8 @@ export class EvaluationDto {
   orgranizationalUnit: OrganizationalUnitDto
   expectedModelLevel: ModelLevelDto
   members: EvaluationMemberDto[]
+  auditor: EvaluationMemberDto
+  evaluators: EvaluationMemberDto[]
+  evaluatorInsitution: EvaluationMemberDto
   projects: EvaluationProjectDto[]
 }

@@ -8,16 +8,12 @@ import { OrganizationalUnitRepository } from '../repositories/organizational-uni
 export class ListOrganizationalUnitService {
   constructor(private readonly organizationalUnitRepository: OrganizationalUnitRepository) {}
 
-  public async list(
-    listOrganizationalUnitQueryDto: ListOrganizationalUnitQueryDto
-  ): Promise<OrganizationalUnitDto[]> {
+  public async list(listOrganizationalUnitQueryDto: ListOrganizationalUnitQueryDto): Promise<OrganizationalUnitDto[]> {
     const organizationalUnits = await this.findOrganizationalUnits(listOrganizationalUnitQueryDto)
-    return organizationalUnits.map(OrganizationalUnitDto.fromEntity)
+    return organizationalUnits.map((organizationalUnit) => OrganizationalUnitDto.fromEntity(organizationalUnit))
   }
 
-  private findOrganizationalUnits(
-    listOrganizationalUnitQueryDto: ListOrganizationalUnitQueryDto
-  ): Promise<OrganizationalUnit[]> {
+  private findOrganizationalUnits(listOrganizationalUnitQueryDto: ListOrganizationalUnitQueryDto): Promise<OrganizationalUnit[]> {
     const queryBuilder = this.organizationalUnitRepository
       .createQueryBuilder('organizationalUnit')
       .leftJoinAndSelect('organizationalUnit.commonEntity', 'commonEntity')

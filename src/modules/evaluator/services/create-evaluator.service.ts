@@ -1,13 +1,13 @@
 import { EvaluatorInstitutionNotFoundError } from '@modules/evaluator-institution/errors'
 import { EvaluatorInstitution } from '@modules/evaluator-institution/entities'
 import { Evaluator, EvaluatorLicense } from '@modules/evaluator/entities'
-import { CreateCommonEntityService } from '@modules/public/services'
+import { CreateCommonEntityService, LoginAfterCreateService } from '@modules/public/services'
 import { CreateEvaluatorLicenseDto } from '@modules/evaluator/dtos'
 import { Repository, EntityManager, getConnection } from 'typeorm'
 import { ModelLevelNotFoundError } from '@modules/model/errors'
 import { EvaluatorDto } from '@modules/shared/dtos/evaluator'
 import { CreateEvaluatorDto } from '@modules/evaluator/dtos'
-import { CreateCommonEntityDto } from '@modules/public/dtos'
+import { CreateCommonEntityDto, LoginResponseDto } from '@modules/public/dtos'
 import { CommonEntity } from '@modules/public/entities'
 import { ModelLevel } from '@modules/model/entities'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -28,7 +28,8 @@ export class CreateEvaluatorService {
     private readonly evaluatorInstitutionRepository: Repository<EvaluatorInstitution>,
     private readonly createCommonEntityService: CreateCommonEntityService,
     private readonly createUserRoleService: CreateUserRoleService,
-    private readonly createUserService: CreateUserService
+    private readonly createUserService: CreateUserService,
+    private readonly loginAfterCreateService: LoginAfterCreateService
   ) {}
 
   public async create(createEvaluatorDto: CreateEvaluatorDto): Promise<EvaluatorDto> {
@@ -36,14 +37,18 @@ export class CreateEvaluatorService {
       return this.createWithTransaction(createEvaluatorDto, manager)
     })
 
-    const evaluator = this.transformToEvaluatorDto(createdEvaluator)
+    const authorizationDto = await this.loginAfterCreate(createdEvaluator.id)
+    const evaluator = this.transformToEvaluatorDto(createdEvaluator, authorizationDto)
+
     return evaluator
   }
 
-  public async createWithTransaction(
-    createEvaluatorDto: CreateEvaluatorDto,
-    manager: EntityManager
-  ): Promise<Evaluator> {
+  private loginAfterCreate(userId: string): Promise<LoginResponseDto> {
+    const loginResponse = this.loginAfterCreateService.login(userId)
+    return loginResponse
+  }
+
+  public async createWithTransaction(createEvaluatorDto: CreateEvaluatorDto, manager: EntityManager): Promise<Evaluator> {
     await this.verifyEvaluatorConflicts(createEvaluatorDto, manager)
     await this.verifyCommonEntity(createEvaluatorDto, manager)
     const evaluatorToCreate = await this.buildEvaluatorEntity(createEvaluatorDto, manager)
@@ -52,10 +57,7 @@ export class CreateEvaluatorService {
     return createdEvaluator
   }
 
-  private async verifyEvaluatorConflicts(
-    { email, documentNumber }: CreateEvaluatorDto,
-    manager: EntityManager
-  ): Promise<void | never> {
+  private async verifyEvaluatorConflicts({ email, documentNumber }: CreateEvaluatorDto, manager: EntityManager): Promise<void | never> {
     const evaluator = await manager
       .createQueryBuilder(Evaluator, 'evaluator')
       .leftJoin('evaluator.commonEntity', 'commonEntity')
@@ -68,10 +70,7 @@ export class CreateEvaluatorService {
     }
   }
 
-  private async verifyCommonEntity(
-    { email, documentNumber }: CreateEvaluatorDto,
-    manager: EntityManager
-  ): Promise<void> {
+  private async verifyCommonEntity({ email, documentNumber }: CreateEvaluatorDto, manager: EntityManager): Promise<void> {
     const commonEntity = await manager
       .createQueryBuilder(CommonEntity, 'commonEntity')
       .where('commonEntity.documentNumber = :documentNumber', { documentNumber })
@@ -107,14 +106,9 @@ export class CreateEvaluatorService {
     return evaluatorInstitution
   }
 
-  private async buildEvaluatorEntity(
-    createEvaluatorDto: CreateEvaluatorDto,
-    manager: EntityManager
-  ): Promise<Evaluator> {
+  private async buildEvaluatorEntity(createEvaluatorDto: CreateEvaluatorDto, manager: EntityManager): Promise<Evaluator> {
     const licenses = await this.buildEvaluatorLicences(createEvaluatorDto.licenses)
-    const evaluatorInstitution = await this.findEvaluatorInstitution(
-      createEvaluatorDto.evaluatorInstitutionId
-    )
+    const evaluatorInstitution = await this.findEvaluatorInstitution(createEvaluatorDto.evaluatorInstitutionId)
     const commonEntity = await this.createCommonEntity(createEvaluatorDto, manager)
 
     const evaluator = new Evaluator()
@@ -127,10 +121,7 @@ export class CreateEvaluatorService {
     return evaluator
   }
 
-  private async createCommonEntity(
-    createEvaluatorDto: CreateEvaluatorDto,
-    manager: EntityManager
-  ): Promise<CommonEntity> {
+  private async createCommonEntity(createEvaluatorDto: CreateEvaluatorDto, manager: EntityManager): Promise<CommonEntity> {
     const user = await this.createUser(createEvaluatorDto, manager)
     const dto = this.transformToCreateCommonEntityDto(createEvaluatorDto, user.id)
     const createdCommonEntity = await this.createCommonEntityService.createWithTransaction(dto, manager)
@@ -165,10 +156,7 @@ export class CreateEvaluatorService {
     return createUserDto
   }
 
-  private transformToCreateCommonEntityDto(
-    createEvaluatorDto: CreateEvaluatorDto,
-    userId?: string
-  ): CreateCommonEntityDto {
+  private transformToCreateCommonEntityDto(createEvaluatorDto: CreateEvaluatorDto, userId?: string): CreateCommonEntityDto {
     const dto = new CreateCommonEntityDto()
 
     dto.documentNumber = createEvaluatorDto.documentNumber
@@ -181,9 +169,7 @@ export class CreateEvaluatorService {
     return dto
   }
 
-  private async buildEvaluatorLicences(
-    createEvaluatorLicensesDto: CreateEvaluatorLicenseDto[]
-  ): Promise<EvaluatorLicense[]> {
+  private async buildEvaluatorLicences(createEvaluatorLicensesDto: CreateEvaluatorLicenseDto[]): Promise<EvaluatorLicense[]> {
     const evaluatorLicensesPromises = createEvaluatorLicensesDto.map(async (createEvaluatorLicenseDto) => {
       const modelLevel = await this.findModelLevel(createEvaluatorLicenseDto.modelLevelId)
       const evaluatorLicense = new EvaluatorLicense()
@@ -200,7 +186,7 @@ export class CreateEvaluatorService {
     return resolvedEvaluatorLicenses
   }
 
-  private transformToEvaluatorDto(evaluator: Evaluator): EvaluatorDto {
-    return EvaluatorDto.fromEntity(evaluator)
+  private transformToEvaluatorDto(evaluator: Evaluator, loginResponseDto: LoginResponseDto): EvaluatorDto {
+    return EvaluatorDto.fromEntity(evaluator, loginResponseDto)
   }
 }

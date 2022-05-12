@@ -1,7 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm'
 import { AuditableEntity } from '@modules/shared/entities'
 import { ModelProcess } from '@modules/model/entities'
 import { ModelLevel } from './model-level.entity'
+import { EvaluationIndicatorsExpectedResultDto } from '@modules/evaluation/dtos/evaluation-indicators'
+import { EvaluationIndicators, ExpectedResultIndicator } from '@modules/evaluation/entities'
 
 @Entity({ schema: 'model' })
 @Unique(['name', 'initial', 'modelProcess'])
@@ -29,4 +31,9 @@ export class ExpectedResult extends AuditableEntity {
   @ManyToOne(() => ModelProcess, (modelProcess: ModelProcess) => modelProcess.id)
   @JoinColumn({ name: 'modelProcessId', referencedColumnName: 'id' })
   modelProcess: ModelProcess
+
+  @OneToMany(() => ExpectedResultIndicator, (expectedResultIndicator) => expectedResultIndicator.expectedResult, {
+    createForeignKeyConstraints: false
+  })
+  expectedResultIndicators: ExpectedResultIndicator[]
 }

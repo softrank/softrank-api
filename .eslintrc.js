@@ -5,10 +5,7 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended'
-  ],
+  extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
   root: true,
   env: {
     node: true,
@@ -22,6 +19,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/comma-dangle': ['error', 'never'],
     'object-curly-spacing': 'off',
+    'max-len': '140',
     '@typescript-eslint/object-curly-spacing': ['error', 'always']
   }
 }
