@@ -8,7 +8,8 @@ import {
   UpdateIndicatorService,
   UploadIndicatorFileService,
   ListEvaluationsService,
-  ListEvaluationProcessesService
+  ListEvaluationProcessesService,
+  FindEvaluationService
 } from './services'
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
@@ -56,7 +57,8 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
     UpdateIndicatorService,
     UploadIndicatorFileService,
     ListEvaluationsService,
-    ListEvaluationProcessesService
+    ListEvaluationProcessesService,
+    FindEvaluationService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

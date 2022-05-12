@@ -6,8 +6,9 @@ import { AuthorizedUserDto } from '../../shared/dtos/public/authorized-user.dto'
 import { CreateEvaluationService } from '../services/create-evaluation.service'
 import { FindEvaluationIndicatorsService } from '../services/find-evaluation-indicators.service'
 import { EvaluationIndicatorsDto } from '../dtos/evaluation-indicators'
-import { ListEvaluationProcessesService } from '../services'
+import { FindEvaluationService, ListEvaluationProcessesService } from '../services'
 import { uuidParamValidation } from '@utils/validations'
+import { EvaluationDto } from '@modules/shared/dtos/evaluation'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -15,7 +16,8 @@ export class EvaluationController {
   constructor(
     private readonly createEvaluationService: CreateEvaluationService,
     private readonly findEvaluationIndicatorsService: FindEvaluationIndicatorsService,
-    private readonly listEvaluationProcessesService: ListEvaluationProcessesService
+    private readonly listEvaluationProcessesService: ListEvaluationProcessesService,
+    private readonly findEvaluationService: FindEvaluationService
   ) {}
 
   @Post()
@@ -42,5 +44,11 @@ export class EvaluationController {
   ): Promise<any> {
     const listEvaluationProcessesQueryDto = new ListEvaluationProcessesQueryDto(evaluationId, user.id)
     return this.listEvaluationProcessesService.list(listEvaluationProcessesQueryDto)
+  }
+
+  @Get(':id')
+  @RouteGuards()
+  public findEvaluationByID(@Param('id', uuidParamValidation()) evaluationId: string): Promise<EvaluationDto> {
+    return this.findEvaluationService.findById(evaluationId)
   }
 }
