@@ -25,23 +25,21 @@ export class IndicatorController {
   }
 
   @Put(':indicatorId')
-  public updateIndicator(
-    @Param('indicatorId') indicatorId: string,
-    @Body() updateIndicatorBodyDto: UpdateIndicatorBodyDto
-  ) {
+  public updateIndicator(@Param('indicatorId') indicatorId: string, @Body() updateIndicatorBodyDto: UpdateIndicatorBodyDto) {
     const updateIndicatorDto = new UpdateIndicatorDto(indicatorId, updateIndicatorBodyDto)
     return this.updateIndicatorService.update(updateIndicatorDto)
   }
 
-  @Post(':indicatorId/file')
+  @Post(':indicatorId/file/:projectId')
   @UseInterceptors(buildImageFileInterceptor('file'))
   @SwaggerUploadFileDecorator()
   public uploadIndicatorFIle(
     @UploadedFile() expressFile: Express.Multer.File,
     @Param('indicatorId') indicatorId: string,
+    @Param('projectId') projectId: string,
     @AuthorizedUser() user: AuthorizedUserDto
   ): Promise<EvaluationIndicatorsFileDto> {
-    const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, user.id, expressFile)
+    const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, projectId, user.id, expressFile)
     return this.uploadIndicatorFileService.upload(uploadIndicatorFileDto)
   }
 }

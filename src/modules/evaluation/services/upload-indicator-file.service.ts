@@ -1,6 +1,6 @@
 import { EvaluationIndicatorsFileDto } from '@modules/evaluation/dtos/evaluation-indicators'
 import { FileManagerAdapterService } from '@modules/file-manager/services'
-import { Indicator, IndicatorFile } from '@modules/evaluation/entities'
+import { Indicator, IndicatorFile, EvaluationProject } from '@modules/evaluation/entities'
 import { IndicatorNotFoundError } from '@modules/evaluation/errors'
 import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
 import { UploadFileDto } from '@modules/file-manager/dtos'
@@ -11,15 +11,20 @@ import { Repository } from 'typeorm'
 @Injectable()
 export class UploadIndicatorFileService {
   constructor(
-    @InjectRepository(IndicatorFile) private readonly indicatorFileRepository: Repository<IndicatorFile>,
-    @InjectRepository(Indicator) private readonly indicatorRepository: Repository<Indicator>,
+    @InjectRepository(IndicatorFile)
+    private readonly indicatorFileRepository: Repository<IndicatorFile>,
+    @InjectRepository(Indicator)
+    private readonly indicatorRepository: Repository<Indicator>,
+    @InjectRepository(EvaluationProject)
+    private readonly evaluationProjectRepository: Repository<EvaluationProject>,
     private readonly fileManagerAdapterService: FileManagerAdapterService
   ) {}
 
   public async upload(uploadIndicatorFileDto: UploadIndicatorFileDto): Promise<EvaluationIndicatorsFileDto> {
     const indicator = await this.findIndicatorById(uploadIndicatorFileDto.indicatorId)
+    const evaluationProject = await this.findEvaluationProjectById(uploadIndicatorFileDto.projectId)
     const url = await this.uploadFile(uploadIndicatorFileDto)
-    const indicatorFile = this.buildIndicatorFile(indicator, url, uploadIndicatorFileDto)
+    const indicatorFile = this.buildIndicatorFile(indicator, url, uploadIndicatorFileDto, evaluationProject)
     const savedIndicatorFile = await this.indicatorFileRepository.save(indicatorFile)
     const evaluationIndicatorsFileDto = this.buildEvaluationIndicatorsFileDto(savedIndicatorFile)
 
@@ -38,6 +43,20 @@ export class UploadIndicatorFileService {
     }
 
     return indicator
+  }
+
+  private async findEvaluationProjectById(evaluationProjectId: string): Promise<EvaluationProject> {
+    const evaluationProject = await this.evaluationProjectRepository
+      .createQueryBuilder('evaluationProject')
+      .where('evaluationProject.id = :evaluationProjectId')
+      .setParameters({ evaluationProjectId })
+      .getOne()
+
+    if (!evaluationProject) {
+      throw new Error()
+    }
+
+    return evaluationProject
   }
 
   private async uploadFile(uploadIndicatorFileDto: UploadIndicatorFileDto): Promise<string> {
@@ -59,7 +78,8 @@ export class UploadIndicatorFileService {
   private buildIndicatorFile(
     indicator: Indicator,
     url: string,
-    uploadIndicatorFileDto: UploadIndicatorFileDto
+    uploadIndicatorFileDto: UploadIndicatorFileDto,
+    evaluationProject: EvaluationProject
   ): IndicatorFile {
     const indicatorFile = new IndicatorFile()
 
@@ -67,6 +87,7 @@ export class UploadIndicatorFileService {
     indicatorFile.source = url
     indicatorFile.name = uploadIndicatorFileDto.originalname
     indicatorFile.mimetype = uploadIndicatorFileDto.mimetype
+    indicatorFile.evaluationProject = evaluationProject
 
     return indicatorFile
   }

@@ -5,6 +5,7 @@ export class EvaluationIndicatorsFileDto {
   name: string
   source: string
   mimetype: string
+  projectId: string
 
   static fromEntity(indicatorFile: IndicatorFile): EvaluationIndicatorsFileDto {
     const evaluationIndicatorsFileDto = new EvaluationIndicatorsFileDto()
@@ -13,6 +14,7 @@ export class EvaluationIndicatorsFileDto {
     evaluationIndicatorsFileDto.mimetype = indicatorFile.mimetype
     evaluationIndicatorsFileDto.name = indicatorFile.name
     evaluationIndicatorsFileDto.source = indicatorFile.source
+    evaluationIndicatorsFileDto.projectId = indicatorFile.evaluationProject?.id
 
     return evaluationIndicatorsFileDto
   }
