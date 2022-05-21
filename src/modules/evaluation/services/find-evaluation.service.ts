@@ -61,7 +61,7 @@ export class FindEvaluationService {
     )
     evaluationDto.end = evaluation.end
     evaluationDto.expectedModelLevel = ModelLevelDto.fromEntity(evaluation.expectedModelLevel)
-    evaluationDto.orgranizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
+    evaluationDto.organizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
     evaluationDto.projects = this.buildEvaluationProjectsDtos(evaluation.projects)
 
     return evaluationDto

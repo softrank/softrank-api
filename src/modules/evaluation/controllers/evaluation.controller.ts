@@ -1,14 +1,24 @@
-import { AuthorizedUser, RouteGuards } from '@modules/shared/decorators'
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
-import { CreateEvaluationServiceBodyDto, CreateEvaluationServiceDto, ListEvaluationProcessesQueryDto } from '../dtos'
+import {
+  CreateEvaluationServiceBodyDto,
+  CreateEvaluationServiceDto,
+  ListEvaluationProcessesQueryDto,
+  ListEvaluationResponseDto,
+  ListEvaluationsQueryDto
+} from '@modules/evaluation/dtos'
+import {
+  FindEvaluationIndicatorsService,
+  ListEvaluationsService,
+  FindEvaluationService,
+  ListEvaluationProcessesService,
+  CreateEvaluationService
+} from '@modules/evaluation/services'
 import { AuthorizedUserDto } from '../../shared/dtos/public/authorized-user.dto'
-import { CreateEvaluationService } from '../services/create-evaluation.service'
-import { FindEvaluationIndicatorsService } from '../services/find-evaluation-indicators.service'
-import { EvaluationIndicatorsDto } from '../dtos/evaluation-indicators'
-import { FindEvaluationService, ListEvaluationProcessesService } from '../services'
-import { uuidParamValidation } from '@utils/validations'
+import { EvaluationIndicatorsDto } from '@modules/evaluation/dtos/evaluation-indicators'
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common'
+import { AuthorizedUser, RouteGuards } from '@modules/shared/decorators'
 import { EvaluationDto } from '@modules/shared/dtos/evaluation'
+import { uuidParamValidation } from '@utils/validations'
+import { ApiTags } from '@nestjs/swagger'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -17,7 +27,8 @@ export class EvaluationController {
     private readonly createEvaluationService: CreateEvaluationService,
     private readonly findEvaluationIndicatorsService: FindEvaluationIndicatorsService,
     private readonly listEvaluationProcessesService: ListEvaluationProcessesService,
-    private readonly findEvaluationService: FindEvaluationService
+    private readonly findEvaluationService: FindEvaluationService,
+    private readonly listEvaluationsService: ListEvaluationsService
   ) {}
 
   @Post()
@@ -30,6 +41,15 @@ export class EvaluationController {
     return this.createEvaluationService.create(createEvaluationServiceDto)
   }
 
+  @Get()
+  @RouteGuards()
+  public listEvaluations(
+    @AuthorizedUser() user: AuthorizedUserDto,
+    @Query() query: ListEvaluationsQueryDto
+  ): Promise<ListEvaluationResponseDto[]> {
+    const listEvaluationsQueryDto = new ListEvaluationsQueryDto({ ...query, userId: user.id })
+    return this.listEvaluationsService.list(listEvaluationsQueryDto)
+  }
   @Get(':id/indicators')
   @RouteGuards()
   public findEvaluationIndicators(@Param('id') evaluationId: string): Promise<EvaluationIndicatorsDto> {

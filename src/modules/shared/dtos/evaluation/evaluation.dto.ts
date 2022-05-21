@@ -8,7 +8,7 @@ export class EvaluationDto {
   start: Date
   end: Date
   implementationInstitution: string
-  orgranizationalUnit: OrganizationalUnitDto
+  organizationalUnit: OrganizationalUnitDto
   expectedModelLevel: ModelLevelDto
   members: EvaluationMemberDto[]
   auditor: EvaluationMemberDto

@@ -26,37 +26,50 @@ export class ListEvaluationsService {
       .leftJoinAndSelect('modelLevel.model', 'model')
       .leftJoinAndSelect('evaluation.organizationalUnit', 'organizationalUnit')
       .leftJoinAndSelect('organizationalUnit.commonEntity', 'organizationalUnitCommonEntity')
+      .setParameters(listEvaluationsQueryDto)
       .where('true')
 
     if (listEvaluationsQueryDto.evaluatorId) {
       const typeBrackets = new Brackets((bracketsQueryBuilder) => {
-        bracketsQueryBuilder
-          .where('"evaluationMember".type = :leader')
-          .orWhere('"evaluationMember".type = :adjunct')
+        bracketsQueryBuilder.where('"evaluationMember".type = :leader')
+        bracketsQueryBuilder.orWhere('"evaluationMember".type = :adjunct')
+
+        return bracketsQueryBuilder
       })
 
-      evaluationsQueryBuilder
-        .andWhere('"evaluationMember"."memberId" = :evaluatorId')
-        .andWhere(typeBrackets)
-        .setParameters({
-          leader: EvaluationMemberType.EVALUATOR_LEADER,
-          adjunct: EvaluationMemberType.EVALUATOR_ADJUNCT,
-          evaluatorId: listEvaluationsQueryDto.evaluatorId
-        })
+      evaluationsQueryBuilder.andWhere('"evaluationMember"."memberId" = :evaluatorId').andWhere(typeBrackets).setParameters({
+        leader: EvaluationMemberType.EVALUATOR_LEADER,
+        adjunct: EvaluationMemberType.EVALUATOR_ADJUNCT
+      })
     }
 
     if (listEvaluationsQueryDto.modelManagerId) {
-      evaluationsQueryBuilder.andWhere('model."modelManagerId" = :modelManagerId').setParameters({
-        modelManagerId: listEvaluationsQueryDto.modelManagerId
-      })
+      evaluationsQueryBuilder.andWhere('model."modelManagerId" = :modelManagerId')
+    }
+
+    if (listEvaluationsQueryDto.organizationalUnitId) {
+      evaluationsQueryBuilder.andWhere('organizationalUnit.id = :organizationalUnitId')
+    }
+
+    if (listEvaluationsQueryDto.auditorId) {
+      evaluationsQueryBuilder.andWhere('"evaluationMember".type = :auditor')
+      evaluationsQueryBuilder.andWhere('"evaluationMember"."memberId" = :auditorId')
+      evaluationsQueryBuilder.setParameters({ auditor: EvaluationMemberType.AUDITOR })
     }
 
     if (listEvaluationsQueryDto.search) {
-      evaluationsQueryBuilder
-        .andWhere("unaccent(evaluation.name) ilike unaccent(concat('%', :search::varchar, '%')) ")
-        .setParameters({
-          search: listEvaluationsQueryDto.search
-        })
+      evaluationsQueryBuilder.andWhere("unaccent(evaluation.name) ilike unaccent(concat('%', :search::varchar, '%')) ")
+    }
+
+    if (listEvaluationsQueryDto.userId) {
+      const anyMemberBrackets = new Brackets((subQueryBuilder) => {
+        subQueryBuilder
+          .where('organizationalUnit.id = :userId')
+          .orWhere('"evaluationMember"."memberId" = :userId')
+          .orWhere('model."modelManagerId" = :userId')
+      })
+
+      evaluationsQueryBuilder.andWhere(anyMemberBrackets)
     }
 
     const evaluations = evaluationsQueryBuilder.getMany()

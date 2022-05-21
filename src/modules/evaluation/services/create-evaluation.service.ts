@@ -234,7 +234,7 @@ export class CreateEvaluationService {
     evaluationDto.start = evaluation.start
     evaluationDto.end = evaluation.end
     evaluationDto.expectedModelLevel = ModelLevelDto.fromEntity(evaluation.expectedModelLevel)
-    evaluationDto.orgranizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
+    evaluationDto.organizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
     evaluationDto.members = resolvedMember
     evaluationDto.projects = this.buildEvaluationProjectsDtos(evaluation.projects)
 

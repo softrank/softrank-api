@@ -12,6 +12,9 @@ export class ListEvaluationsQueryDto {
 
   evaluatorId: string
   modelManagerId: string
+  organizationalUnitId: string
+  auditorId: string
+  userId: string
 
   @ApiProperty({ required: false })
   @IsOptional()
