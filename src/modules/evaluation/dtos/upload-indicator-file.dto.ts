@@ -1,10 +1,11 @@
 import { ExpressMulterFile } from '../../file-manager/interfaces/express-multer-file'
 
 export class UploadIndicatorFileDto extends ExpressMulterFile {
-  constructor(indicatorId: string, userId: string, expressMulterFile: ExpressMulterFile) {
+  constructor(indicatorId: string, projectId: string, userId: string, expressMulterFile: ExpressMulterFile) {
     super()
 
     this.indicatorId = indicatorId
+    this.projectId = projectId
     this.userId = userId
     this.buffer = expressMulterFile.buffer
     this.destination = expressMulterFile.destination
@@ -19,5 +20,6 @@ export class UploadIndicatorFileDto extends ExpressMulterFile {
   }
 
   indicatorId: string
+  projectId: string
   userId: string
 }

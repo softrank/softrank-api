@@ -4,6 +4,7 @@ import { AuditableEntity } from '../../shared/entities/auditable.entity'
 import { IndicatorProject } from './indicator-project.entity'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { IndicatorFile } from './indicator-files.entity'
+import { IndicatorStatusEnum } from '../enums'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class Indicator extends AuditableEntity {
@@ -12,6 +13,9 @@ export class Indicator extends AuditableEntity {
 
   @Column('varchar', { nullable: true })
   content: string
+
+  @Column('varchar', { nullable: true })
+  status: IndicatorStatusEnum
 
   @OneToMany(() => IndicatorFile, (indicatorFile) => indicatorFile.indicator)
   @JoinColumn({ name: 'id', referencedColumnName: 'indicatorId' })
