@@ -9,12 +9,13 @@ import {
   UploadIndicatorFileService,
   ListEvaluationsService,
   ListEvaluationProcessesService,
-  FindEvaluationService
+  FindEvaluationService,
+  CreateAdjustmentService
 } from './services'
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
 import { EvaluatorModule } from '../evaluator/evaluator.module'
-import { EvaluationController, IndicatorController } from './controllers'
+import { EvaluationController, IndicatorController, AdjustmentController } from './controllers'
 import { OrganizationalUnitModule } from '../organizational-unit/organizational-unit.module'
 import { PublicModule } from '../public/public.module'
 import { IndicatorFile } from './entities/indicator-files.entity'
@@ -25,7 +26,8 @@ import {
   ExpectedResultIndicator,
   Indicator,
   IndicatorProject,
-  EvaluationProject
+  EvaluationProject,
+  Adjustment
 } from './entities'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 
@@ -39,7 +41,8 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
       Indicator,
       IndicatorProject,
       IndicatorFile,
-      EvaluationProject
+      EvaluationProject,
+      Adjustment
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
@@ -48,7 +51,7 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
     forwardRef(() => OrganizationalUnitModule),
     FileManagerModule
   ],
-  controllers: [EvaluationController, IndicatorController],
+  controllers: [EvaluationController, IndicatorController, AdjustmentController],
   providers: [
     CreateEvaluationService,
     GenerateEvaluationIndicatorsService,
@@ -58,7 +61,8 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
     UploadIndicatorFileService,
     ListEvaluationsService,
     ListEvaluationProcessesService,
-    FindEvaluationService
+    FindEvaluationService,
+    CreateAdjustmentService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

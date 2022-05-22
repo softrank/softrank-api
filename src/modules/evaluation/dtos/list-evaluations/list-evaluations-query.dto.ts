@@ -8,6 +8,9 @@ export class ListEvaluationsQueryDto {
     this.search = listEvaluationsQueryDto?.search
     this.limit = listEvaluationsQueryDto?.limit
     this.page = listEvaluationsQueryDto?.page
+    this.userId = listEvaluationsQueryDto?.userId
+    this.auditorId = listEvaluationsQueryDto?.auditorId
+    this.organizationalUnitId = listEvaluationsQueryDto?.organizationalUnitId
   }
 
   evaluatorId: string

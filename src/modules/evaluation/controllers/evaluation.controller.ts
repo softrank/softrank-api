@@ -47,6 +47,7 @@ export class EvaluationController {
     @AuthorizedUser() user: AuthorizedUserDto,
     @Query() query: ListEvaluationsQueryDto
   ): Promise<ListEvaluationResponseDto[]> {
+    console.log('passei aqui 1')
     const listEvaluationsQueryDto = new ListEvaluationsQueryDto({ ...query, userId: user.id })
     return this.listEvaluationsService.list(listEvaluationsQueryDto)
   }
