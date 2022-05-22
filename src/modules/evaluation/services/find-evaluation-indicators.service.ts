@@ -4,17 +4,9 @@ import {
   EvaluationIndicatorsIndicatorDto,
   EvaluationIndicatorsExpectedResultDto,
   EvaluationIndicatorsModelProcessDto,
-  EvaluationIndicatorsModelLevelDto,
-  EvaluationIndicatorsProjectDto
+  EvaluationIndicatorsModelLevelDto
 } from '@modules/evaluation/dtos/evaluation-indicators'
-import {
-  Evaluation,
-  EvaluationIndicators,
-  ExpectedResultIndicator,
-  Indicator,
-  IndicatorProject,
-  IndicatorFile
-} from '@modules/evaluation/entities'
+import { Evaluation, EvaluationIndicators, ExpectedResultIndicator, Indicator, IndicatorFile } from '@modules/evaluation/entities'
 import { EvaluationNotFoundError } from '@modules/evaluation/errors'
 import { ModelLevel, ModelProcess } from '@modules/model/entities'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -42,10 +34,7 @@ export class FindEvaluationIndicatorsService {
     await this.verifyEvaluationById(evaluationId)
     const evaluationIndicators = await this.findEvaluationIndicators(evaluationId)
     const reducedEvaluationIndicators = this.prepareDataToTransform(evaluationIndicators)
-    const evaluationIndicatorsDto = this.buildEvaluationIndicatorsDto(
-      evaluationIndicators,
-      reducedEvaluationIndicators
-    )
+    const evaluationIndicatorsDto = this.buildEvaluationIndicatorsDto(evaluationIndicators, reducedEvaluationIndicators)
 
     return evaluationIndicatorsDto
   }
@@ -121,8 +110,7 @@ export class FindEvaluationIndicatorsService {
     evaluationIndicatorsDto.id = evaluationIndicators.id
     evaluationIndicatorsDto.evaluationId = evaluationIndicators.evaluation.id
     evaluationIndicatorsDto.status = evaluationIndicators.evaluation.status
-    evaluationIndicatorsDto.modelLevels =
-      this.buildEvaluationIndicatorsModelLevelsDtos(reducedEvaluationIndicators)
+    evaluationIndicatorsDto.modelLevels = this.buildEvaluationIndicatorsModelLevelsDtos(reducedEvaluationIndicators)
 
     return evaluationIndicatorsDto
   }
@@ -164,10 +152,7 @@ export class FindEvaluationIndicatorsService {
     expectedResultIndicators: ExpectedResultIndicator[]
   ): EvaluationIndicatorsModelProcessDto[] {
     const evaluationIndicatorsModelProcessesDtos = modelProcesses.map((modelProcess) => {
-      const filteredExpectedResultIndicators = this.filterModelProcessExpectedResults(
-        modelProcess.id,
-        expectedResultIndicators
-      )
+      const filteredExpectedResultIndicators = this.filterModelProcessExpectedResults(modelProcess.id, expectedResultIndicators)
 
       return this.buildEvaluationIndicatorsModelProcessDto(modelProcess, filteredExpectedResultIndicators)
     })
@@ -201,8 +186,7 @@ export class FindEvaluationIndicatorsService {
     evaluationIndicatorsModelProcessDto.initial = modelProcess.initial
     evaluationIndicatorsModelProcessDto.description = modelProcess.description
     evaluationIndicatorsModelProcessDto.type = modelProcess.type
-    evaluationIndicatorsModelProcessDto.expectedResults =
-      this.buildEvaluationIndicatorsExpectedResultsDtos(expectedResultIndicators)
+    evaluationIndicatorsModelProcessDto.expectedResults = this.buildEvaluationIndicatorsExpectedResultsDtos(expectedResultIndicators)
 
     return evaluationIndicatorsModelProcessDto
   }
@@ -210,11 +194,9 @@ export class FindEvaluationIndicatorsService {
   private buildEvaluationIndicatorsExpectedResultsDtos(
     expectedResultIndicators: ExpectedResultIndicator[]
   ): EvaluationIndicatorsExpectedResultDto[] {
-    const evaluationIndicatorsExpectedResultsDtos = expectedResultIndicators.map(
-      (expectedResultIndicator) => {
-        return this.buildEvaluationIndicatorsExpectedResultDto(expectedResultIndicator)
-      }
-    )
+    const evaluationIndicatorsExpectedResultsDtos = expectedResultIndicators.map((expectedResultIndicator) => {
+      return this.buildEvaluationIndicatorsExpectedResultDto(expectedResultIndicator)
+    })
 
     return evaluationIndicatorsExpectedResultsDtos
   }
@@ -230,16 +212,12 @@ export class FindEvaluationIndicatorsService {
     evaluationIndicatorsExpectedResultDto.name = expectedResult.name
     evaluationIndicatorsExpectedResultDto.initial = expectedResult.initial
     evaluationIndicatorsExpectedResultDto.description = expectedResult.description
-    evaluationIndicatorsExpectedResultDto.indicators = this.buildEvaluationIndicatorsIndicatorsDtos(
-      expectedResultIndicator.indicators
-    )
+    evaluationIndicatorsExpectedResultDto.indicators = this.buildEvaluationIndicatorsIndicatorsDtos(expectedResultIndicator.indicators)
 
     return evaluationIndicatorsExpectedResultDto
   }
 
-  private buildEvaluationIndicatorsIndicatorsDtos(
-    indicators: Indicator[]
-  ): EvaluationIndicatorsIndicatorDto[] {
+  private buildEvaluationIndicatorsIndicatorsDtos(indicators: Indicator[]): EvaluationIndicatorsIndicatorDto[] {
     const evaluationIndicatorsIndicatorsDtos = indicators.map((indicator) => {
       return this.buildEvaluationIndicatorsIndicatorDto(indicator)
     })
@@ -252,32 +230,9 @@ export class FindEvaluationIndicatorsService {
 
     evaluationIndicatorsIndicatorDto.id = indicator.id
     evaluationIndicatorsIndicatorDto.content = indicator.content
-    evaluationIndicatorsIndicatorDto.projects = this.buildEvaluationIndicatorsProjectsDtos(indicator.projects)
     evaluationIndicatorsIndicatorDto.files = this.buildEvaluationIndicatorsFilesDtos(indicator.files)
 
     return evaluationIndicatorsIndicatorDto
-  }
-
-  private buildEvaluationIndicatorsProjectsDtos(
-    indicatorProjects: IndicatorProject[]
-  ): EvaluationIndicatorsProjectDto[] {
-    const evaluationIndicatorsProjectsDtos = indicatorProjects.map((indicatorProject) => {
-      return this.buildEvaluationIndicatorsProjectDto(indicatorProject)
-    })
-    return evaluationIndicatorsProjectsDtos
-  }
-
-  private buildEvaluationIndicatorsProjectDto(
-    indicatorProject: IndicatorProject
-  ): EvaluationIndicatorsProjectDto {
-    const { project } = indicatorProject
-    const evaluationIndicatorsProjectDto = new EvaluationIndicatorsProjectDto()
-
-    evaluationIndicatorsProjectDto.id = indicatorProject.id
-    evaluationIndicatorsProjectDto.projectId = project.id
-    evaluationIndicatorsProjectDto.name = project.name
-
-    return evaluationIndicatorsProjectDto
   }
 
   private buildEvaluationIndicatorsFilesDtos(indicatorFiles: IndicatorFile[]): EvaluationIndicatorsFileDto[] {

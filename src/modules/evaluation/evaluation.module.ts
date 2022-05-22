@@ -25,7 +25,6 @@ import {
   EvaluationMember,
   ExpectedResultIndicator,
   Indicator,
-  IndicatorProject,
   EvaluationProject,
   Adjustment
 } from './entities'
@@ -39,7 +38,6 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
       EvaluationMember,
       ExpectedResultIndicator,
       Indicator,
-      IndicatorProject,
       IndicatorFile,
       EvaluationProject,
       Adjustment

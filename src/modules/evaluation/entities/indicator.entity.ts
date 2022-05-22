@@ -1,7 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
 import { ExpectedResultIndicator } from './expected-result-indicator.entity'
 import { AuditableEntity } from '../../shared/entities/auditable.entity'
-import { IndicatorProject } from './indicator-project.entity'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { IndicatorFile } from './indicator-files.entity'
 import { IndicatorStatusEnum } from '../enums'
@@ -15,6 +14,9 @@ export class Indicator extends AuditableEntity {
   content: string
 
   @Column('varchar', { nullable: true })
+  qualityAssuranceGroup: string
+
+  @Column('varchar', { nullable: true })
   status: IndicatorStatusEnum
 
   @OneToMany(() => IndicatorFile, (indicatorFile) => indicatorFile.indicator)
@@ -24,8 +26,4 @@ export class Indicator extends AuditableEntity {
   @ManyToOne(() => ExpectedResultIndicator)
   @JoinColumn({ name: 'expectedResultIndicatorId', referencedColumnName: 'id' })
   expectedResultIndicator: ExpectedResultIndicator
-
-  @OneToMany(() => IndicatorProject, (indicatorProject) => indicatorProject.indicator, { cascade: true })
-  @JoinColumn({ name: 'id', referencedColumnName: 'indicatorId' })
-  projects: IndicatorProject[]
 }

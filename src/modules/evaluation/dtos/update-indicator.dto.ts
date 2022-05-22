@@ -7,10 +7,10 @@ export class UpdateIndicatorBodyDto {
   @IsString()
   content: string
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Algum grupo' })
   @IsOptional()
-  @IsUUID('4', { each: true })
-  projectIds: string[]
+  @IsString()
+  qualityAssuranceGroup: string
 }
 
 export class UpdateIndicatorDto extends UpdateIndicatorBodyDto {
@@ -18,7 +18,7 @@ export class UpdateIndicatorDto extends UpdateIndicatorBodyDto {
     super()
 
     this.content = updateIndicatorBodyDto.content
-    this.projectIds = updateIndicatorBodyDto.projectIds
+    this.qualityAssuranceGroup = updateIndicatorBodyDto.qualityAssuranceGroup
     this.indicatorId = indicatorId
   }
 

@@ -20,10 +20,7 @@ export class CreateIndicatorService {
     return this.buildEvaluationIndicatorsIndicatorDto(indicator)
   }
 
-  public async createWithTransaction(
-    expectedResultIndicatorId: string,
-    manager: EntityManager
-  ): Promise<Indicator> {
+  public async createWithTransaction(expectedResultIndicatorId: string, manager: EntityManager): Promise<Indicator> {
     const expectedResultIndicator = await this.findExpectedResultIndicatorById(expectedResultIndicatorId)
     const indicatorToCreate = this.buildIndicator(expectedResultIndicator)
     const indicator = await manager.save(indicatorToCreate)
@@ -31,9 +28,7 @@ export class CreateIndicatorService {
     return indicator
   }
 
-  private async findExpectedResultIndicatorById(
-    expectedResultIndicatorId: string
-  ): Promise<ExpectedResultIndicator> {
+  private async findExpectedResultIndicatorById(expectedResultIndicatorId: string): Promise<ExpectedResultIndicator> {
     const expectedResultIndicator = await this.expectedResultIndicatorRepository
       .createQueryBuilder('expectedResultIndicator')
       .where('expectedResultIndicator.id = :expectedResultIndicatorId')
@@ -61,7 +56,6 @@ export class CreateIndicatorService {
     evaluationIndicatorsIndicatorDto.id = indicator.id
     evaluationIndicatorsIndicatorDto.content = indicator.content
     evaluationIndicatorsIndicatorDto.files = []
-    evaluationIndicatorsIndicatorDto.projects = []
 
     return evaluationIndicatorsIndicatorDto
   }
