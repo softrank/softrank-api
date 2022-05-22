@@ -48,7 +48,7 @@ export class CreateAdjustmentService {
     const adjustment = new Adjustment()
 
     adjustment.problem = createAdjustmentDto.problem
-    adjustment.sugestion = createAdjustmentDto.sugestion
+    adjustment.suggestion = createAdjustmentDto.suggestion
     adjustment.type = createAdjustmentDto.type
     adjustment.expectedResultIndicator = expectedResultIndicator
 

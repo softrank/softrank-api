@@ -7,14 +7,14 @@ export class CreateAdjustmentDto {
     if (createAjustmentDto) {
       this.expectedResultIndicatorId = createAjustmentDto.expectedResultIndicatorId
       this.problem = createAjustmentDto.problem
-      this.sugestion = createAjustmentDto.sugestion
+      this.suggestion = createAjustmentDto.suggestion
     }
   }
 
   @ApiProperty({ example: 'Adicionar seção.' })
   @IsString()
   @IsNotEmpty()
-  sugestion: string
+  suggestion: string
 
   @ApiProperty({ example: 'Seção não encontrada.' })
   @IsString()

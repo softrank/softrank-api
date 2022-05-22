@@ -16,7 +16,7 @@ export class Adjustment extends AuditableEntity {
   problem: string
 
   @Column('varchar')
-  sugestion: string
+  suggestion: string
 
   @ManyToOne(() => ExpectedResultIndicator, (expectedResultIndicator) => expectedResultIndicator.id)
   expectedResultIndicator: ExpectedResultIndicator

@@ -3,7 +3,7 @@ import { Adjustment } from '@modules/evaluation/entities'
 
 export class AdjustmentDto {
   id: string
-  sugestion: string
+  suggestion: string
   problem: string
   expectedResultIndicator: ExpectedResultIndicatorDto
 
@@ -13,7 +13,7 @@ export class AdjustmentDto {
 
     ajustmentDto.id = ajustment.id
     ajustmentDto.problem = ajustment.problem
-    ajustmentDto.sugestion = ajustment.sugestion
+    ajustmentDto.suggestion = ajustment.suggestion
 
     if (expectedResultIndicator) {
       ajustmentDto.expectedResultIndicator = ExpectedResultIndicatorDto.fromEntity(expectedResultIndicator)
