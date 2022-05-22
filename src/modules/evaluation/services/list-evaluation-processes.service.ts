@@ -4,7 +4,7 @@ import { ModelRepository } from '@modules/model/repositories'
 import { ModelNotFoundError } from '@modules/model/errors'
 import { Evaluation } from '@modules/evaluation/entities'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Brackets, Repository } from 'typeorm'
 import { UserIsNotAllowedToAccessThisEvaluationError } from '../errors'
 
 export class ListEvaluationProcessesService {
@@ -26,10 +26,17 @@ export class ListEvaluationProcessesService {
   }
 
   private async verifyIfUserIsAllowed(listEvaluationProcessesQueryDto: ListEvaluationProcessesQueryDto): Promise<void> {
+    const evaluationMemberBracket = new Brackets((bracketsQueryBuilder) => {
+      bracketsQueryBuilder.where('evaluationMember.memberId = :userId')
+      bracketsQueryBuilder.orWhere('evaluation."organizationalUnitId" = :userId')
+
+      return bracketsQueryBuilder
+    })
+
     const evaluation = await this.evaluationRepository
       .createQueryBuilder('evaluation')
       .innerJoin('evaluation.evaluationMembers', 'evaluationMember')
-      .where('evaluationMember.memberId = :userId')
+      .where(evaluationMemberBracket)
       .andWhere('evaluation.id = :evaluationId')
       .setParameters(listEvaluationProcessesQueryDto)
       .getOne()
