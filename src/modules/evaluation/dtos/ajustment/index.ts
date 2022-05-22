@@ -1,1 +1,1 @@
-export * from './create-ajustment.dto'
+export * from './create-adjustment.dto'
