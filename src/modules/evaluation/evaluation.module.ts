@@ -10,7 +10,8 @@ import {
   ListEvaluationsService,
   ListEvaluationProcessesService,
   FindEvaluationService,
-  CreateAdjustmentService
+  CreateAdjustmentService,
+  SetIndicatorStatusService
 } from './services'
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
@@ -60,7 +61,8 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
     ListEvaluationsService,
     ListEvaluationProcessesService,
     FindEvaluationService,
-    CreateAdjustmentService
+    CreateAdjustmentService,
+    SetIndicatorStatusService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

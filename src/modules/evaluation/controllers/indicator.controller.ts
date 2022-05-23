@@ -1,5 +1,5 @@
+import { CreateIndicatorService, UpdateIndicatorService, SetIndicatorStatusService } from '@modules/evaluation/services'
 import { Body, Controller, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common'
-import { CreateIndicatorService, UpdateIndicatorService } from '@modules/evaluation/services'
 import { EvaluationIndicatorsFileDto } from '@modules/evaluation/dtos/evaluation-indicators'
 import { UpdateIndicatorBodyDto, UpdateIndicatorDto } from '@modules/evaluation/dtos'
 import { buildImageFileInterceptor } from '@modules/file-manager/decorators'
@@ -8,6 +8,8 @@ import { AuthorizedUser, RouteGuards, SwaggerUploadFileDecorator } from '@module
 import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
 import { AuthorizedUserDto } from '@modules/shared/dtos/public'
 import { ApiTags } from '@nestjs/swagger'
+import { SetIndicatorStatusDto } from '../dtos/indicator'
+import { IndicatorDto } from '..//dtos/evaluation-indicators'
 
 @ApiTags('Indicator')
 @Controller('indicator')
@@ -16,7 +18,8 @@ export class IndicatorController {
   constructor(
     private readonly createIndicatorService: CreateIndicatorService,
     private readonly updateIndicatorService: UpdateIndicatorService,
-    private readonly uploadIndicatorFileService: UploadIndicatorFileService
+    private readonly uploadIndicatorFileService: UploadIndicatorFileService,
+    private readonly setIndicatorStatusService: SetIndicatorStatusService
   ) {}
 
   @Post(':expectedResultId')
@@ -28,6 +31,12 @@ export class IndicatorController {
   public updateIndicator(@Param('indicatorId') indicatorId: string, @Body() updateIndicatorBodyDto: UpdateIndicatorBodyDto) {
     const updateIndicatorDto = new UpdateIndicatorDto(indicatorId, updateIndicatorBodyDto)
     return this.updateIndicatorService.update(updateIndicatorDto)
+  }
+
+  @Put(':indicatorId/status')
+  public setIndicatorStatus(@Param('indicatorId') indicatorId: string, @Body() { status }: SetIndicatorStatusDto): Promise<IndicatorDto> {
+    const setIndicatorStatusDto = new SetIndicatorStatusDto(indicatorId, status)
+    return this.setIndicatorStatusService.setStatus(setIndicatorStatusDto)
   }
 
   @Post(':indicatorId/file/:projectId')
