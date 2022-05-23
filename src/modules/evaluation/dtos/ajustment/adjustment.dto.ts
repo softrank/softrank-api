@@ -1,22 +1,22 @@
-import { ExpectedResultIndicatorDto } from '../evaluation-indicators'
+import { ExpectedResultDto } from '@modules/shared/dtos/model'
 import { Adjustment } from '@modules/evaluation/entities'
 
 export class AdjustmentDto {
   id: string
   suggestion: string
   problem: string
-  expectedResultIndicator: ExpectedResultIndicatorDto
+  expectedResult: ExpectedResultDto
 
   static fromEntity(ajustment: Adjustment): AdjustmentDto {
-    const { expectedResultIndicator } = ajustment
+    const { expectedResult } = ajustment
     const ajustmentDto = new AdjustmentDto()
 
     ajustmentDto.id = ajustment.id
     ajustmentDto.problem = ajustment.problem
     ajustmentDto.suggestion = ajustment.suggestion
 
-    if (expectedResultIndicator) {
-      ajustmentDto.expectedResultIndicator = ExpectedResultIndicatorDto.fromEntity(expectedResultIndicator)
+    if (expectedResult) {
+      ajustmentDto.expectedResult = ExpectedResultDto.fromEntity(expectedResult)
     }
 
     return ajustmentDto

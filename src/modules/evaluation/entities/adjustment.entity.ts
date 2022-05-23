@@ -1,8 +1,9 @@
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { AuditableEntity } from '@modules/shared/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { ExpectedResult } from '@modules/model/entities'
 import { AjustmentTypeEnum } from '../enums'
-import { ExpectedResultIndicator } from './expected-result-indicator.entity'
+import { Evaluation } from '.'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class Adjustment extends AuditableEntity {
@@ -18,6 +19,9 @@ export class Adjustment extends AuditableEntity {
   @Column('varchar')
   suggestion: string
 
-  @ManyToOne(() => ExpectedResultIndicator, (expectedResultIndicator) => expectedResultIndicator.id)
-  expectedResultIndicator: ExpectedResultIndicator
+  @ManyToOne(() => ExpectedResult, (expectedResult) => expectedResult.id)
+  expectedResult: ExpectedResult
+
+  @ManyToOne(() => Evaluation, (evaluation) => evaluation.id)
+  evaluation: Evaluation
 }

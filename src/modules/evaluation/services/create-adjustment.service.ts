@@ -1,16 +1,20 @@
+import { AdjustmentDto } from '@modules/evaluation/dtos/ajustment/adjustment.dto'
+import { CreateAdjustmentDto } from '@modules/evaluation/dtos/ajustment'
+import { ExpectedResultAlreadyExistsError } from '@modules/model/errors'
+import { EvaluationNotFoundError } from '@modules/evaluation/errors'
+import { Adjustment, Evaluation } from '@modules/evaluation/entities'
 import { EntityManager, getConnection, Repository } from 'typeorm'
-import { ExpectedResultIndicatorNotFoundError } from '../errors'
-import { Adjustment, ExpectedResultIndicator } from '../entities'
-import { AdjustmentDto } from '../dtos/ajustment/adjustment.dto'
-import { CreateAdjustmentDto } from '../dtos/ajustment'
+import { ExpectedResult } from '@modules/model/entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class CreateAdjustmentService {
   constructor(
-    @InjectRepository(ExpectedResultIndicator)
-    private readonly expectedResultIndicatorRepository: Repository<ExpectedResultIndicator>
+    @InjectRepository(Evaluation)
+    private readonly evaluationRepository: Repository<Evaluation>,
+    @InjectRepository(ExpectedResult)
+    private readonly expectedResultRepository: Repository<ExpectedResult>
   ) {}
 
   public async create(createAjustmentDto: CreateAdjustmentDto): Promise<AdjustmentDto> {
@@ -19,38 +23,58 @@ export class CreateAdjustmentService {
     })
 
     const adjustmentDto = AdjustmentDto.fromEntity(adjustment)
-
     return adjustmentDto
   }
 
   public async createWithTransaction(createAjustmentDto: CreateAdjustmentDto, manager: EntityManager): Promise<Adjustment> {
-    const expectedResultIndicator = await this.findExpectedResultById(createAjustmentDto.expectedResultIndicatorId)
-    const adjustment = this.buildAdjustmentEntity(createAjustmentDto, expectedResultIndicator)
+    const expectedResult = await this.findExpectedResultById(createAjustmentDto.expectedResultId)
+    const evaluation = await this.findEvaluationById(createAjustmentDto.evaluationId)
+    const adjustment = this.buildAdjustmentEntity(createAjustmentDto, expectedResult, evaluation)
     const savedAdjustment = await manager.save(adjustment)
+
     return savedAdjustment
   }
 
-  private async findExpectedResultById(expectedResultIndicatorId: string): Promise<ExpectedResultIndicator> {
-    const expectedResultIndicator = await this.expectedResultIndicatorRepository
-      .createQueryBuilder('expectedResultIndicator')
-      .where('expectedResultIndicator.id = :expectedResultIndicatorId')
-      .setParameters({ expectedResultIndicatorId })
+  private async findExpectedResultById(expectedResuultId: string): Promise<ExpectedResult> {
+    const expectedResult = await this.expectedResultRepository
+      .createQueryBuilder('expectedResult')
+      .where('expectedResult.id = :expectedResuultId')
+      .setParameters({ expectedResuultId })
       .getOne()
 
-    if (!expectedResultIndicator) {
-      throw new ExpectedResultIndicatorNotFoundError()
+    if (!expectedResult) {
+      throw new ExpectedResultAlreadyExistsError()
     }
 
-    return expectedResultIndicator
+    return expectedResult
   }
 
-  private buildAdjustmentEntity(createAdjustmentDto: CreateAdjustmentDto, expectedResultIndicator: ExpectedResultIndicator): Adjustment {
+  private async findEvaluationById(evaluationId: string): Promise<Evaluation> {
+    const evaluation = await this.evaluationRepository
+      .createQueryBuilder('evaluation')
+      .where('evaluation.id = :evaluationId')
+      .setParameters({ evaluationId })
+      .getOne()
+
+    if (!evaluation) {
+      throw new EvaluationNotFoundError()
+    }
+
+    return evaluation
+  }
+
+  private buildAdjustmentEntity(
+    createAdjustmentDto: CreateAdjustmentDto,
+    expectedResult: ExpectedResult,
+    evaluation: Evaluation
+  ): Adjustment {
     const adjustment = new Adjustment()
 
     adjustment.problem = createAdjustmentDto.problem
     adjustment.suggestion = createAdjustmentDto.suggestion
     adjustment.type = createAdjustmentDto.type
-    adjustment.expectedResultIndicator = expectedResultIndicator
+    adjustment.expectedResult = expectedResult
+    adjustment.evaluation = evaluation
 
     return adjustment
   }

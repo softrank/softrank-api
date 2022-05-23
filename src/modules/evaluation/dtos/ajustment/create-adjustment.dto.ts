@@ -5,9 +5,10 @@ import { IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator'
 export class CreateAdjustmentDto {
   constructor(createAjustmentDto?: CreateAdjustmentDto) {
     if (createAjustmentDto) {
-      this.expectedResultIndicatorId = createAjustmentDto.expectedResultIndicatorId
       this.problem = createAjustmentDto.problem
       this.suggestion = createAjustmentDto.suggestion
+      this.expectedResultId = createAjustmentDto.expectedResultId
+      this.evaluationId = createAjustmentDto.evaluationId
     }
   }
 
@@ -24,7 +25,12 @@ export class CreateAdjustmentDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID('4')
-  expectedResultIndicatorId: string
+  evaluationId: string
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID('4')
+  expectedResultId: string
 
   @ApiProperty({ example: AjustmentTypeEnum.REQUIRED })
   @IsNotEmpty()

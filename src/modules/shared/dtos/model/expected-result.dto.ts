@@ -27,7 +27,7 @@ export class ExpectedResultDto {
     dto.name = expectedResult.name
     dto.initial = expectedResult.initial
     dto.maxLevel = expectedResult.maxLevel?.initial
-    dto.minLevel = expectedResult.minLevel.initial
+    dto.minLevel = expectedResult.minLevel?.initial
     dto.description = expectedResult.description
 
     return dto
