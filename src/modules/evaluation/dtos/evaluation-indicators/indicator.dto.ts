@@ -2,13 +2,13 @@ import { Indicator } from '@modules/evaluation/entities'
 
 export class IndicatorDto {
   id: string
-  content: string
+  name: string
 
   static fromEntity(indicator: Indicator): IndicatorDto {
     const indicatorDto = new IndicatorDto()
 
     indicatorDto.id = indicator.id
-    indicatorDto.content = indicator.content
+    indicatorDto.name = indicator.name
 
     return indicatorDto
   }

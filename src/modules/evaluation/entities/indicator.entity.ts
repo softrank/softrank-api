@@ -11,7 +11,7 @@ export class Indicator extends AuditableEntity {
   id: string
 
   @Column('varchar', { nullable: true })
-  content: string
+  name: string
 
   @Column('varchar', { nullable: true })
   qualityAssuranceGroup: string

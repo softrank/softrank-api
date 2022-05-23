@@ -54,7 +54,7 @@ export class CreateIndicatorService {
     const evaluationIndicatorsIndicatorDto = new EvaluationIndicatorsIndicatorDto()
 
     evaluationIndicatorsIndicatorDto.id = indicator.id
-    evaluationIndicatorsIndicatorDto.content = indicator.content
+    evaluationIndicatorsIndicatorDto.name = indicator.name
     evaluationIndicatorsIndicatorDto.files = []
 
     return evaluationIndicatorsIndicatorDto

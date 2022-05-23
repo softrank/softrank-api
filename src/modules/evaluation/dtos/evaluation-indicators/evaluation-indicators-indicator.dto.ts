@@ -2,6 +2,6 @@ import { EvaluationIndicatorsFileDto } from '.'
 
 export class EvaluationIndicatorsIndicatorDto {
   id: string
-  content: string
+  name: string
   files: EvaluationIndicatorsFileDto[]
 }

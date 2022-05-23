@@ -5,7 +5,7 @@ export class UpdateIndicatorBodyDto {
   @ApiProperty({ example: 'Planejamento do projeto' })
   @IsOptional()
   @IsString()
-  content: string
+  name: string
 
   @ApiProperty({ example: 'Algum grupo' })
   @IsOptional()
@@ -17,7 +17,7 @@ export class UpdateIndicatorDto extends UpdateIndicatorBodyDto {
   constructor(indicatorId: string, updateIndicatorBodyDto: UpdateIndicatorBodyDto) {
     super()
 
-    this.content = updateIndicatorBodyDto.content
+    this.name = updateIndicatorBodyDto.name
     this.qualityAssuranceGroup = updateIndicatorBodyDto.qualityAssuranceGroup
     this.indicatorId = indicatorId
   }

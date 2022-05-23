@@ -45,7 +45,7 @@ export class UpdateIndicatorService {
   }
 
   private async updateIndicatorData(updateIndicatorDto: UpdateIndicatorDto, indicator: Indicator): Promise<Indicator> {
-    indicator.content = updateIndicatorDto.content
+    indicator.name = updateIndicatorDto.name
     indicator.qualityAssuranceGroup = updateIndicatorDto.qualityAssuranceGroup
 
     return indicator
@@ -55,7 +55,7 @@ export class UpdateIndicatorService {
     const evaluationIndicatorsIndicatorDto = new EvaluationIndicatorsIndicatorDto()
 
     evaluationIndicatorsIndicatorDto.id = indicator.id
-    evaluationIndicatorsIndicatorDto.content = indicator.content
+    evaluationIndicatorsIndicatorDto.name = indicator.name
     evaluationIndicatorsIndicatorDto.files = this.buildEvaluationIndicatorsFileDtos(indicator.files)
 
     return evaluationIndicatorsIndicatorDto

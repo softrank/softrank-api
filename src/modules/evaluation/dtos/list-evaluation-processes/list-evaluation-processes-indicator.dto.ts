@@ -3,14 +3,14 @@ import { ListEvaluationProcessesIndicatorFile } from './list-evaluation-processe
 
 export class ListEvaluationProcessesIndicator {
   id: string
-  content: string
+  name: string
   files: ListEvaluationProcessesIndicatorFile[]
 
   static fromEntity(indicator: Indicator): ListEvaluationProcessesIndicator {
     const listEvaluationProcessesIndicator = new ListEvaluationProcessesIndicator()
 
     listEvaluationProcessesIndicator.id = indicator.id
-    listEvaluationProcessesIndicator.content = indicator.content
+    listEvaluationProcessesIndicator.name = indicator.name
     listEvaluationProcessesIndicator.files = ListEvaluationProcessesIndicatorFile.fromManyEntities(indicator.files)
 
     return listEvaluationProcessesIndicator

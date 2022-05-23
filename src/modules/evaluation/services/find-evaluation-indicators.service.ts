@@ -229,7 +229,7 @@ export class FindEvaluationIndicatorsService {
     const evaluationIndicatorsIndicatorDto = new EvaluationIndicatorsIndicatorDto()
 
     evaluationIndicatorsIndicatorDto.id = indicator.id
-    evaluationIndicatorsIndicatorDto.content = indicator.content
+    evaluationIndicatorsIndicatorDto.name = indicator.name
     evaluationIndicatorsIndicatorDto.files = this.buildEvaluationIndicatorsFilesDtos(indicator.files)
 
     return evaluationIndicatorsIndicatorDto
