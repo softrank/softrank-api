@@ -31,7 +31,6 @@ export class UpdateIndicatorService {
   private async findIndicatorById(indicatorId: string): Promise<Indicator> {
     const indicator = await this.indicatorRepository
       .createQueryBuilder('indicator')
-      .leftJoinAndSelect('indicator.projects', 'project')
       .leftJoinAndSelect('indicator.files', 'file')
       .where('indicator.id = :indicatorId')
       .setParameters({ indicatorId })
