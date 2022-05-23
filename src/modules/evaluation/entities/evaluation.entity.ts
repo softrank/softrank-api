@@ -2,9 +2,9 @@ import { ModelLevel } from '@modules/model/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Column, PrimaryGeneratedColumn, ManyToOne, Entity, OneToMany, JoinColumn } from 'typeorm'
 import { AuditableEntity } from '../../shared/entities/auditable.entity'
-import { EvaluationMember } from './evaluation.member.entity'
+import { EvaluationMember } from './evaluation-member.entity'
 import { OrganizationalUnit } from '../../organizational-unit/entities/organzational-unit.entity'
-import { EvaluationStatusEnum } from '../enums'
+import { EvaluationStateEnum } from '../enums'
 import { EvaluationProject } from '.'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
@@ -13,7 +13,7 @@ export class Evaluation extends AuditableEntity {
   id: string
 
   @Column('varchar')
-  status: EvaluationStatusEnum
+  state: EvaluationStateEnum
 
   @Column('varchar')
   name: string

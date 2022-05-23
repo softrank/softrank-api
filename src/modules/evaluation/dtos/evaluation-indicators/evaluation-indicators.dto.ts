@@ -1,9 +1,9 @@
-import { EvaluationStatusEnum } from '@modules/evaluation/enums'
+import { TranslatedEvaluationStateEnum } from '@modules/evaluation/enums'
 import { EvaluationIndicatorsModelLevelDto } from '.'
 
 export class EvaluationIndicatorsDto {
   id: string
   evaluationId: string
-  status: EvaluationStatusEnum
+  state: TranslatedEvaluationStateEnum
   modelLevels: EvaluationIndicatorsModelLevelDto[]
 }

@@ -1,3 +1,4 @@
+import { TranslatedEvaluationStateEnum } from '@modules/evaluation/enums'
 import { EvaluationMemberDto, EvaluationProjectDto } from '.'
 import { ModelLevelDto } from '../model'
 import { OrganizationalUnitDto } from '../organizational-unit'
@@ -7,6 +8,7 @@ export class EvaluationDto {
   name: string
   start: Date
   end: Date
+  state: TranslatedEvaluationStateEnum
   implementationInstitution: string
   organizationalUnit: OrganizationalUnitDto
   expectedModelLevel: ModelLevelDto

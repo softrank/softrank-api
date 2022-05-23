@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { EvaluationMember, Evaluation, EvaluationProject } from '../entities'
-import { EvaluationMemberType } from '../enums'
+import { EvaluationMemberType, EvaluationStateEnum, evaluationStateMapper, TranslatedEvaluationStateEnum } from '../enums'
 import { EvaluationNotFoundError } from '../errors'
 
 @Injectable()
@@ -54,6 +54,7 @@ export class FindEvaluationService {
     evaluationDto.name = evaluation.name
     evaluationDto.implementationInstitution = evaluation.implementationInstitution
     evaluationDto.start = evaluation.start
+    evaluationDto.state = this.getTranslatedEvaluationState(evaluation.state)
     evaluationDto.auditor = resolvedMember.find((member) => (member.type = EvaluationMemberType.AUDITOR))
     evaluationDto.evaluatorInsitution = resolvedMember.find((member) => (member.type = EvaluationMemberType.EVALUATOR_INSTITUTION))
     evaluationDto.evaluators = resolvedMember.filter(
@@ -101,5 +102,9 @@ export class FindEvaluationService {
       .getOne()
 
     return commonEntity
+  }
+
+  private getTranslatedEvaluationState(evaluationState: EvaluationStateEnum): TranslatedEvaluationStateEnum {
+    return evaluationStateMapper[evaluationState]
   }
 }

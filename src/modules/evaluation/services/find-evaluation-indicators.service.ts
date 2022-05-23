@@ -12,6 +12,7 @@ import { ModelLevel, ModelProcess } from '@modules/model/entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
+import { evaluationStateMapper } from '../enums'
 
 interface ReducedEvaluationIndicators {
   [x: string]: {
@@ -109,7 +110,7 @@ export class FindEvaluationIndicatorsService {
 
     evaluationIndicatorsDto.id = evaluationIndicators.id
     evaluationIndicatorsDto.evaluationId = evaluationIndicators.evaluation.id
-    evaluationIndicatorsDto.status = evaluationIndicators.evaluation.status
+    evaluationIndicatorsDto.state = evaluationStateMapper[evaluationIndicators.evaluation.state]
     evaluationIndicatorsDto.modelLevels = this.buildEvaluationIndicatorsModelLevelsDtos(reducedEvaluationIndicators)
 
     return evaluationIndicatorsDto

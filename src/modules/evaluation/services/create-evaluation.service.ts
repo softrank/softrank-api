@@ -1,4 +1,4 @@
-import { EvaluationMemberStatusEnum, EvaluationStatusEnum, EvaluationMemberType } from '@modules/evaluation/enums'
+import { EvaluationMemberStatusEnum, EvaluationStateEnum, EvaluationMemberType } from '@modules/evaluation/enums'
 import { EvaluationMemberDto, EvaluationProjectDto, EvaluationDto } from '@modules/shared/dtos/evaluation'
 import { CreateEvaluationServiceDto, VerifiedCreateEvaluationDto } from '@modules/evaluation/dtos'
 import { Evaluation, EvaluationMember, EvaluationProject } from '@modules/evaluation/entities'
@@ -164,7 +164,7 @@ export class CreateEvaluationService {
   private buildEvaluationEntity(verifiedCreateEvaluationDto: VerifiedCreateEvaluationDto): Evaluation {
     const evaluation = new Evaluation()
 
-    evaluation.status = EvaluationStatusEnum.PENDING
+    evaluation.state = EvaluationStateEnum.PENDING
     evaluation.name = verifiedCreateEvaluationDto.name
     evaluation.implementationInstitution = verifiedCreateEvaluationDto.implementationInstitution
     evaluation.start = verifiedCreateEvaluationDto.start as any
