@@ -1,5 +1,4 @@
 import { EvaluationIndicatorsFileDto, EvaluationIndicatorsIndicatorDto } from '../dtos/evaluation-indicators'
-import { EvaluationProject } from '../entities/evaluation-project.entity'
 import { EntityManager, Repository, getConnection } from 'typeorm'
 import { IndicatorFile } from '../entities/indicator-files.entity'
 import { InjectRepository } from '@nestjs/typeorm'
