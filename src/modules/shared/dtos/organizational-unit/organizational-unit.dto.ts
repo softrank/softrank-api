@@ -15,18 +15,18 @@ export class OrganizationalUnitDto {
   authorization: LoginResponseDto
 
   static fromEntity(organizationalUnit: OrganizationalUnit, authorization?: LoginResponseDto): OrganizationalUnitDto {
-    const auditorDto = new OrganizationalUnitDto()
+    const organizationalUnitDto = new OrganizationalUnitDto()
 
-    auditorDto.id = organizationalUnit.id
-    auditorDto.status = organizationalUnit.status
-    auditorDto.name = organizationalUnit.commonEntity.name
-    auditorDto.documentNumber = organizationalUnit.commonEntity.documentNumber
-    auditorDto.documentType = organizationalUnit.commonEntity.documentType
-    auditorDto.email = organizationalUnit.commonEntity.email
-    auditorDto.phone = organizationalUnit.commonEntity.phone
-    auditorDto.projects = organizationalUnit.projects?.map(OrganizationalUnitProjectDto.fromEntity)
-    auditorDto.authorization = authorization
+    organizationalUnitDto.id = organizationalUnit.id
+    organizationalUnitDto.status = organizationalUnit.status
+    organizationalUnitDto.name = organizationalUnit.commonEntity.name
+    organizationalUnitDto.documentNumber = organizationalUnit.commonEntity.documentNumber
+    organizationalUnitDto.documentType = organizationalUnit.commonEntity.documentType
+    organizationalUnitDto.email = organizationalUnit.commonEntity.email
+    organizationalUnitDto.phone = organizationalUnit.commonEntity.phone
+    organizationalUnitDto.projects = organizationalUnit.projects?.map(OrganizationalUnitProjectDto.fromEntity)
+    organizationalUnitDto.authorization = authorization
 
-    return auditorDto
+    return organizationalUnitDto
   }
 }
