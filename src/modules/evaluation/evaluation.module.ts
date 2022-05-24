@@ -3,7 +3,7 @@ import { Module, forwardRef } from '@nestjs/common'
 import {
   CreateEvaluationService,
   GenerateEvaluationIndicatorsService,
-  CreateIndicatorService,
+  CreateEmptyIndicatorService,
   FindEvaluationIndicatorsService,
   UpdateIndicatorService,
   UploadIndicatorFileService,
@@ -55,7 +55,7 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
     CreateEvaluationService,
     GenerateEvaluationIndicatorsService,
     FindEvaluationIndicatorsService,
-    CreateIndicatorService,
+    CreateEmptyIndicatorService,
     UpdateIndicatorService,
     UploadIndicatorFileService,
     ListEvaluationsService,

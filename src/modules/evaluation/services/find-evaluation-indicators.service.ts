@@ -9,10 +9,10 @@ import {
 import { Evaluation, EvaluationIndicators, ExpectedResultIndicator, Indicator, IndicatorFile } from '@modules/evaluation/entities'
 import { EvaluationNotFoundError } from '@modules/evaluation/errors'
 import { ModelLevel, ModelProcess } from '@modules/model/entities'
+import { evaluationStateMapper } from '@modules/evaluation/enums'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
-import { evaluationStateMapper } from '../enums'
 
 interface ReducedEvaluationIndicators {
   [x: string]: {
@@ -64,6 +64,7 @@ export class FindEvaluationIndicatorsService {
       .leftJoinAndSelect('modelProcess.model', 'model')
       .leftJoinAndSelect('expectedResultIndicator.indicators', 'indicator')
       .leftJoinAndSelect('indicator.files', 'indicatorFile')
+      .leftJoinAndSelect('indicatorFile.evaluationProject', 'evaluationProject')
       .where('evaluationIndicators.evaluationId = :evaluationId')
       .setParameters({ evaluationId })
       .getOne()
@@ -240,12 +241,7 @@ export class FindEvaluationIndicatorsService {
   }
 
   private buildEvaluationIndicatorsFileDto(indicatorFile: IndicatorFile): EvaluationIndicatorsFileDto {
-    const evaluationIndicatorsFile = new EvaluationIndicatorsFileDto()
-
-    evaluationIndicatorsFile.id = indicatorFile.id
-    evaluationIndicatorsFile.name = indicatorFile.name
-    evaluationIndicatorsFile.source = indicatorFile.source
-
+    const evaluationIndicatorsFile = EvaluationIndicatorsFileDto.fromEntity(indicatorFile)
     return evaluationIndicatorsFile
   }
 }

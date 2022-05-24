@@ -69,6 +69,7 @@ export class ListEvaluationProcessesService {
       .innerJoinAndSelect('expectedResult.expectedResultIndicators', 'expectedResultIndicator')
       .leftJoinAndSelect('expectedResultIndicator.indicators', 'indicator')
       .leftJoinAndSelect('indicator.files', 'indicatorFiles')
+      .leftJoinAndSelect('indicatorFiles.evaluationProject', 'evaluationProject')
       .where('"modelProcess"."modelId" = :modelId')
       .andWhere(
         `

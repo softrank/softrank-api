@@ -7,7 +7,7 @@ import { EvaluationIndicatorsIndicatorDto } from '../dtos/evaluation-indicators'
 import { ExpectedResultIndicatorNotFoundError } from '../errors'
 
 @Injectable()
-export class CreateIndicatorService {
+export class CreateEmptyIndicatorService {
   constructor(
     @InjectRepository(ExpectedResultIndicator)
     private readonly expectedResultIndicatorRepository: Repository<ExpectedResultIndicator>

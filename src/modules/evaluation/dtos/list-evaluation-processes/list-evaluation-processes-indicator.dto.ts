@@ -4,6 +4,7 @@ import { ListEvaluationProcessesIndicatorFile } from './list-evaluation-processe
 export class ListEvaluationProcessesIndicator {
   id: string
   name: string
+  qualityAssuranceGroup: string
   files: ListEvaluationProcessesIndicatorFile[]
 
   static fromEntity(indicator: Indicator): ListEvaluationProcessesIndicator {
@@ -11,6 +12,7 @@ export class ListEvaluationProcessesIndicator {
 
     listEvaluationProcessesIndicator.id = indicator.id
     listEvaluationProcessesIndicator.name = indicator.name
+    listEvaluationProcessesIndicator.qualityAssuranceGroup = indicator.qualityAssuranceGroup
     listEvaluationProcessesIndicator.files = ListEvaluationProcessesIndicatorFile.fromManyEntities(indicator.files)
 
     return listEvaluationProcessesIndicator

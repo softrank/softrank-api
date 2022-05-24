@@ -1,4 +1,4 @@
-import { CreateIndicatorService, UpdateIndicatorService, SetIndicatorStatusService } from '@modules/evaluation/services'
+import { CreateEmptyIndicatorService, UpdateIndicatorService, SetIndicatorStatusService } from '@modules/evaluation/services'
 import { Body, Controller, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { EvaluationIndicatorsFileDto } from '@modules/evaluation/dtos/evaluation-indicators'
 import { UpdateIndicatorBodyDto, UpdateIndicatorDto } from '@modules/evaluation/dtos'
@@ -16,7 +16,7 @@ import { IndicatorDto } from '..//dtos/evaluation-indicators'
 @RouteGuards()
 export class IndicatorController {
   constructor(
-    private readonly createIndicatorService: CreateIndicatorService,
+    private readonly createIndicatorService: CreateEmptyIndicatorService,
     private readonly updateIndicatorService: UpdateIndicatorService,
     private readonly uploadIndicatorFileService: UploadIndicatorFileService,
     private readonly setIndicatorStatusService: SetIndicatorStatusService
