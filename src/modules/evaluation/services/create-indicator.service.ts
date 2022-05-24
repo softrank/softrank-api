@@ -5,6 +5,7 @@ import { ExpectedResultIndicator } from '../entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { EvaluationIndicatorsIndicatorDto } from '../dtos/evaluation-indicators'
 import { ExpectedResultIndicatorNotFoundError } from '../errors'
+import { IndicatorDto, IndicatorFileDto } from '../dtos/entities'
 
 @Injectable()
 export class CreateEmptyIndicatorService {
@@ -12,12 +13,13 @@ export class CreateEmptyIndicatorService {
     @InjectRepository(ExpectedResultIndicator)
     private readonly expectedResultIndicatorRepository: Repository<ExpectedResultIndicator>
   ) {}
-  public async create(expectedResultIndicatorId: string): Promise<EvaluationIndicatorsIndicatorDto> {
+  public async create(expectedResultIndicatorId: string): Promise<IndicatorDto> {
     const indicator = await getConnection().transaction((manager) => {
       return this.createWithTransaction(expectedResultIndicatorId, manager)
     })
 
-    return this.buildEvaluationIndicatorsIndicatorDto(indicator)
+    const indicatorDto = IndicatorDto.fromEntity(indicator)
+    return indicatorDto
   }
 
   public async createWithTransaction(expectedResultIndicatorId: string, manager: EntityManager): Promise<Indicator> {
@@ -48,15 +50,5 @@ export class CreateEmptyIndicatorService {
     indicator.expectedResultIndicator = expectedResultIndicator
 
     return indicator
-  }
-
-  private buildEvaluationIndicatorsIndicatorDto(indicator: Indicator): EvaluationIndicatorsIndicatorDto {
-    const evaluationIndicatorsIndicatorDto = new EvaluationIndicatorsIndicatorDto()
-
-    evaluationIndicatorsIndicatorDto.id = indicator.id
-    evaluationIndicatorsIndicatorDto.name = indicator.name
-    evaluationIndicatorsIndicatorDto.files = []
-
-    return evaluationIndicatorsIndicatorDto
   }
 }

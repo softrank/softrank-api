@@ -1,5 +1,5 @@
-import { IndicatorDto } from '@modules/evaluation/dtos/evaluation-indicators'
 import { ExpectedResultIndicator } from '@modules/evaluation/entities'
+import { IndicatorDto } from '@modules/evaluation/dtos/entities'
 
 export class ExpectedResultIndicatorDto {
   id: string

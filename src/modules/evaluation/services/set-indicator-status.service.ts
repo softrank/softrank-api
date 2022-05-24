@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { SetIndicatorStatusDto } from '@modules/evaluation/dtos/indicator'
+import { IndicatorNotFoundError } from '@modules/evaluation/errors'
 import { EntityManager, getConnection, Repository } from 'typeorm'
-import { IndicatorDto } from '../dtos/evaluation-indicators'
-import { SetIndicatorStatusDto } from '../dtos/indicator'
-import { Indicator } from '../entities'
-import { IndicatorStatusEnum } from '../enums'
-import { IndicatorNotFoundError } from '../errors'
+import { IndicatorDto } from '@modules/evaluation/dtos/entities'
+import { IndicatorStatusEnum } from '@modules/evaluation/enums'
+import { Indicator } from '@modules/evaluation/entities'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class SetIndicatorStatusService {

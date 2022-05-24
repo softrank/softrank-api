@@ -6,10 +6,10 @@ import { buildImageFileInterceptor } from '@modules/file-manager/decorators'
 import { UploadIndicatorFileService } from '@modules/evaluation/services'
 import { AuthorizedUser, RouteGuards, SwaggerUploadFileDecorator } from '@modules/shared/decorators'
 import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
+import { IndicatorDto } from '@modules/evaluation/dtos/entities'
 import { AuthorizedUserDto } from '@modules/shared/dtos/public'
-import { ApiTags } from '@nestjs/swagger'
 import { SetIndicatorStatusDto } from '../dtos/indicator'
-import { IndicatorDto } from '..//dtos/evaluation-indicators'
+import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Indicator')
 @Controller('indicator')
