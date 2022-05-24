@@ -21,4 +21,9 @@ export class AdjustmentDto {
 
     return ajustmentDto
   }
+
+  static fromManyEntities(ajustments: Adjustment[]): AdjustmentDto[] {
+    const adjustmentsDtos = ajustments?.map(AdjustmentDto.fromEntity)
+    return adjustmentsDtos || []
+  }
 }

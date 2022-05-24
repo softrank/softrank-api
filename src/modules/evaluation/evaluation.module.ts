@@ -30,6 +30,7 @@ import {
   EvaluationProject,
   Adjustment
 } from './entities'
+import { ListEvaluationAdjustments } from '@modules/evaluation/services/adjustment'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 import { IndicatorRepository } from '@modules/evaluation/repositories'
 
@@ -66,7 +67,8 @@ import { IndicatorRepository } from '@modules/evaluation/repositories'
     FindEvaluationService,
     CreateAdjustmentService,
     SetIndicatorStatusService,
-    DeleteIndicatorService
+    DeleteIndicatorService,
+    ListEvaluationAdjustments
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

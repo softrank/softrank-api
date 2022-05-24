@@ -22,14 +22,21 @@ export class ModelDto {
   modelLevels: ModelLevelDto[]
 
   static fromEntity(model: Model): ModelDto {
+    const { modelLevels, modelProcesses } = model
     const dto = new ModelDto()
 
     dto.id = model.id
     dto.name = model.name
     dto.year = model.year
     dto.description = model.description
-    dto.modelLevels = model.modelLevels?.map(ModelLevelDto.fromEntity)
-    dto.modelProcesses = model.modelProcesses?.map(ModelProcessDto.fromEntity)
+
+    if (modelLevels) {
+      dto.modelLevels = ModelLevelDto.fromManyEntities(modelLevels)
+    }
+
+    if (modelProcesses) {
+      dto.modelProcesses = ModelProcessDto.fromManyEntities(modelProcesses)
+    }
 
     return dto
   }

@@ -1,7 +1,7 @@
-import { ExpectedResultDto } from '@modules/shared/dtos/model'
+import { ExpectedResultDto, ModelDto } from '@modules/shared/dtos/model'
+import { ModelProcessTypeEnum } from '@modules/model/enum'
 import { ModelProcess } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
-import { ModelProcessTypeEnum } from '@modules/model/enum'
 
 export class ModelProcessDto {
   @ApiProperty()
@@ -22,7 +22,11 @@ export class ModelProcessDto {
   @ApiProperty({ type: () => [ExpectedResultDto] })
   expectedResults: ExpectedResultDto[]
 
+  @ApiProperty({ type: () => [ModelDto] })
+  model: ModelDto
+
   static fromEntity(modelProcess: ModelProcess): ModelProcessDto {
+    const { expectedResults, model } = modelProcess
     const dto = new ModelProcessDto()
 
     dto.id = modelProcess.id
@@ -30,8 +34,20 @@ export class ModelProcessDto {
     dto.initial = modelProcess.initial
     dto.description = modelProcess.description
     dto.type = modelProcess.type
-    dto.expectedResults = modelProcess.expectedResults?.map(ExpectedResultDto.fromEntity)
+
+    if (expectedResults) {
+      dto.expectedResults = ExpectedResultDto.fromManyEntities(expectedResults)
+    }
+
+    if (model) {
+      dto.model = ModelDto.fromEntity(model)
+    }
 
     return dto
+  }
+
+  static fromManyEntities(modelProcesses: ModelProcess[]): ModelProcessDto[] {
+    const modelProcessesDtos = modelProcesses?.map(ModelProcessDto.fromEntity)
+    return modelProcessesDtos || []
   }
 }

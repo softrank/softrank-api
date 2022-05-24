@@ -24,4 +24,9 @@ export class ModelLevelDto {
 
     return dto
   }
+
+  static fromManyEntities(modelLevels: ModelLevel[]): ModelLevelDto[] {
+    const modelLevelsDtos = modelLevels?.map(ModelLevelDto.fromEntity)
+    return modelLevelsDtos || []
+  }
 }

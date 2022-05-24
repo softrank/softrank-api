@@ -19,6 +19,8 @@ import { AuthorizedUser, RouteGuards } from '@modules/shared/decorators'
 import { EvaluationDto } from '@modules/shared/dtos/evaluation'
 import { uuidParamValidation } from '@utils/validations'
 import { ApiTags } from '@nestjs/swagger'
+import { ListEvaluationAdjustments } from '../services/adjustment'
+import { AdjustmentDto } from '../dtos/entities'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -28,7 +30,8 @@ export class EvaluationController {
     private readonly findEvaluationIndicatorsService: FindEvaluationIndicatorsService,
     private readonly listEvaluationProcessesService: ListEvaluationProcessesService,
     private readonly findEvaluationService: FindEvaluationService,
-    private readonly listEvaluationsService: ListEvaluationsService
+    private readonly listEvaluationsService: ListEvaluationsService,
+    private readonly listEvaluationAdjustments: ListEvaluationAdjustments
   ) {}
 
   @Post()
@@ -65,6 +68,12 @@ export class EvaluationController {
   ): Promise<any> {
     const listEvaluationProcessesQueryDto = new ListEvaluationProcessesQueryDto(evaluationId, user.id)
     return this.listEvaluationProcessesService.list(listEvaluationProcessesQueryDto)
+  }
+
+  @Get(':id/adjustments')
+  @RouteGuards()
+  public listEvaluationAdjustmentsRoute(@Param('id', uuidParamValidation()) evaluatoinId: string): Promise<AdjustmentDto[]> {
+    return this.listEvaluationAdjustments.list(evaluatoinId)
   }
 
   @Get(':id')
