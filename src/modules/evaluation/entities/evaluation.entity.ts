@@ -1,9 +1,10 @@
-import { ModelLevel } from '@modules/model/entities'
-import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Column, PrimaryGeneratedColumn, ManyToOne, Entity, OneToMany, JoinColumn } from 'typeorm'
+import { OrganizationalUnit } from '../../organizational-unit/entities/organzational-unit.entity'
+import { ExpectedResultIndicator } from './expected-result-indicator.entity'
 import { AuditableEntity } from '../../shared/entities/auditable.entity'
 import { EvaluationMember } from './evaluation-member.entity'
-import { OrganizationalUnit } from '../../organizational-unit/entities/organzational-unit.entity'
+import { DatabaseSchemaEnum } from '@modules/shared/enums'
+import { ModelLevel } from '@modules/model/entities'
 import { EvaluationStateEnum } from '../enums'
 import { EvaluationProject } from '.'
 
@@ -42,4 +43,8 @@ export class Evaluation extends AuditableEntity {
   @OneToMany(() => EvaluationProject, (evaluationProject) => evaluationProject.evaluation, { cascade: true })
   @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
   projects: EvaluationProject[]
+
+  @OneToMany(() => ExpectedResultIndicator, (expectedResultIndicator) => expectedResultIndicator.evaluation)
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  expectedResultIndicator: ExpectedResultIndicator[]
 }

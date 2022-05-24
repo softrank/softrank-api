@@ -4,6 +4,7 @@ import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { ExpectedResult } from '@modules/model/entities'
 import { Indicator } from '.'
 import { EvaluationIndicators } from './evaluation-indicators.entity'
+import { Evaluation } from './evaluation.entity'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class ExpectedResultIndicator extends AuditableEntity {
@@ -21,4 +22,8 @@ export class ExpectedResultIndicator extends AuditableEntity {
   @ManyToOne(() => EvaluationIndicators)
   @JoinColumn({ name: 'evaluationIndicatorsId', referencedColumnName: 'id' })
   evaluationIndicators: EvaluationIndicators
+
+  @ManyToOne(() => Evaluation, { cascade: false })
+  @JoinColumn({ name: 'evaluationId', referencedColumnName: 'id' })
+  evaluation: Evaluation
 }

@@ -19,11 +19,11 @@ export class Indicator extends AuditableEntity {
   @Column('varchar', { nullable: true })
   status: IndicatorStatusEnum
 
-  @OneToMany(() => IndicatorFile, (indicatorFile) => indicatorFile.indicator)
+  @OneToMany(() => IndicatorFile, (indicatorFile) => indicatorFile.indicator, { cascade: false })
   @JoinColumn({ name: 'id', referencedColumnName: 'indicatorId' })
   files: IndicatorFile[]
 
-  @ManyToOne(() => ExpectedResultIndicator)
+  @ManyToOne(() => ExpectedResultIndicator, { cascade: false })
   @JoinColumn({ name: 'expectedResultIndicatorId', referencedColumnName: 'id' })
   expectedResultIndicator: ExpectedResultIndicator
 }

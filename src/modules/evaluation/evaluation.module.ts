@@ -11,7 +11,8 @@ import {
   ListEvaluationProcessesService,
   FindEvaluationService,
   CreateAdjustmentService,
-  SetIndicatorStatusService
+  SetIndicatorStatusService,
+  DeleteIndicatorService
 } from './services'
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
@@ -30,6 +31,7 @@ import {
   Adjustment
 } from './entities'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
+import { IndicatorRepository } from '@modules/evaluation/repositories'
 
 @Module({
   imports: [
@@ -41,7 +43,8 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
       Indicator,
       IndicatorFile,
       EvaluationProject,
-      Adjustment
+      Adjustment,
+      IndicatorRepository
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
@@ -62,7 +65,8 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
     ListEvaluationProcessesService,
     FindEvaluationService,
     CreateAdjustmentService,
-    SetIndicatorStatusService
+    SetIndicatorStatusService,
+    DeleteIndicatorService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })
