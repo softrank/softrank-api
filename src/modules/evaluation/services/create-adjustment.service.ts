@@ -1,5 +1,5 @@
 import { CreateAdjustmentDto } from '@modules/evaluation/dtos/ajustment'
-import { ExpectedResultAlreadyExistsError } from '@modules/model/errors'
+import { ExpectedResultAlreadyExistsError, ExpectedResultNotFoundError } from '@modules/model/errors'
 import { Adjustment, Evaluation } from '@modules/evaluation/entities'
 import { EvaluationNotFoundError } from '@modules/evaluation/errors'
 import { EntityManager, getConnection, Repository } from 'typeorm'
@@ -43,7 +43,7 @@ export class CreateAdjustmentService {
       .getOne()
 
     if (!expectedResult) {
-      throw new ExpectedResultAlreadyExistsError()
+      throw new ExpectedResultNotFoundError('Resultado esperado não encontrado.')
     }
 
     return expectedResult
@@ -57,7 +57,7 @@ export class CreateAdjustmentService {
       .getOne()
 
     if (!evaluation) {
-      throw new EvaluationNotFoundError()
+      throw new EvaluationNotFoundError('Avaliação não encontrada')
     }
 
     return evaluation

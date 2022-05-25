@@ -5,6 +5,7 @@ import { OrganizationalUnitDto } from '@modules/shared/dtos/organizational-unit'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { EvaluationPlanDto, InterviewDto } from '../dtos/entities'
 import { EvaluationMember, Evaluation, EvaluationProject } from '../entities'
 import { EvaluationMemberType, EvaluationStateEnum, evaluationStateMapper, TranslatedEvaluationStateEnum } from '../enums'
 import { EvaluationNotFoundError } from '../errors'
@@ -29,9 +30,11 @@ export class FindEvaluationService {
       .where('evaluation.id = :evaluationId')
       .innerJoinAndSelect('evaluation.expectedModelLevel', 'expectedModelLevel')
       .innerJoinAndSelect('evaluation.evaluationMembers', 'evaluationMember')
+      .leftJoinAndSelect('evaluation.interviews', 'interview')
+      .leftJoinAndSelect('evaluation.plans', 'plan')
       .innerJoinAndSelect('evaluation.organizationalUnit', 'organizationalUnit')
       .innerJoinAndSelect('organizationalUnit.commonEntity', 'organizationalUnitCommonEntity')
-      .innerJoinAndSelect('evaluation.projects', 'projects')
+      .leftJoinAndSelect('evaluation.projects', 'projects')
       .setParameters({ evaluationId })
       .getOne()
 
@@ -64,6 +67,11 @@ export class FindEvaluationService {
     evaluationDto.expectedModelLevel = ModelLevelDto.fromEntity(evaluation.expectedModelLevel)
     evaluationDto.organizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
     evaluationDto.projects = this.buildEvaluationProjectsDtos(evaluation.projects)
+    evaluationDto.interviews = InterviewDto.fromManyEntities(evaluation.interviews)
+
+    if (evaluation.plan) {
+      evaluationDto.plan = EvaluationPlanDto.fromEntity(evaluation.plan)
+    }
 
     return evaluationDto
   }

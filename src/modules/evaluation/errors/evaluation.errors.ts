@@ -1,19 +1,19 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
 
 export class EvaluationNotFoundError extends HttpException {
-  constructor() {
-    super('Evaluation not found', HttpStatus.NOT_FOUND)
+  constructor(message: string = 'Evaluation not found') {
+    super(message, HttpStatus.NOT_FOUND)
   }
 }
 
 export class EvaluatorCantBeChooseError extends HttpException {
-  constructor() {
-    super('Evaluator can not be choose', HttpStatus.CONFLICT)
+  constructor(message: string = 'Evaluator can not be choose') {
+    super(message, HttpStatus.CONFLICT)
   }
 }
 
 export class UserIsNotAllowedToAccessThisEvaluationError extends HttpException {
-  constructor() {
-    super('User is not allowed to access this evaluation', HttpStatus.FORBIDDEN)
+  constructor(message: string = 'Evaluator can not be choose') {
+    super(message, HttpStatus.FORBIDDEN)
   }
 }

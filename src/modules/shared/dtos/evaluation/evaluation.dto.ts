@@ -1,3 +1,4 @@
+import { EvaluationPlanDto, InterviewDto } from '@modules/evaluation/dtos/entities'
 import { TranslatedEvaluationStateEnum } from '@modules/evaluation/enums'
 import { EvaluationMemberDto, EvaluationProjectDto } from '.'
 import { ModelLevelDto } from '../model'
@@ -17,4 +18,6 @@ export class EvaluationDto {
   evaluators: EvaluationMemberDto[]
   evaluatorInsitution: EvaluationMemberDto
   projects: EvaluationProjectDto[]
+  interviews: InterviewDto[]
+  plan: EvaluationPlanDto
 }

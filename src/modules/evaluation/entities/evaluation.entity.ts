@@ -6,7 +6,8 @@ import { EvaluationMember } from './evaluation-member.entity'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { ModelLevel } from '@modules/model/entities'
 import { EvaluationStateEnum } from '../enums'
-import { EvaluationProject } from '.'
+import { EvaluationPlan, EvaluationProject } from '.'
+import { Interview } from './interview.entity'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class Evaluation extends AuditableEntity {
@@ -47,4 +48,19 @@ export class Evaluation extends AuditableEntity {
   @OneToMany(() => ExpectedResultIndicator, (expectedResultIndicator) => expectedResultIndicator.evaluation)
   @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
   expectedResultIndicator: ExpectedResultIndicator[]
+
+  @OneToMany(() => Interview, (interview) => interview.evaluation, { cascade: false })
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  interviews: Interview[]
+
+  @OneToMany(() => EvaluationPlan, (evaluationPlan) => evaluationPlan.evaluation, { cascade: false })
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  plans: EvaluationPlan[]
+
+  get plan(): EvaluationPlan {
+    if (this.plans?.length) {
+      const mainPlan = this.plans.find((plan) => !plan.deletedAt)
+      return mainPlan
+    }
+  }
 }
