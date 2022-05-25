@@ -26,7 +26,7 @@ export class S3FileUploadService {
     const [_, extension] = uploadFileDto.mimetype.split('/')
     return {
       Bucket: aws.s3.bucket,
-      Key: `${aws.s3.baseFolder}/${v4()}.${extension}`,
+      Key: `${aws.s3.baseFolder}/${uploadFileDto.folder}/${v4()}.${extension}`,
       ContentType: uploadFileDto.mimetype,
       Body: uploadFileDto.buffer,
       ACL: 'public-read'

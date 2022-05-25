@@ -62,7 +62,6 @@ export class ListEvaluationsService {
     }
 
     if (listEvaluationsQueryDto.userId) {
-      console.log('entrei aqui')
       const anyMemberBrackets = new Brackets((subQueryBuilder) => {
         subQueryBuilder
           .where('organizationalUnit.id = :userId')

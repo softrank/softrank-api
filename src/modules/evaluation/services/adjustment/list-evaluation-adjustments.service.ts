@@ -1,7 +1,7 @@
 import { AdjustmentDto } from '@modules/evaluation/dtos/entities'
 import { Adjustment } from '@modules/evaluation/entities'
-import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 
 @Injectable()

@@ -28,11 +28,13 @@ import {
   ExpectedResultIndicator,
   Indicator,
   EvaluationProject,
-  Adjustment
+  Adjustment,
+  Interview
 } from './entities'
 import { ListEvaluationAdjustments } from '@modules/evaluation/services/adjustment'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 import { IndicatorRepository } from '@modules/evaluation/repositories'
+import { UploadInterviewService, UploadEvaluationPlanService } from './services/evaluation'
 
 @Module({
   imports: [
@@ -45,7 +47,8 @@ import { IndicatorRepository } from '@modules/evaluation/repositories'
       IndicatorFile,
       EvaluationProject,
       Adjustment,
-      IndicatorRepository
+      IndicatorRepository,
+      Interview
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
@@ -68,7 +71,9 @@ import { IndicatorRepository } from '@modules/evaluation/repositories'
     CreateAdjustmentService,
     SetIndicatorStatusService,
     DeleteIndicatorService,
-    ListEvaluationAdjustments
+    ListEvaluationAdjustments,
+    UploadInterviewService,
+    UploadEvaluationPlanService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

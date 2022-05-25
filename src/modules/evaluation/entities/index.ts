@@ -7,3 +7,6 @@ export * from './evaluation-indicators.entity'
 export * from './expected-result-indicator.entity'
 export * from './indicator-files.entity'
 export * from './adjustment.entity'
+
+export * from './interview.entity'
+export * from './evaluation-plan.entity'
