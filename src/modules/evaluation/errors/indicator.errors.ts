@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
 
 export class IndicatorNotFoundError extends HttpException {
-  constructor() {
-    super('Indicator not found.', HttpStatus.NOT_FOUND)
+  constructor(message: string = 'Indicator not found.') {
+    super(message, HttpStatus.NOT_FOUND)
   }
 }

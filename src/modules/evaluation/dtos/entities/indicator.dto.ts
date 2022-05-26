@@ -1,6 +1,7 @@
-import { Indicator } from '@modules/evaluation/entities'
+import { ExpectedResultIndicatorDto } from './expected-result-indicator.dto'
 import { IndicatorStatusEnum } from '@modules/evaluation/enums'
 import { EvidenceSourceDto } from './evidence-source.dto'
+import { Indicator } from '@modules/evaluation/entities'
 import { IndicatorFileDto } from './indicator-file.dto'
 
 export class IndicatorDto {
@@ -10,9 +11,10 @@ export class IndicatorDto {
   status: IndicatorStatusEnum
   files: IndicatorFileDto[]
   evidenceSources: EvidenceSourceDto[]
+  expectedResult: ExpectedResultIndicatorDto
 
   static fromEntity(indicator: Indicator): IndicatorDto {
-    const { files, evidenceSources } = indicator
+    const { files, evidenceSources, expectedResultIndicator } = indicator
     const indicatorDto = new IndicatorDto()
 
     indicatorDto.id = indicator.id
@@ -26,6 +28,10 @@ export class IndicatorDto {
 
     if (evidenceSources) {
       indicatorDto.evidenceSources = EvidenceSourceDto.fromManyEntities(evidenceSources)
+    }
+
+    if (expectedResultIndicator) {
+      indicatorDto.expectedResult = ExpectedResultIndicatorDto.fromEntity(expectedResultIndicator)
     }
 
     return indicatorDto
