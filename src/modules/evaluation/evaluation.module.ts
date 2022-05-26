@@ -39,7 +39,7 @@ import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 import { IndicatorRepository, EvidenceSourceRepository } from '@modules/evaluation/repositories'
 import { UploadInterviewService, UploadEvaluationPlanService, EvaluationNextStepService } from './services/evaluation'
 import { FindIndicatorByIdService } from './services/indicator'
-import { DeleteEvidenceSourceService, SetEvidenceSourceFileStatusService } from '@modules/evaluation/services/evidence'
+import { DeleteEvidenceSourceService, SetEvidenceSourceStatusService } from '@modules/evaluation/services/evidence'
 
 @Module({
   imports: [
@@ -86,7 +86,7 @@ import { DeleteEvidenceSourceService, SetEvidenceSourceFileStatusService } from 
     EvaluationNextStepService,
     FindIndicatorByIdService,
     DeleteEvidenceSourceService,
-    SetEvidenceSourceFileStatusService
+    SetEvidenceSourceStatusService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

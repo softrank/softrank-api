@@ -1,54 +1,48 @@
-import { EvidenceSourceFileDto } from '@modules/evaluation/dtos/entities'
-import { SetEvidenceSourceFileStatusDto } from '@modules/evaluation/dtos/evidence-source'
-import { EvidenceSourceFile } from '@modules/evaluation/entities'
-import { EvidenceSourceFileStatusEnum } from '@modules/evaluation/enums'
-import { EvidenceSourceFileNotFoundError } from '@modules/evaluation/errors'
+import { EvidenceSourceDto } from '@modules/evaluation/dtos/entities'
+import { SetEvidenceSourceStatusDto } from '@modules/evaluation/dtos/evidence-source'
+import { EvidenceSource } from '@modules/evaluation/entities'
+import { EvidenceSourceStatusEnum } from '@modules/evaluation/enums'
+import { EvidenceSourceNotFoundError } from '@modules/evaluation/errors'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { EntityManager, getConnection, Repository } from 'typeorm'
 
 @Injectable()
-export class SetEvidenceSourceFileStatusService {
-  constructor(@InjectRepository(EvidenceSourceFile) private readonly evidenceSourceFileRepository: Repository<EvidenceSourceFile>) {}
-  public async set(setEvidenceSourceFileStatusDto: SetEvidenceSourceFileStatusDto): Promise<EvidenceSourceFileDto> {
-    const evidenceSourceFile = await getConnection().transaction((manager) => {
-      return this.setWithTransaction(setEvidenceSourceFileStatusDto, manager)
+export class SetEvidenceSourceStatusService {
+  constructor(@InjectRepository(EvidenceSource) private readonly evidenceSourceRepository: Repository<EvidenceSource>) {}
+  public async set(setEvidenceSourceStatusDto: SetEvidenceSourceStatusDto): Promise<EvidenceSourceDto> {
+    const evidenceSource = await getConnection().transaction((manager) => {
+      return this.setWithTransaction(setEvidenceSourceStatusDto, manager)
     })
 
-    const evidenceSourceFileDto = EvidenceSourceFileDto.fromEntity(evidenceSourceFile)
-    return evidenceSourceFileDto
+    const evidenceSourceDto = EvidenceSourceDto.fromEntity(evidenceSource)
+    return evidenceSourceDto
   }
 
-  public async setWithTransaction(
-    setEvidenceSourceFileStatusDto: SetEvidenceSourceFileStatusDto,
-    manager: EntityManager
-  ): Promise<EvidenceSourceFile> {
-    const evidenceSourceFile = await this.findEvidenceSourceFileById(setEvidenceSourceFileStatusDto.evidenceSourceFileId)
-    const updatedEvidenceSourceFile = this.updateEvidenceSourceFileStauts(evidenceSourceFile, setEvidenceSourceFileStatusDto.status)
-    await manager.save(updatedEvidenceSourceFile)
+  public async setWithTransaction(setEvidenceSourceStatusDto: SetEvidenceSourceStatusDto, manager: EntityManager): Promise<EvidenceSource> {
+    const evidenceSource = await this.findEvidenceSourceById(setEvidenceSourceStatusDto.evidenceSourceId)
+    const updatedEvidenceSource = this.updateEvidenceSourceStauts(evidenceSource, setEvidenceSourceStatusDto.status)
+    await manager.save(updatedEvidenceSource)
 
-    return updatedEvidenceSourceFile
+    return updatedEvidenceSource
   }
 
-  private async findEvidenceSourceFileById(evidenceSourceFileId: string): Promise<EvidenceSourceFile> {
-    const evidenceSourceFile = await this.evidenceSourceFileRepository
-      .createQueryBuilder('evidenceSourceFile')
-      .where('evidenceSourceFile.id = :evidenceSourceFileId')
-      .setParameters({ evidenceSourceFileId })
+  private async findEvidenceSourceById(evidenceSourceId: string): Promise<EvidenceSource> {
+    const evidenceSource = await this.evidenceSourceRepository
+      .createQueryBuilder('evidenceSource')
+      .where('evidenceSource.id = :evidenceSourceId')
+      .setParameters({ evidenceSourceId })
       .getOne()
 
-    if (!evidenceSourceFile) {
-      throw new EvidenceSourceFileNotFoundError()
+    if (!evidenceSource) {
+      throw new EvidenceSourceNotFoundError('Fonde de evidência não encontrada.')
     }
 
-    return evidenceSourceFile
+    return evidenceSource
   }
 
-  private updateEvidenceSourceFileStauts(
-    evidenceSourceFile: EvidenceSourceFile,
-    evidenceSourceFileStatus: EvidenceSourceFileStatusEnum
-  ): EvidenceSourceFile {
-    evidenceSourceFile.status = evidenceSourceFileStatus
-    return evidenceSourceFile
+  private updateEvidenceSourceStauts(evidenceSource: EvidenceSource, evidenceSourceStatus: EvidenceSourceStatusEnum): EvidenceSource {
+    evidenceSource.status = evidenceSourceStatus
+    return evidenceSource
   }
 }
