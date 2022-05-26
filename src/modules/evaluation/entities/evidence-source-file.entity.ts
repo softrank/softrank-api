@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 import { AuditableEntity } from '@modules/shared/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { EvidenceSource } from './evidence-source.entity'
+import { EvidenceSourceFileStatusEnum } from '../enums'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class EvidenceSourceFile extends AuditableEntity {
@@ -16,6 +17,9 @@ export class EvidenceSourceFile extends AuditableEntity {
 
   @Column('varchar')
   mimetype: string
+
+  @Column('varchar', { nullable: true })
+  status: EvidenceSourceFileStatusEnum
 
   @ManyToOne(() => EvidenceSource, (evidenceSource) => evidenceSource.id, { cascade: false })
   @JoinColumn({ name: 'evidenceSourceId', referencedColumnName: 'id' })
