@@ -1,7 +1,7 @@
 export enum EvaluationStateEnum {
   PENDING = 'pending',
   REFUSED = 'refused',
-  INITIAL_EVALUATION = 'inital evaluation',
+  INITIAL_EVALUATION = 'initial evaluation',
   FINAL_EVALUATION = 'final evaluation',
   AUDITORING = 'auditoring',
   FINISHED = 'finished'

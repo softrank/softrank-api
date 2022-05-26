@@ -17,3 +17,9 @@ export class UserIsNotAllowedToAccessThisEvaluationError extends HttpException {
     super(message, HttpStatus.FORBIDDEN)
   }
 }
+
+export class EvaluationCanNotChangeStatusError extends HttpException {
+  constructor(message: string = 'Evaluation can not change status.') {
+    super(message, HttpStatus.UNPROCESSABLE_ENTITY)
+  }
+}

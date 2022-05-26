@@ -1,5 +1,6 @@
 import { EvaluationPlanDto, InterviewDto } from '@modules/evaluation/dtos/entities'
-import { TranslatedEvaluationStateEnum } from '@modules/evaluation/enums'
+import { Evaluation } from '@modules/evaluation/entities'
+import { evaluationStateMapper, TranslatedEvaluationStateEnum } from '@modules/evaluation/enums'
 import { EvaluationMemberDto, EvaluationProjectDto } from '.'
 import { ModelLevelDto } from '../model'
 import { OrganizationalUnitDto } from '../organizational-unit'
@@ -20,4 +21,16 @@ export class EvaluationDto {
   projects: EvaluationProjectDto[]
   interviews: InterviewDto[]
   plan: EvaluationPlanDto
+
+  static fromEntity(evaluation: Evaluation): EvaluationDto {
+    const evaluationDto = new EvaluationDto()
+
+    evaluationDto.id = evaluation.id
+    evaluationDto.name = evaluation.name
+    evaluationDto.start = evaluation.start
+    evaluationDto.end = evaluation.end
+    evaluationDto.state = evaluationStateMapper[evaluation.state]
+
+    return evaluationDto
+  }
 }

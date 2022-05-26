@@ -34,7 +34,7 @@ import {
 import { ListEvaluationAdjustments } from '@modules/evaluation/services/adjustment'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 import { IndicatorRepository } from '@modules/evaluation/repositories'
-import { UploadInterviewService, UploadEvaluationPlanService } from './services/evaluation'
+import { UploadInterviewService, UploadEvaluationPlanService, EvaluationNextStepService } from './services/evaluation'
 
 @Module({
   imports: [
@@ -73,7 +73,8 @@ import { UploadInterviewService, UploadEvaluationPlanService } from './services/
     DeleteIndicatorService,
     ListEvaluationAdjustments,
     UploadInterviewService,
-    UploadEvaluationPlanService
+    UploadEvaluationPlanService,
+    EvaluationNextStepService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })
