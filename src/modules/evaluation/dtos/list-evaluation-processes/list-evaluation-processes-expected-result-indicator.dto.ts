@@ -1,6 +1,5 @@
-import { ExpectedResultIndicator } from '@modules/evaluation/entities'
 import { ExpectedResult } from '@modules/model/entities'
-import { ListEvaluationProcessesIndicator } from './list-evaluation-processes-indicator.dto'
+import { IndicatorDto } from '../entities'
 
 export class ListEvaluationProcessesExpectedResultIndicator {
   id: string
@@ -8,13 +7,15 @@ export class ListEvaluationProcessesExpectedResultIndicator {
   name: string
   initial: string
   description: string
-  indicators: Array<ListEvaluationProcessesIndicator>
+  indicators: IndicatorDto[]
 
   static fromEntity(expectedResult: ExpectedResult): ListEvaluationProcessesExpectedResultIndicator {
     const {
       expectedResultIndicators: [expectedResultIndicator]
     } = expectedResult
     expectedResultIndicator.expectedResult = expectedResult
+
+    const { indicators } = expectedResultIndicator
 
     const listEvaluationProcessesExpectedResultIndicator = new ListEvaluationProcessesExpectedResultIndicator()
 
@@ -23,16 +24,16 @@ export class ListEvaluationProcessesExpectedResultIndicator {
     listEvaluationProcessesExpectedResultIndicator.name = expectedResultIndicator.expectedResult.name
     listEvaluationProcessesExpectedResultIndicator.initial = expectedResultIndicator.expectedResult.initial
     listEvaluationProcessesExpectedResultIndicator.description = expectedResultIndicator.expectedResult.description
-    listEvaluationProcessesExpectedResultIndicator.indicators = ListEvaluationProcessesIndicator.fromManyEntities(
-      expectedResultIndicator.indicators
-    )
+
+    if (indicators) {
+      listEvaluationProcessesExpectedResultIndicator.indicators = IndicatorDto.fromManyEntities(expectedResultIndicator.indicators)
+    }
 
     return listEvaluationProcessesExpectedResultIndicator
   }
 
   static fromManyEntities(expectedResult: Array<ExpectedResult>): Array<ListEvaluationProcessesExpectedResultIndicator> {
-    const listEvaluationProcessesExpectedResultIndicator = expectedResult.map(ListEvaluationProcessesExpectedResultIndicator.fromEntity)
-
-    return listEvaluationProcessesExpectedResultIndicator
+    const listEvaluationProcessesExpectedResultIndicator = expectedResult?.map(ListEvaluationProcessesExpectedResultIndicator.fromEntity)
+    return listEvaluationProcessesExpectedResultIndicator || []
   }
 }

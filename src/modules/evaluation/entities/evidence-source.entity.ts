@@ -1,9 +1,9 @@
-import { AuditableEntity } from '@modules/shared/entities'
-import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { EvaluationStateEnum, EvidenceSourceStatusEnum } from '../enums'
-import { EvaluationProject } from './evaluation-project.entity'
 import { EvidenceSourceFile } from './evidence-source-file.entity'
+import { EvaluationProject } from './evaluation-project.entity'
+import { AuditableEntity } from '@modules/shared/entities'
+import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Indicator } from './indicator.entity'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
@@ -27,5 +27,5 @@ export class EvidenceSource extends AuditableEntity {
 
   @OneToMany(() => EvidenceSourceFile, (evidenceSourceFiles) => evidenceSourceFiles.evidenceSource, { cascade: true })
   @JoinColumn({ name: 'id', referencedColumnName: 'evidenceSourceId' })
-  evidenceSourceFiles: EvidenceSourceFile[]
+  files: EvidenceSourceFile[]
 }

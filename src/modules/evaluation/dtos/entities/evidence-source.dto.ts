@@ -13,15 +13,15 @@ export class EvidenceSourceDto {
   createdOn: TranslatedEvaluationStateEnum
 
   static fromEntity(evidenceSource: EvidenceSource): EvidenceSourceDto {
-    const { evaluationProject, evidenceSourceFiles, indicator } = evidenceSource
+    const { evaluationProject, files, indicator } = evidenceSource
     const evidenceSourceDto = new EvidenceSourceDto()
 
     evidenceSourceDto.id = evidenceSource.id
     evidenceSourceDto.status = evidenceSource.status
     evidenceSourceDto.createdOn = evaluationStateMapper[evidenceSource.createdOn]
 
-    if (evidenceSourceFiles) {
-      evidenceSourceDto.files = EvidenceSourceFileDto.fromManyEntities(evidenceSourceFiles)
+    if (files) {
+      evidenceSourceDto.files = EvidenceSourceFileDto.fromManyEntities(files)
     }
 
     if (evaluationProject) {

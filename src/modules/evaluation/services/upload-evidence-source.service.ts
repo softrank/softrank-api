@@ -131,7 +131,7 @@ export class UploadEvidenceSourceService {
 
     evidenceSource.indicator = indicator
     evidenceSource.createdOn = evaluationState
-    evidenceSource.evidenceSourceFiles = [this.buildEvidenceSourceFile(uploadIndicatorFileDto, url)]
+    evidenceSource.files = [this.buildEvidenceSourceFile(uploadIndicatorFileDto, url)]
     evidenceSource.evaluationProject = evaluationProject
 
     return evidenceSource
