@@ -5,10 +5,10 @@ import {
   DeleteIndicatorService
 } from '@modules/evaluation/services'
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common'
-import { EvaluationIndicatorsFileDto } from '@modules/evaluation/dtos/evaluation-indicators'
+import { EvidenceSourceDto } from '@modules/evaluation/dtos/entities'
 import { UpdateIndicatorBodyDto, UpdateIndicatorDto } from '@modules/evaluation/dtos'
 import { buildImageFileInterceptor } from '@modules/file-manager/decorators'
-import { UploadIndicatorFileService } from '@modules/evaluation/services'
+import { UploadEvidenceSourceService } from '@modules/evaluation/services'
 import { AuthorizedUser, RouteGuards, SwaggerUploadFileDecorator } from '@modules/shared/decorators'
 import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
 import { IndicatorDto } from '@modules/evaluation/dtos/entities'
@@ -24,7 +24,7 @@ export class IndicatorController {
   constructor(
     private readonly createIndicatorService: CreateEmptyIndicatorService,
     private readonly updateIndicatorService: UpdateIndicatorService,
-    private readonly uploadIndicatorFileService: UploadIndicatorFileService,
+    private readonly uploadIndicatorFileService: UploadEvidenceSourceService,
     private readonly setIndicatorStatusService: SetIndicatorStatusService,
     private readonly deleteIndicatorService: DeleteIndicatorService
   ) {}
@@ -60,7 +60,7 @@ export class IndicatorController {
     @Param('indicatorId', uuidParamValidation()) indicatorId: string,
     @Param('projectId', uuidParamValidation()) projectId: string,
     @AuthorizedUser() user: AuthorizedUserDto
-  ): Promise<EvaluationIndicatorsFileDto> {
+  ): Promise<EvidenceSourceDto> {
     const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, projectId, user.id, expressFile)
     return this.uploadIndicatorFileService.upload(uploadIndicatorFileDto)
   }

@@ -10,3 +10,6 @@ export * from './adjustment.entity'
 
 export * from './interview.entity'
 export * from './evaluation-plan.entity'
+
+export * from './evidence-source.entity'
+export * from './evidence-source-file.entity'

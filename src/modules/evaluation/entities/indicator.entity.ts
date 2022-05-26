@@ -2,6 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMan
 import { ExpectedResultIndicator } from './expected-result-indicator.entity'
 import { AuditableEntity } from '../../shared/entities/auditable.entity'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
+import { EvidenceSource } from './evidence-source.entity'
 import { IndicatorFile } from './indicator-files.entity'
 import { IndicatorStatusEnum } from '../enums'
 
@@ -26,4 +27,8 @@ export class Indicator extends AuditableEntity {
   @ManyToOne(() => ExpectedResultIndicator, { cascade: false })
   @JoinColumn({ name: 'expectedResultIndicatorId', referencedColumnName: 'id' })
   expectedResultIndicator: ExpectedResultIndicator
+
+  @OneToMany(() => EvidenceSource, (evidenceSources) => evidenceSources.indicator, { cascade: false })
+  @JoinColumn({ name: 'id', referencedColumnName: 'indicatorId' })
+  evidenceSources: EvidenceSource[]
 }
