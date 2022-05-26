@@ -17,7 +17,7 @@ import {
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
 import { EvaluatorModule } from '../evaluator/evaluator.module'
-import { EvaluationController, IndicatorController, AdjustmentController } from './controllers'
+import { EvaluationController, IndicatorController, AdjustmentController, EvidenceSourceController } from './controllers'
 import { OrganizationalUnitModule } from '../organizational-unit/organizational-unit.module'
 import { PublicModule } from '../public/public.module'
 import { IndicatorFile } from './entities/indicator-files.entity'
@@ -29,13 +29,17 @@ import {
   Indicator,
   EvaluationProject,
   Adjustment,
-  Interview
+  Interview,
+  EvaluationPlan,
+  EvidenceSource,
+  EvidenceSourceFile
 } from './entities'
 import { ListEvaluationAdjustments } from '@modules/evaluation/services/adjustment'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
-import { IndicatorRepository } from '@modules/evaluation/repositories'
+import { IndicatorRepository, EvidenceSourceRepository } from '@modules/evaluation/repositories'
 import { UploadInterviewService, UploadEvaluationPlanService, EvaluationNextStepService } from './services/evaluation'
 import { FindIndicatorByIdService } from './services/indicator'
+import { DeleteEvidenceSourceService } from '@modules/evaluation/services/evidence'
 
 @Module({
   imports: [
@@ -49,7 +53,11 @@ import { FindIndicatorByIdService } from './services/indicator'
       EvaluationProject,
       Adjustment,
       IndicatorRepository,
-      Interview
+      Interview,
+      EvidenceSourceRepository,
+      EvaluationPlan,
+      EvidenceSource,
+      EvidenceSourceFile
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
@@ -58,7 +66,7 @@ import { FindIndicatorByIdService } from './services/indicator'
     forwardRef(() => OrganizationalUnitModule),
     FileManagerModule
   ],
-  controllers: [EvaluationController, IndicatorController, AdjustmentController],
+  controllers: [EvaluationController, IndicatorController, AdjustmentController, EvidenceSourceController],
   providers: [
     CreateEvaluationService,
     GenerateEvaluationIndicatorsService,
@@ -76,7 +84,8 @@ import { FindIndicatorByIdService } from './services/indicator'
     UploadInterviewService,
     UploadEvaluationPlanService,
     EvaluationNextStepService,
-    FindIndicatorByIdService
+    FindIndicatorByIdService,
+    DeleteEvidenceSourceService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })
