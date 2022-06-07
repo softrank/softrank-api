@@ -1,5 +1,5 @@
 import { Evaluation } from '@modules/evaluation/entities'
-import { EvaluationStateEnum, evaluationStateMapper, TranslatedEvaluationStateEnum } from '@modules/evaluation/enums'
+import { evaluationStateMapper, TranslatedEvaluationStateEnum } from '@modules/evaluation/enums'
 import { ListEvaluationModelLevelResponseDto } from './list-evaluation-model-level-response.dto'
 import { ListEvaluationOrganizationalUnitResponseDto } from './list-evaluation-organizational-unit-response.dto'
 

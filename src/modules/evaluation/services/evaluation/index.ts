@@ -1,3 +1,5 @@
 export * from './upload-interview.service'
 export * from './upload-evaluation-plan.service'
 export * from './evaluation-next-step.service'
+export * from './delete-evaluation-plan.service'
+export * from './delete-interview.service'

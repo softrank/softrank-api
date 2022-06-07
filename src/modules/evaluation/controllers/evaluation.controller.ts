@@ -14,14 +14,20 @@ import {
 } from '@modules/evaluation/services'
 import { AuthorizedUserDto } from '../../shared/dtos/public/authorized-user.dto'
 import { EvaluationIndicatorsDto } from '@modules/evaluation/dtos/evaluation-indicators'
-import { Body, Controller, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { AuthorizedUser, RouteGuards, SwaggerUploadFileDecorator } from '@modules/shared/decorators'
 import { EvaluationDto } from '@modules/shared/dtos/evaluation'
 import { uuidParamValidation } from '@utils/validations'
 import { ApiTags } from '@nestjs/swagger'
 import { ListEvaluationAdjustments } from '../services/adjustment'
 import { AdjustmentDto, InterviewDto } from '../dtos/entities'
-import { EvaluationNextStepService, UploadEvaluationPlanService, UploadInterviewService } from '../services/evaluation'
+import {
+  DeleteEvaluationPlanService,
+  DeleteInterviewService,
+  EvaluationNextStepService,
+  UploadEvaluationPlanService,
+  UploadInterviewService
+} from '../services/evaluation'
 import { buildImageFileInterceptor } from '@modules/file-manager/decorators'
 import { UploadInterviewDto } from '../dtos/interview'
 import { UploadEvaluationPlanDto } from '../dtos/evaluation-plan'
@@ -38,7 +44,9 @@ export class EvaluationController {
     private readonly listEvaluationAdjustments: ListEvaluationAdjustments,
     private readonly uploadInterviewService: UploadInterviewService,
     private readonly uploadEvaluationPlanService: UploadEvaluationPlanService,
-    private readonly evaluationNextStepService: EvaluationNextStepService
+    private readonly evaluationNextStepService: EvaluationNextStepService,
+    private readonly deleteEvaluationPlanService: DeleteEvaluationPlanService,
+    private readonly deleteInterviewService: DeleteInterviewService
   ) {}
 
   @Post()
@@ -73,6 +81,18 @@ export class EvaluationController {
   ): Promise<InterviewDto> {
     const uploadEvaluationPlanDto = new UploadEvaluationPlanDto(expressFile, evaluationId)
     return this.uploadEvaluationPlanService.upload(uploadEvaluationPlanDto)
+  }
+
+  @Delete('plans/:planId')
+  @RouteGuards()
+  public deleteEvaluationPlan(@Param('planId', uuidParamValidation()) evaluationPlanId: string): Promise<void> {
+    return this.deleteEvaluationPlanService.delete(evaluationPlanId)
+  }
+
+  @Delete('interviews/:interviewId')
+  @RouteGuards()
+  public deleteInterview(@Param('interviewId', uuidParamValidation()) interviewId: string): Promise<void> {
+    return this.deleteInterviewService.delete(interviewId)
   }
 
   @Get()
