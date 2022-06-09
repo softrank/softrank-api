@@ -19,6 +19,9 @@ export class Adjustment extends AuditableEntity {
   @Column('varchar')
   suggestion: string
 
+  @Column('bool', { default: false })
+  implemented: boolean
+
   @ManyToOne(() => ExpectedResult, (expectedResult) => expectedResult.id)
   expectedResult: ExpectedResult
 
