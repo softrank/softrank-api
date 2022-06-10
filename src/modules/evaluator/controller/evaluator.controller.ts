@@ -11,12 +11,7 @@ import {
   FindEvaluatorByIdService,
   UpdateEvaluatorService
 } from '@modules/evaluator/services'
-import {
-  CreateEvaluatorDto,
-  FindEvaluatorQueryDto,
-  UpdateEvaluatorBodyDto,
-  UpdateEvaluatorDto
-} from '@modules/evaluator/dtos'
+import { CreateEvaluatorDto, FindEvaluatorQueryDto, UpdateEvaluatorBodyDto, UpdateEvaluatorDto } from '@modules/evaluator/dtos'
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { AuthorizedUserDto } from '@modules/shared/dtos/public'
 import { EvaluatorDto } from '@modules/shared/dtos/evaluator'
@@ -26,6 +21,8 @@ import { uuidParamValidation } from '@utils/validations'
 import { RouteGuards } from '../../shared/decorators/route-guards.decorator'
 import { ListEvaluationsService } from '@modules/evaluation/services'
 import { ListEvaluationResponseDto, ListEvaluationsQueryDto } from '@modules/evaluation/dtos'
+import { ModelDto } from '@modules/shared/dtos/model'
+import { ListEvaluatorModelsService } from '../services/model'
 
 @Controller('evaluators')
 @ApiTags('Evaluator')
@@ -35,7 +32,8 @@ export class EvaluatorController {
     private readonly getEvaluatorsService: FindEvaluatorsService,
     private readonly findEvaluatorByIdService: FindEvaluatorByIdService,
     private readonly updateEvaluatorService: UpdateEvaluatorService,
-    private readonly listEvaluationsService: ListEvaluationsService
+    private readonly listEvaluationsService: ListEvaluationsService,
+    private readonly listEvaluatorModelsService: ListEvaluatorModelsService
   ) {}
 
   @Post()
@@ -71,6 +69,12 @@ export class EvaluatorController {
     })
 
     return this.listEvaluationsService.list(listEvaluationsQueryDto)
+  }
+
+  @Get('models')
+  @RouteGuards()
+  public listEvaluatorModelLevels(@AuthorizedUser() user: AuthorizedUserDto): Promise<ModelDto[]> {
+    return this.listEvaluatorModelsService.list(user.id)
   }
 
   @Get(':id')

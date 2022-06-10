@@ -1,10 +1,4 @@
-import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiTags
-} from '@nestjs/swagger'
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { GetModelService, CreateModelService, UpdateModelService } from '@modules/model/services'
 import { CreateModelDto, UpdateModelBodyDto, UpdateModelDto } from '@modules/model/dtos'
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
@@ -27,20 +21,15 @@ export class ModelController {
   @RouteGuards()
   @ApiCreatedResponse({ description: 'Modelo criado com sucesso' })
   @ApiBadRequestResponse({ description: 'Erro de requisição por parte do front' })
-  async createModel(
-    @Body() createModelDto: CreateModelDto,
-    @AuthorizedUser() user: AuthorizedUserDto
-  ): Promise<ModelDto> {
+  async createModel(@Body() createModelDto: CreateModelDto, @AuthorizedUser() user: AuthorizedUserDto): Promise<ModelDto> {
     return this.createModelService.create(createModelDto, user.id)
   }
 
   @Put(':id')
   @ApiOkResponse({ description: 'Modelo atualizado com sucesso' })
   @ApiBadRequestResponse({ description: 'Erro de requisição por parte do front' })
-  async updateModel(
-    @Body() updateModelBodyDto: UpdateModelBodyDto,
-    @Param('id', uuidParamValidation()) id: string
-  ): Promise<ModelDto> {
+  @RouteGuards()
+  async updateModel(@Body() updateModelBodyDto: UpdateModelBodyDto, @Param('id', uuidParamValidation()) id: string): Promise<ModelDto> {
     const updateModelDto = new UpdateModelDto(Object.assign(updateModelBodyDto, { id }))
     return this.updateModelService.update(updateModelDto)
   }

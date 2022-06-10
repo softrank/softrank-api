@@ -40,4 +40,9 @@ export class ModelDto {
 
     return dto
   }
+
+  static fromManyEntities(models: Model[]): ModelDto[] {
+    const modelsDtos = models?.map(ModelDto.fromEntity)
+    return modelsDtos || []
+  }
 }

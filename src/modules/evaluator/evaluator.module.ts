@@ -15,6 +15,7 @@ import { ModelModule } from '@modules/model/model.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { forwardRef, Module } from '@nestjs/common'
 import { EvaluationModule } from '@modules/evaluation/evaluation.module'
+import { ListEvaluatorModelsService } from './services/model'
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { EvaluationModule } from '@modules/evaluation/evaluation.module'
     FindEvaluatorByIdService,
     CreateEvaluatorLicenseService,
     UpdateEvaluatorService,
-    UpdateEvaluatorLicenseService
+    UpdateEvaluatorLicenseService,
+    ListEvaluatorModelsService
   ],
   controllers: [EvaluatorController],
   exports: [TypeOrmModule]

@@ -17,15 +17,12 @@ export class CreateEvaluatorLicenseDto {
   @IsEnum(EvaluatorLicenseType)
   type: EvaluatorLicenseType
 
-  @ApiProperty({ example: v4() })
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   modelLevelId: string
 
-  static toEntity(
-    createEvaluatorLicenseDto: CreateEvaluatorLicenseDto,
-    modelLevel: ModelLevel
-  ): EvaluatorLicense {
+  static toEntity(createEvaluatorLicenseDto: CreateEvaluatorLicenseDto, modelLevel: ModelLevel): EvaluatorLicense {
     const entity = new EvaluatorLicense()
 
     entity.expiration = createEvaluatorLicenseDto.expiration
