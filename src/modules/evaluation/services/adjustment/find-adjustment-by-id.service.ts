@@ -19,6 +19,7 @@ export class FindAdjustmentByIdService {
     const adjustment = await this.adjustmentRepository
       .createQueryBuilder('adjustment')
       .innerJoinAndSelect('adjustment.expectedResult', 'expectedResult')
+      .innerJoinAndSelect('expectedResult.modelProcess', 'modelProcess')
       .where('adjustment.id = :adjustmentId')
       .setParameters({ adjustmentId })
       .getOne()
