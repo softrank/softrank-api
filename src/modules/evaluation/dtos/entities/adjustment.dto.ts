@@ -1,9 +1,11 @@
 import { ExpectedResultDto } from '@modules/shared/dtos/model'
 import { Adjustment } from '@modules/evaluation/entities'
+import { AjustmentTypeEnum } from '@modules/evaluation/enums'
 
 export class AdjustmentDto {
   id: string
   suggestion: string
+  type: AjustmentTypeEnum
   problem: string
   implemented: boolean
   expectedResult: ExpectedResultDto
@@ -13,6 +15,7 @@ export class AdjustmentDto {
     const ajustmentDto = new AdjustmentDto()
 
     ajustmentDto.id = ajustment.id
+    ajustmentDto.type = ajustment.type
     ajustmentDto.problem = ajustment.problem
     ajustmentDto.suggestion = ajustment.suggestion
     ajustmentDto.implemented = ajustment.implemented

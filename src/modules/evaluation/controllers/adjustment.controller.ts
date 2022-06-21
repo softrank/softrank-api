@@ -1,12 +1,11 @@
 import { RouteGuards } from '@modules/shared/decorators'
-import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { uuidParamValidation } from '@utils/validations'
 import { CreateAdjustmentDto, UpdateAdjustmentDto } from '../dtos/ajustment'
 import { AdjustmentDto } from '../dtos/entities'
 import { CreateAdjustmentService } from '../services'
-import { UpdateAdjustmentService } from '../services/adjustment'
-import { DeleteAdjustmentService } from '../services/adjustment/delete-adjustment.service'
+import { UpdateAdjustmentService, FindAdjustmentByIdService, DeleteAdjustmentService } from '../services/adjustment'
 
 @ApiTags('Adjustment')
 @Controller('adjustments')
@@ -14,7 +13,8 @@ export class AdjustmentController {
   constructor(
     private readonly createAjustmentService: CreateAdjustmentService,
     private readonly deleteAdjustmentService: DeleteAdjustmentService,
-    private readonly updateAdjustmentService: UpdateAdjustmentService
+    private readonly updateAdjustmentService: UpdateAdjustmentService,
+    private readonly findAdjustmentByIdService: FindAdjustmentByIdService
   ) {}
 
   @Post()
@@ -28,6 +28,12 @@ export class AdjustmentController {
   public update(@Param('id', uuidParamValidation()) adjustmentId: string, @Body() body: UpdateAdjustmentDto): Promise<AdjustmentDto> {
     const updateAdjustmentDto = new UpdateAdjustmentDto(body, adjustmentId)
     return this.updateAdjustmentService.update(updateAdjustmentDto)
+  }
+
+  @Get(':id')
+  @RouteGuards()
+  public findById(@Param('id', uuidParamValidation()) adjustmentId: string): Promise<AdjustmentDto> {
+    return this.findAdjustmentByIdService.find(adjustmentId)
   }
 
   @Delete(':id')

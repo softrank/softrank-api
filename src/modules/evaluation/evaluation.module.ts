@@ -34,7 +34,12 @@ import {
   EvidenceSource,
   EvidenceSourceFile
 } from './entities'
-import { ListEvaluationAdjustments, DeleteAdjustmentService, UpdateAdjustmentService } from '@modules/evaluation/services/adjustment'
+import {
+  ListEvaluationAdjustments,
+  DeleteAdjustmentService,
+  UpdateAdjustmentService,
+  FindAdjustmentByIdService
+} from '@modules/evaluation/services/adjustment'
 import { FileManagerModule } from '@modules/file-manager/file-manager.module'
 import { IndicatorRepository, EvidenceSourceRepository } from '@modules/evaluation/repositories'
 import {
@@ -96,7 +101,8 @@ import { DeleteEvidenceSourceService, SetEvidenceSourceStatusService } from '@mo
     DeleteEvaluationPlanService,
     DeleteInterviewService,
     DeleteAdjustmentService,
-    UpdateAdjustmentService
+    UpdateAdjustmentService,
+    FindAdjustmentByIdService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })
