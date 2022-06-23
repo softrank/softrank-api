@@ -26,6 +26,7 @@ import {
   DeleteInterviewService,
   EvaluationHasAModelCapacityTypeService,
   EvaluationNextStepService,
+  ListModelProcessToOrganizationalModelCapacitiesIndicator,
   UploadEvaluationPlanService,
   UploadInterviewService
 } from '../services/evaluation'
@@ -38,6 +39,7 @@ import {
 } from '../services/model-capacity-indicators'
 import { ListEvaluationModelCapacitiesIndicatorsQueryDto } from '../dtos/model-capacity-indicator'
 import { VerifyIfEvaluationHasModelCapacityTypeDto } from '../dtos/evaluation/verify-if-evaluation-has-model-capacity-type-query.dto'
+import { ModelProcessDto } from '@modules/shared/dtos/model'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -56,7 +58,8 @@ export class EvaluationController {
     private readonly deleteInterviewService: DeleteInterviewService,
     private readonly generateEvaluationModelCapacityIndicatorsService: GenerateEvaluationModelCapacityIndicatorsService,
     private readonly listEvaluationModelCapacityIndicatorsService: ListEvaluationModelCapacityIndicatorsService,
-    private readonly evaluationHasAModelCapacityTypeService: EvaluationHasAModelCapacityTypeService
+    private readonly evaluationHasAModelCapacityTypeService: EvaluationHasAModelCapacityTypeService,
+    private readonly listModelProcessToOrganizationalModelCapacitiesIndicator: ListModelProcessToOrganizationalModelCapacitiesIndicator
   ) {}
 
   @Post()
@@ -149,6 +152,11 @@ export class EvaluationController {
     @Query() query: ListEvaluationModelCapacitiesIndicatorsQueryDto
   ): Promise<ModelCapacityIndicatorDto[]> {
     return this.listEvaluationModelCapacityIndicatorsService.list(evaluatoinId, query.type)
+  }
+
+  @Get(':id/organizational-proesses')
+  public listEvaluationOrganizationalModelProcesses(@Param('id', uuidParamValidation()) evaluationId: string): Promise<ModelProcessDto[]> {
+    return this.listModelProcessToOrganizationalModelCapacitiesIndicator.list(evaluationId)
   }
 
   @Get(':id')

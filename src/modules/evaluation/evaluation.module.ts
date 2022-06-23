@@ -49,7 +49,8 @@ import {
   EvaluationNextStepService,
   DeleteEvaluationPlanService,
   DeleteInterviewService,
-  EvaluationHasAModelCapacityTypeService
+  EvaluationHasAModelCapacityTypeService,
+  ListModelProcessToOrganizationalModelCapacitiesIndicator
 } from './services/evaluation'
 import { FindIndicatorByIdService } from './services/indicator'
 import { DeleteEvidenceSourceService, SetEvidenceSourceStatusService } from '@modules/evaluation/services/evidence'
@@ -112,7 +113,8 @@ import {
     FindAdjustmentByIdService,
     GenerateEvaluationModelCapacityIndicatorsService,
     ListEvaluationModelCapacityIndicatorsService,
-    EvaluationHasAModelCapacityTypeService
+    EvaluationHasAModelCapacityTypeService,
+    ListModelProcessToOrganizationalModelCapacitiesIndicator
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })
