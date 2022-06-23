@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
 
 export class EvaluationNotFoundError extends HttpException {
-  constructor(message: string = 'Evaluation not found') {
+  constructor(message: string = 'Avaliação não encontrada.') {
     super(message, HttpStatus.NOT_FOUND)
   }
 }

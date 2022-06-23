@@ -32,7 +32,8 @@ import {
   Interview,
   EvaluationPlan,
   EvidenceSource,
-  EvidenceSourceFile
+  EvidenceSourceFile,
+  ModelCapacityIndicator
 } from './entities'
 import {
   ListEvaluationAdjustments,
@@ -51,6 +52,7 @@ import {
 } from './services/evaluation'
 import { FindIndicatorByIdService } from './services/indicator'
 import { DeleteEvidenceSourceService, SetEvidenceSourceStatusService } from '@modules/evaluation/services/evidence'
+import { GenerateEvaluationModelCapacityIndicatorsService } from './services/model-capacity-indicators'
 
 @Module({
   imports: [
@@ -68,7 +70,8 @@ import { DeleteEvidenceSourceService, SetEvidenceSourceStatusService } from '@mo
       EvidenceSourceRepository,
       EvaluationPlan,
       EvidenceSource,
-      EvidenceSourceFile
+      EvidenceSourceFile,
+      ModelCapacityIndicator
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
@@ -102,7 +105,8 @@ import { DeleteEvidenceSourceService, SetEvidenceSourceStatusService } from '@mo
     DeleteInterviewService,
     DeleteAdjustmentService,
     UpdateAdjustmentService,
-    FindAdjustmentByIdService
+    FindAdjustmentByIdService,
+    GenerateEvaluationModelCapacityIndicatorsService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

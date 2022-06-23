@@ -31,6 +31,7 @@ import {
 import { buildImageFileInterceptor } from '@modules/file-manager/decorators'
 import { UploadInterviewDto } from '../dtos/interview'
 import { UploadEvaluationPlanDto } from '../dtos/evaluation-plan'
+import { GenerateEvaluationModelCapacityIndicatorsService } from '../services/model-capacity-indicators'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -46,7 +47,8 @@ export class EvaluationController {
     private readonly uploadEvaluationPlanService: UploadEvaluationPlanService,
     private readonly evaluationNextStepService: EvaluationNextStepService,
     private readonly deleteEvaluationPlanService: DeleteEvaluationPlanService,
-    private readonly deleteInterviewService: DeleteInterviewService
+    private readonly deleteInterviewService: DeleteInterviewService,
+    private readonly generateEvaluationModelCapacityIndicatorsService: GenerateEvaluationModelCapacityIndicatorsService
   ) {}
 
   @Post()
@@ -69,6 +71,12 @@ export class EvaluationController {
   ): Promise<InterviewDto> {
     const uploadInterviewDto = new UploadInterviewDto(expressFile, evaluationId)
     return this.uploadInterviewService.upload(uploadInterviewDto)
+  }
+
+  @Post(':evaluationId/fix-capacities')
+  @RouteGuards()
+  public fixEvaluationCapacities(@Param('evaluationId', uuidParamValidation()) evaluationId: string): Promise<void> {
+    return this.generateEvaluationModelCapacityIndicatorsService.generate(evaluationId)
   }
 
   @Post(':evaluationId/plans')

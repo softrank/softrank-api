@@ -20,6 +20,7 @@ import { ModelLevel } from '@modules/model/entities'
 import { Auditor } from '@modules/auditor/entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Injectable } from '@nestjs/common'
+import { GenerateEvaluationModelCapacityIndicatorsService } from './model-capacity-indicators'
 
 @Injectable()
 export class CreateEvaluationService {
@@ -32,7 +33,8 @@ export class CreateEvaluationService {
     private readonly modelLevelRepository: Repository<ModelLevel>,
     private readonly generateEvaluationIndicatorsService: GenerateEvaluationIndicatorsService,
     @InjectRepository(CommonEntity)
-    private readonly commonEntityRepository: Repository<CommonEntity>
+    private readonly commonEntityRepository: Repository<CommonEntity>,
+    private readonly generateEvaluationModelCapacityIndicatorsService: GenerateEvaluationModelCapacityIndicatorsService
   ) {}
 
   public async create(createEvaluationServiceDto: CreateEvaluationServiceDto): Promise<EvaluationDto> {
@@ -49,6 +51,7 @@ export class CreateEvaluationService {
     const evaluationEntity = this.buildEvaluationEntity(verifiedCreateEvaluation)
     const evaluation = await manager.save(evaluationEntity)
     await this.generateEvaluationIndicatorsService.generateWithTransaction(evaluation.id, manager)
+    await this.generateEvaluationModelCapacityIndicatorsService.generateWithTransaction(evaluation.id, manager)
 
     return evaluation
   }
