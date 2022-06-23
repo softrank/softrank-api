@@ -20,7 +20,7 @@ import { EvaluationDto } from '@modules/shared/dtos/evaluation'
 import { uuidParamValidation } from '@utils/validations'
 import { ApiTags } from '@nestjs/swagger'
 import { ListEvaluationAdjustments } from '../services/adjustment'
-import { AdjustmentDto, InterviewDto } from '../dtos/entities'
+import { AdjustmentDto, InterviewDto, ModelCapacityIndicatorDto } from '../dtos/entities'
 import {
   DeleteEvaluationPlanService,
   DeleteInterviewService,
@@ -31,7 +31,10 @@ import {
 import { buildImageFileInterceptor } from '@modules/file-manager/decorators'
 import { UploadInterviewDto } from '../dtos/interview'
 import { UploadEvaluationPlanDto } from '../dtos/evaluation-plan'
-import { GenerateEvaluationModelCapacityIndicatorsService } from '../services/model-capacity-indicators'
+import {
+  GenerateEvaluationModelCapacityIndicatorsService,
+  ListEvaluationModelCapacityIndicatorsService
+} from '../services/model-capacity-indicators'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -48,7 +51,8 @@ export class EvaluationController {
     private readonly evaluationNextStepService: EvaluationNextStepService,
     private readonly deleteEvaluationPlanService: DeleteEvaluationPlanService,
     private readonly deleteInterviewService: DeleteInterviewService,
-    private readonly generateEvaluationModelCapacityIndicatorsService: GenerateEvaluationModelCapacityIndicatorsService
+    private readonly generateEvaluationModelCapacityIndicatorsService: GenerateEvaluationModelCapacityIndicatorsService,
+    private readonly listEvaluationModelCapacityIndicatorsService: ListEvaluationModelCapacityIndicatorsService
   ) {}
 
   @Post()
@@ -132,6 +136,15 @@ export class EvaluationController {
   @RouteGuards()
   public listEvaluationAdjustmentsRoute(@Param('id', uuidParamValidation()) evaluatoinId: string): Promise<AdjustmentDto[]> {
     return this.listEvaluationAdjustments.list(evaluatoinId)
+  }
+
+  @Get(':id/capacities')
+  @RouteGuards()
+  public listEvaluationModelCapacitiesIndicators(
+    @Param('id', uuidParamValidation()) evaluatoinId: string,
+    @Query() query: any
+  ): Promise<ModelCapacityIndicatorDto[]> {
+    return this.listEvaluationModelCapacityIndicatorsService.list(evaluatoinId, query.type)
   }
 
   @Get(':id')

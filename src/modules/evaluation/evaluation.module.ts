@@ -52,7 +52,10 @@ import {
 } from './services/evaluation'
 import { FindIndicatorByIdService } from './services/indicator'
 import { DeleteEvidenceSourceService, SetEvidenceSourceStatusService } from '@modules/evaluation/services/evidence'
-import { GenerateEvaluationModelCapacityIndicatorsService } from './services/model-capacity-indicators'
+import {
+  GenerateEvaluationModelCapacityIndicatorsService,
+  ListEvaluationModelCapacityIndicatorsService
+} from './services/model-capacity-indicators'
 
 @Module({
   imports: [
@@ -106,7 +109,8 @@ import { GenerateEvaluationModelCapacityIndicatorsService } from './services/mod
     DeleteAdjustmentService,
     UpdateAdjustmentService,
     FindAdjustmentByIdService,
-    GenerateEvaluationModelCapacityIndicatorsService
+    GenerateEvaluationModelCapacityIndicatorsService,
+    ListEvaluationModelCapacityIndicatorsService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })
