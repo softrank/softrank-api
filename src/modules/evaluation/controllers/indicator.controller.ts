@@ -13,7 +13,7 @@ import { AuthorizedUser, RouteGuards, SwaggerUploadFileDecorator } from '@module
 import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
 import { IndicatorDto } from '@modules/evaluation/dtos/entities'
 import { AuthorizedUserDto } from '@modules/shared/dtos/public'
-import { SetIndicatorStatusDto } from '../dtos/indicator'
+import { CreateIndicatorDto, SetIndicatorStatusDto } from '../dtos/indicator'
 import { ApiTags } from '@nestjs/swagger'
 import { uuidParamValidation } from '@utils/validations'
 import { FindIndicatorByIdService } from '../services/indicator'
@@ -30,10 +30,27 @@ export class IndicatorController {
     private readonly findIndicatorByIdService: FindIndicatorByIdService
   ) {}
 
-  @Post(':expectedResultId')
+  @Post(':targetId')
   @RouteGuards()
-  public createIndicator(@Param('expectedResultId', uuidParamValidation()) expectedResultId: string): Promise<any> {
-    return this.createIndicatorService.create(expectedResultId)
+  public createIndicator(
+    @Param('targetId', uuidParamValidation()) targetId: string,
+    @Body() createIndicatorDto: CreateIndicatorDto
+  ): Promise<any> {
+    return this.createIndicatorService.create(targetId, createIndicatorDto)
+  }
+
+  @Post(':indicatorId/file/:projectId')
+  @UseInterceptors(buildImageFileInterceptor('file'))
+  @SwaggerUploadFileDecorator()
+  @RouteGuards()
+  public uploadIndicatorFIle(
+    @UploadedFile() expressFile: Express.Multer.File,
+    @Param('indicatorId', uuidParamValidation()) indicatorId: string,
+    @Param('projectId', uuidParamValidation()) projectId: string,
+    @AuthorizedUser() user: AuthorizedUserDto
+  ): Promise<EvidenceSourceDto> {
+    const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, projectId, user.id, expressFile)
+    return this.uploadIndicatorFileService.upload(uploadIndicatorFileDto)
   }
 
   @Put(':indicatorId')
@@ -54,20 +71,6 @@ export class IndicatorController {
   ): Promise<IndicatorDto> {
     const setIndicatorStatusDto = new SetIndicatorStatusDto(indicatorId, status)
     return this.setIndicatorStatusService.setStatus(setIndicatorStatusDto)
-  }
-
-  @Post(':indicatorId/file/:projectId')
-  @UseInterceptors(buildImageFileInterceptor('file'))
-  @SwaggerUploadFileDecorator()
-  @RouteGuards()
-  public uploadIndicatorFIle(
-    @UploadedFile() expressFile: Express.Multer.File,
-    @Param('indicatorId', uuidParamValidation()) indicatorId: string,
-    @Param('projectId', uuidParamValidation()) projectId: string,
-    @AuthorizedUser() user: AuthorizedUserDto
-  ): Promise<EvidenceSourceDto> {
-    const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, projectId, user.id, expressFile)
-    return this.uploadIndicatorFileService.upload(uploadIndicatorFileDto)
   }
 
   @Delete(':indicatorId')

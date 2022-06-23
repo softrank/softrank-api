@@ -1,33 +1,61 @@
 import { Injectable } from '@nestjs/common'
 import { Indicator } from '../entities/indicator.entity'
 import { getConnection, Repository, EntityManager } from 'typeorm'
-import { ExpectedResultIndicator } from '../entities'
+import { ExpectedResultIndicator, ModelCapacityIndicator } from '../entities'
 import { InjectRepository } from '@nestjs/typeorm'
-import { EvaluationIndicatorsIndicatorDto } from '../dtos/evaluation-indicators'
-import { ExpectedResultIndicatorNotFoundError } from '../errors'
-import { IndicatorDto, IndicatorFileDto } from '../dtos/entities'
+import { ExpectedResultIndicatorNotFoundError, ModelCapacityIndicatorNotFoundError } from '../errors'
+import { IndicatorDto } from '../dtos/entities'
+import { CreateIndicatorDto } from '../dtos/indicator'
+import { IndicatorTypeEnum } from '../enums'
 
 @Injectable()
 export class CreateEmptyIndicatorService {
   constructor(
     @InjectRepository(ExpectedResultIndicator)
-    private readonly expectedResultIndicatorRepository: Repository<ExpectedResultIndicator>
+    private readonly expectedResultIndicatorRepository: Repository<ExpectedResultIndicator>,
+    @InjectRepository(ModelCapacityIndicator)
+    private readonly modelCapacityIndicatorRepository: Repository<ModelCapacityIndicator>
   ) {}
-  public async create(expectedResultIndicatorId: string): Promise<IndicatorDto> {
+
+  public async create(expectedResultIndicatorId: string, createIndicatorDto: CreateIndicatorDto): Promise<IndicatorDto> {
     const indicator = await getConnection().transaction((manager) => {
-      return this.createWithTransaction(expectedResultIndicatorId, manager)
+      return this.createWithTransaction(expectedResultIndicatorId, createIndicatorDto, manager)
     })
 
     const indicatorDto = IndicatorDto.fromEntity(indicator)
     return indicatorDto
   }
 
-  public async createWithTransaction(expectedResultIndicatorId: string, manager: EntityManager): Promise<Indicator> {
-    const expectedResultIndicator = await this.findExpectedResultIndicatorById(expectedResultIndicatorId)
-    const indicatorToCreate = this.buildIndicator(expectedResultIndicator)
+  public async createWithTransaction(targetId: string, createIndicatorDto: CreateIndicatorDto, manager: EntityManager): Promise<Indicator> {
+    const target = await this.findTargetByType(targetId, createIndicatorDto.type)
+    const indicatorToCreate = this.buildIndicator(target)
     const indicator = await manager.save(indicatorToCreate)
 
     return indicator
+  }
+
+  private async findTargetByType(targetId: string, type: IndicatorTypeEnum): Promise<ModelCapacityIndicator | ExpectedResultIndicator> {
+    if (type === IndicatorTypeEnum.MODEL_CAPACITY) {
+      const modelCapacityIndicator = await this.findModelCapacityIndicatorById(targetId)
+      return modelCapacityIndicator
+    } else {
+      const expectedResultIndicator = await this.findExpectedResultIndicatorById(targetId)
+      return expectedResultIndicator
+    }
+  }
+
+  private async findModelCapacityIndicatorById(modelCapacityIndicatorById: string): Promise<ModelCapacityIndicator> {
+    const modelCapacityIndicator = await this.modelCapacityIndicatorRepository
+      .createQueryBuilder('modelCapacityIndicator')
+      .where('modelCapacityIndicator.id = :modelCapacityIndicatorById')
+      .setParameters({ modelCapacityIndicatorById })
+      .getOne()
+
+    if (!modelCapacityIndicator) {
+      throw new ModelCapacityIndicatorNotFoundError()
+    }
+
+    return modelCapacityIndicator
   }
 
   private async findExpectedResultIndicatorById(expectedResultIndicatorId: string): Promise<ExpectedResultIndicator> {
@@ -44,10 +72,16 @@ export class CreateEmptyIndicatorService {
     return expectedResultIndicator
   }
 
-  private buildIndicator(expectedResultIndicator: ExpectedResultIndicator): Indicator {
+  private buildIndicator(targetEntity: ExpectedResultIndicator | ModelCapacityIndicator): Indicator {
     const indicator = new Indicator()
 
-    indicator.expectedResultIndicator = expectedResultIndicator
+    if (targetEntity instanceof ExpectedResultIndicator) {
+      indicator.expectedResultIndicator = targetEntity
+    }
+
+    if (targetEntity instanceof ModelCapacityIndicator) {
+      indicator.modelCapacityIndicator = targetEntity
+    }
 
     return indicator
   }

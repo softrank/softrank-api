@@ -1,4 +1,4 @@
 export enum IndicatorTypeEnum {
-  FILE = 'file',
-  COMMENT = 'comment'
+  MODEL_CAPACITY = 'modelCapacity',
+  EXPECTED_RESULT = 'expectedResult'
 }
