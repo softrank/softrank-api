@@ -1,5 +1,5 @@
 import { Indicator, EvaluationProject, EvidenceSource, EvidenceSourceFile, Evaluation } from '@modules/evaluation/entities'
-import { IndicatorNotFoundError, EvaluationNotFoundError } from '@modules/evaluation/errors'
+import { IndicatorNotFoundError, EvaluationNotFoundError, EvaluationProjectNotFoundError } from '@modules/evaluation/errors'
 import { FileManagerAdapterService } from '@modules/file-manager/services'
 import { EntityManager, getConnection, Repository } from 'typeorm'
 import { UploadIndicatorFileDto } from '@modules/evaluation/dtos'
@@ -8,6 +8,9 @@ import { EvidenceSourceDto } from '../dtos/entities'
 import { InjectRepository } from '@nestjs/typeorm'
 import { EvaluationStateEnum } from '../enums'
 import { Injectable } from '@nestjs/common'
+import { ModelCapacityTypeEnum } from '@modules/model/enum'
+import { ModelProcess } from '@modules/model/entities'
+import { ModelProcessNotFoundError } from '@modules/model/errors'
 
 @Injectable()
 export class UploadEvidenceSourceService {
@@ -18,6 +21,8 @@ export class UploadEvidenceSourceService {
     private readonly evaluationProjectRepository: Repository<EvaluationProject>,
     @InjectRepository(Evaluation)
     private readonly evaluationRepository: Repository<Evaluation>,
+    @InjectRepository(ModelProcess)
+    private readonly modelProcessRepository: Repository<ModelProcess>,
     private readonly fileManagerAdapterService: FileManagerAdapterService
   ) {}
 
@@ -32,19 +37,29 @@ export class UploadEvidenceSourceService {
 
   public async uploadWithTransaction(uploadIndicatorFileDto: UploadIndicatorFileDto, manager: EntityManager): Promise<EvidenceSource> {
     const indicator = await this.findIndicatorById(uploadIndicatorFileDto.indicatorId)
-    const evaluationProject = await this.findEvaluationProjectById(uploadIndicatorFileDto.projectId)
+    const isAProjectTarget = this.isAProjectTarget(indicator)
+    const target = await this.findTargetById(uploadIndicatorFileDto.targetId, isAProjectTarget)
     const url = await this.uploadFile(uploadIndicatorFileDto)
-    const evaluationState = await this.getEvaluationState(indicator.expectedResultIndicator.id)
-    const evidenceSourceToCreate = this.buildEvidenceSource(indicator, url, uploadIndicatorFileDto, evaluationProject, evaluationState)
+    const evaluationState = await this.getEvaluationState(indicator)
+    const evidenceSourceToCreate = this.buildEvidenceSource(indicator, url, uploadIndicatorFileDto, target, evaluationState)
     const evidenceSource = await manager.save(evidenceSourceToCreate)
 
     return evidenceSource
   }
 
+  private isAProjectTarget(indicator: Indicator): boolean {
+    const isExpectedResultIndicator = Boolean(indicator.expectedResultIndicator)
+    const isProjectModelCapacityIndicator = Boolean(indicator.modelCapacityIndicator?.modelCapacity?.type === ModelCapacityTypeEnum.PROJECT)
+
+    return isExpectedResultIndicator || isProjectModelCapacityIndicator
+  }
+
   private async findIndicatorById(indicatorId: string): Promise<Indicator> {
     const indicator = await this.indicatorRepository
       .createQueryBuilder('indicator')
-      .innerJoinAndSelect('indicator.expectedResultIndicator', 'expectedResultIndicator')
+      .leftJoinAndSelect('indicator.expectedResultIndicator', 'expectedResultIndicator')
+      .leftJoinAndSelect('indicator.modelCapacityIndicator', 'modelCapacityIndicator')
+      .leftJoinAndSelect('modelCapacityIndicator.modelCapacity', 'modelCapacity')
       .where('indicator.id = :indicatorId')
       .setParameters({ indicatorId })
       .getOne()
@@ -56,6 +71,30 @@ export class UploadEvidenceSourceService {
     return indicator
   }
 
+  private async findTargetById(targetId: string, isAProjectTarget: boolean): Promise<EvaluationProject | ModelProcess> {
+    if (isAProjectTarget) {
+      const evaluationProject = await this.findEvaluationProjectById(targetId)
+      return evaluationProject
+    } else {
+      const modelProcess = await this.findModelProcessById(targetId)
+      return modelProcess
+    }
+  }
+
+  private async findModelProcessById(modelProcessId: string): Promise<ModelProcess> {
+    const modelProcess = await this.modelProcessRepository
+      .createQueryBuilder('modelProcess')
+      .where('modelProcess.id = :modelProcessId')
+      .setParameters({ modelProcessId })
+      .getOne()
+
+    if (!modelProcess) {
+      throw new ModelProcessNotFoundError()
+    }
+
+    return modelProcess
+  }
+
   private async findEvaluationProjectById(evaluationProjectId: string): Promise<EvaluationProject> {
     const evaluationProject = await this.evaluationProjectRepository
       .createQueryBuilder('evaluationProject')
@@ -64,32 +103,49 @@ export class UploadEvidenceSourceService {
       .getOne()
 
     if (!evaluationProject) {
-      throw new Error()
+      throw new EvaluationProjectNotFoundError()
     }
 
     return evaluationProject
   }
 
-  private async getEvaluationState(expectedResultIndicatorId: string): Promise<EvaluationStateEnum> {
-    const evaluation = await this.evaluationRepository
-      .createQueryBuilder('evaluation')
-      .where(
-        `
+  private async getEvaluationState(indicator: Indicator): Promise<EvaluationStateEnum> {
+    const whereExists = Boolean(indicator.expectedResultIndicator)
+      ? `
+    exists (
+      select
+        1
+      from
+        evaluation.evaluation_indicators evaluationIndicators
+      join
+        evaluation.expected_result_indicator expectedResultIndicator
+        on expectedResultIndicator."evaluationIndicatorsId" = evaluationIndicators.id
+      join
+        evaluation.indicator indicator
+        on indicator."expectedResultIndicatorId" = expectedResultIndicator.id
+      where
+        evaluationIndicators."evaluationId" = evaluation.id
+        and indicator.id = :indicatorId::uuid
+    )
+  `
+      : `
         exists (
           select
             1
           from
-            evaluation.evaluation_indicators evaluationIndicators
+            evaluation.model_capacity_indicator modelCapacityIndicator
           join
-            evaluation.expected_result_indicator expectedResultIndicator
-            on expectedResultIndicator."evaluationIndicatorsId" = evaluationIndicators.id
+            evaluation.indicator indicator
+            on indicator."modelCapacityIndicatorId" = modelCapacityIndicator.id
           where
-            evaluationIndicators."evaluationId" = evaluation.id
-            and expectedResultIndicator.id = :expectedResultIndicatorId::uuid
+            modelCapacityIndicator."evaluationId" = evaluation.id
+            and indicator.id = :indicatorId::uuid
         )
       `
-      )
-      .setParameters({ expectedResultIndicatorId })
+    const evaluation = await this.evaluationRepository
+      .createQueryBuilder('evaluation')
+      .where(whereExists)
+      .setParameters({ indicatorId: indicator.id })
       .getOne()
 
     if (!evaluation) {
@@ -124,7 +180,7 @@ export class UploadEvidenceSourceService {
     indicator: Indicator,
     url: string,
     uploadIndicatorFileDto: UploadIndicatorFileDto,
-    evaluationProject: EvaluationProject,
+    target: EvaluationProject | ModelProcess,
     evaluationState: EvaluationStateEnum
   ): EvidenceSource {
     const evidenceSource = new EvidenceSource()
@@ -132,7 +188,14 @@ export class UploadEvidenceSourceService {
     evidenceSource.indicator = indicator
     evidenceSource.createdOn = evaluationState
     evidenceSource.files = [this.buildEvidenceSourceFile(uploadIndicatorFileDto, url)]
-    evidenceSource.evaluationProject = evaluationProject
+
+    if (target instanceof EvaluationProject) {
+      evidenceSource.evaluationProject = target
+    }
+
+    if (target instanceof ModelProcess) {
+      evidenceSource.modelProcess = target
+    }
 
     return evidenceSource
   }

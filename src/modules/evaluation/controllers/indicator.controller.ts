@@ -39,17 +39,17 @@ export class IndicatorController {
     return this.createIndicatorService.create(targetId, createIndicatorDto)
   }
 
-  @Post(':indicatorId/file/:projectId')
+  @Post(':indicatorId/file/:targetId')
   @UseInterceptors(buildImageFileInterceptor('file'))
   @SwaggerUploadFileDecorator()
   @RouteGuards()
   public uploadIndicatorFIle(
     @UploadedFile() expressFile: Express.Multer.File,
     @Param('indicatorId', uuidParamValidation()) indicatorId: string,
-    @Param('projectId', uuidParamValidation()) projectId: string,
+    @Param('targetId', uuidParamValidation()) targetId: string,
     @AuthorizedUser() user: AuthorizedUserDto
   ): Promise<EvidenceSourceDto> {
-    const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, projectId, user.id, expressFile)
+    const uploadIndicatorFileDto = new UploadIndicatorFileDto(indicatorId, targetId, user.id, expressFile)
     return this.uploadIndicatorFileService.upload(uploadIndicatorFileDto)
   }
 

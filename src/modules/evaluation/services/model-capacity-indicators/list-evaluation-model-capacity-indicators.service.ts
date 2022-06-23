@@ -26,6 +26,7 @@ export class ListEvaluationModelCapacityIndicatorsService {
       .leftJoinAndSelect('indicator.evidenceSources', 'evidenceSource')
       .leftJoinAndSelect('evidenceSource.files', 'evidenceSourceFile')
       .leftJoinAndSelect('evidenceSource.evaluationProject', 'evaluationProject')
+      .leftJoinAndSelect('evidenceSource.modelProcess', 'modelProcess')
       .where('modelCapacityIndicator.evaluation = :evaluationId')
 
     if (type) {

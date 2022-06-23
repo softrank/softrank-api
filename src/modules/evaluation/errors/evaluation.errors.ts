@@ -23,3 +23,9 @@ export class EvaluationCanNotChangeStatusError extends HttpException {
     super(message, HttpStatus.UNPROCESSABLE_ENTITY)
   }
 }
+
+export class EvaluationProjectNotFoundError extends HttpException {
+  constructor(message: string = 'Projeto da avaliação não encontrado.') {
+    super(message, HttpStatus.NOT_FOUND)
+  }
+}

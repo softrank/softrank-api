@@ -5,6 +5,7 @@ import { EvaluationProject } from './evaluation-project.entity'
 import { AuditableEntity } from '@modules/shared/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Indicator } from './indicator.entity'
+import { ModelProcess } from '@modules/model/entities'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class EvidenceSource extends AuditableEntity {
@@ -24,6 +25,10 @@ export class EvidenceSource extends AuditableEntity {
   @ManyToOne(() => EvaluationProject, (evaluationProject) => evaluationProject.id, { cascade: false })
   @JoinColumn({ name: 'evaluationProjectId', referencedColumnName: 'id' })
   evaluationProject: EvaluationProject
+
+  @ManyToOne(() => ModelProcess, (modelProcess) => modelProcess.id, { cascade: false })
+  @JoinColumn({ name: 'modelProcessId', referencedColumnName: 'id' })
+  modelProcess: ModelProcess
 
   @OneToMany(() => EvidenceSourceFile, (evidenceSourceFiles) => evidenceSourceFiles.evidenceSource, { cascade: true })
   @JoinColumn({ name: 'id', referencedColumnName: 'evidenceSourceId' })

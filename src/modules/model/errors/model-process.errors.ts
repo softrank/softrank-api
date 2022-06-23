@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus } from '@nestjs/common'
 
 export class ModelProcessNotFoundError extends HttpException {
-  constructor() {
-    super('Model process not found.', HttpStatus.NOT_FOUND)
+  constructor(message: string = 'Processo do modelo não encontrado.') {
+    super(message, HttpStatus.NOT_FOUND)
   }
 }
 

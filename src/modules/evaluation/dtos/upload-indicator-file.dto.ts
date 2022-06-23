@@ -5,7 +5,7 @@ export class UploadIndicatorFileDto extends ExpressMulterFile {
     super()
 
     this.indicatorId = indicatorId
-    this.projectId = projectId
+    this.targetId = projectId
     this.userId = userId
     this.buffer = expressMulterFile.buffer
     this.destination = expressMulterFile.destination
@@ -20,6 +20,6 @@ export class UploadIndicatorFileDto extends ExpressMulterFile {
   }
 
   indicatorId: string
-  projectId: string
+  targetId: string
   userId: string
 }

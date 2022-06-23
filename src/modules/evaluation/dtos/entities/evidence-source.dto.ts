@@ -3,6 +3,7 @@ import { EvidenceSourceFileDto } from './evidence-source-file.dto'
 import { EvaluationProjectDto } from './evaluation-project.dto'
 import { EvidenceSource } from '@modules/evaluation/entities'
 import { IndicatorDto } from './indicator.dto'
+import { ModelProcessDto } from '@modules/shared/dtos/model'
 
 export class EvidenceSourceDto {
   id: string
@@ -11,9 +12,10 @@ export class EvidenceSourceDto {
   files: EvidenceSourceFileDto[]
   status: EvidenceSourceStatusEnum
   createdOn: TranslatedEvaluationStateEnum
+  modelProcess: ModelProcessDto
 
   static fromEntity(evidenceSource: EvidenceSource): EvidenceSourceDto {
-    const { evaluationProject, files, indicator } = evidenceSource
+    const { evaluationProject, files, indicator, modelProcess } = evidenceSource
     const evidenceSourceDto = new EvidenceSourceDto()
 
     evidenceSourceDto.id = evidenceSource.id
@@ -30,6 +32,10 @@ export class EvidenceSourceDto {
 
     if (indicator) {
       evidenceSourceDto.indicator = IndicatorDto.fromEntity(indicator)
+    }
+
+    if (modelProcess) {
+      evidenceSourceDto.modelProcess = ModelProcessDto.fromEntity(modelProcess)
     }
 
     return evidenceSourceDto
