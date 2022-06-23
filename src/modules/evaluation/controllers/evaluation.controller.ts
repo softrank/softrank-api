@@ -35,6 +35,7 @@ import {
   GenerateEvaluationModelCapacityIndicatorsService,
   ListEvaluationModelCapacityIndicatorsService
 } from '../services/model-capacity-indicators'
+import { ListEvaluationModelCapacitiesIndicatorsQueryDto } from '../dtos/model-capacity-indicator'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -142,7 +143,7 @@ export class EvaluationController {
   @RouteGuards()
   public listEvaluationModelCapacitiesIndicators(
     @Param('id', uuidParamValidation()) evaluatoinId: string,
-    @Query() query: any
+    @Query() query: ListEvaluationModelCapacitiesIndicatorsQueryDto
   ): Promise<ModelCapacityIndicatorDto[]> {
     return this.listEvaluationModelCapacityIndicatorsService.list(evaluatoinId, query.type)
   }
