@@ -24,6 +24,7 @@ import { AdjustmentDto, InterviewDto, ModelCapacityIndicatorDto } from '../dtos/
 import {
   DeleteEvaluationPlanService,
   DeleteInterviewService,
+  EvaluationHasAModelCapacityTypeService,
   EvaluationNextStepService,
   UploadEvaluationPlanService,
   UploadInterviewService
@@ -36,6 +37,7 @@ import {
   ListEvaluationModelCapacityIndicatorsService
 } from '../services/model-capacity-indicators'
 import { ListEvaluationModelCapacitiesIndicatorsQueryDto } from '../dtos/model-capacity-indicator'
+import { VerifyIfEvaluationHasModelCapacityTypeDto } from '../dtos/evaluation/verify-if-evaluation-has-model-capacity-type-query.dto'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -53,7 +55,8 @@ export class EvaluationController {
     private readonly deleteEvaluationPlanService: DeleteEvaluationPlanService,
     private readonly deleteInterviewService: DeleteInterviewService,
     private readonly generateEvaluationModelCapacityIndicatorsService: GenerateEvaluationModelCapacityIndicatorsService,
-    private readonly listEvaluationModelCapacityIndicatorsService: ListEvaluationModelCapacityIndicatorsService
+    private readonly listEvaluationModelCapacityIndicatorsService: ListEvaluationModelCapacityIndicatorsService,
+    private readonly evaluationHasAModelCapacityTypeService: EvaluationHasAModelCapacityTypeService
   ) {}
 
   @Post()
@@ -152,6 +155,15 @@ export class EvaluationController {
   @RouteGuards()
   public findEvaluationByID(@Param('id', uuidParamValidation()) evaluationId: string): Promise<EvaluationDto> {
     return this.findEvaluationService.findById(evaluationId)
+  }
+
+  @Get(':id/has-type')
+  @RouteGuards()
+  public verifyIfEvaluationHasModelCapacityType(
+    @Param('id', uuidParamValidation()) evaluationId: string,
+    @Query() verifyIfEvaluationHasModelCapacityTypeDto: VerifyIfEvaluationHasModelCapacityTypeDto
+  ): Promise<boolean> {
+    return this.evaluationHasAModelCapacityTypeService.verify(evaluationId, verifyIfEvaluationHasModelCapacityTypeDto.type)
   }
 
   @Put(':id/next-step')
