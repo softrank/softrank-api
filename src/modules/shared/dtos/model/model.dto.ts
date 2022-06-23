@@ -1,4 +1,4 @@
-import { ModelProcessDto, ModelLevelDto } from '@modules/shared/dtos/model'
+import { ModelProcessDto, ModelLevelDto, ModelCapacityDto } from '@modules/shared/dtos/model'
 import { Model } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
 
@@ -21,8 +21,11 @@ export class ModelDto {
   @ApiProperty({ type: () => [ModelLevelDto] })
   modelLevels: ModelLevelDto[]
 
+  @ApiProperty({ type: () => [ModelCapacityDto] })
+  modelCapacities: ModelCapacityDto[]
+
   static fromEntity(model: Model): ModelDto {
-    const { modelLevels, modelProcesses } = model
+    const { modelLevels, modelProcesses, modelCapacities } = model
     const dto = new ModelDto()
 
     dto.id = model.id
@@ -36,6 +39,10 @@ export class ModelDto {
 
     if (modelProcesses) {
       dto.modelProcesses = ModelProcessDto.fromManyEntities(modelProcesses)
+    }
+
+    if (modelCapacities) {
+      dto.modelCapacities = ModelCapacityDto.fromManyEntities(modelCapacities)
     }
 
     return dto

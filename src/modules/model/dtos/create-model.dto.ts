@@ -4,10 +4,9 @@ import { setPredecessorModelLevelTransformer } from '@modules/model/transformers
 import { CreateModelProcessDto, CreateModelLevelDto } from '@modules/model/dtos'
 import { dateTransformer } from '@modules/shared/transformers'
 import { Transform, Type } from 'class-transformer'
-import { Model } from '@modules/model/entities'
 import { ApiProperty } from '@nestjs/swagger'
 import { stringDate } from '@utils/helpers'
-import { ModelManager } from '../entities/model-manager.entity'
+import { CreateModelCapacityDto } from './create-model-capacity.dto'
 
 export class CreateModelDto {
   @ApiProperty({
@@ -44,4 +43,10 @@ export class CreateModelDto {
   @ValidateNested()
   @Validate(ModelExpectedResultValidator)
   modelProcesses: CreateModelProcessDto[]
+
+  @ApiProperty({ type: () => [CreateModelCapacityDto] })
+  @Type(() => CreateModelCapacityDto)
+  @IsOptional()
+  @ValidateNested()
+  modelCapacities: CreateModelCapacityDto[]
 }

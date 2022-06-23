@@ -16,6 +16,9 @@ export class GetModelService {
       .leftJoinAndSelect('modelProcess.expectedResults', 'expectedResult')
       .leftJoinAndSelect('expectedResult.maxLevel', 'maxLevel')
       .leftJoinAndSelect('expectedResult.minLevel', 'minLevel')
+      .leftJoinAndSelect('model.modelCapacities', 'modelCapacity')
+      .leftJoinAndSelect('modelCapacity.minModelLevel', 'minModelLevel')
+      .leftJoinAndSelect('modelCapacity.maxModelLevel', 'maxModelLevel')
       .getMany()
 
     const modelsDto = this.mapToDto(models)

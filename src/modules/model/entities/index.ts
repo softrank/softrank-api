@@ -1,5 +1,6 @@
 export * from './expected-result.entity'
 export * from './model-process.entity'
 export * from './model-level.entity'
+export * from './model-capacity.entity'
 export * from './model.entity'
 export * from './model-manager.entity'

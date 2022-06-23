@@ -6,6 +6,7 @@ import { dateTransformer } from '@modules/shared/transformers'
 import { Transform, Type } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
 import { stringDate } from '@utils/helpers'
+import { UpdateModelCapacityDto } from './update-model-capacity.dto'
 
 export class UpdateModelBodyDto {
   @ApiProperty({
@@ -29,8 +30,8 @@ export class UpdateModelBodyDto {
 
   @ApiProperty({ type: () => [UpdateModelLevelDto] })
   @Type(() => UpdateModelLevelDto)
-  @IsNotEmpty()
   @ArrayNotEmpty()
+  @IsOptional()
   @ValidateNested()
   @Transform(setPredecessorModelLevelTransformer)
   @Validate(ModelLevelValidator)
@@ -43,6 +44,13 @@ export class UpdateModelBodyDto {
   @ValidateNested()
   @Validate(ModelExpectedResultValidator)
   modelProcesses: UpdateModelProcessDto[]
+
+  @ApiProperty({ type: () => [UpdateModelCapacityDto] })
+  @Type(() => UpdateModelCapacityDto)
+  @ArrayNotEmpty()
+  @IsOptional()
+  @ValidateNested()
+  modelCapacities: UpdateModelCapacityDto[]
 }
 
 export class UpdateModelDto extends UpdateModelBodyDto {
@@ -54,6 +62,7 @@ export class UpdateModelDto extends UpdateModelBodyDto {
     this.description = updateModelDto.description
     this.modelLevels = updateModelDto.modelLevels
     this.modelProcesses = updateModelDto.modelProcesses
+    this.modelCapacities = updateModelDto.modelCapacities
   }
 
   id: string
