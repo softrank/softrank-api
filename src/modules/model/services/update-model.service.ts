@@ -106,7 +106,7 @@ export class UpdateModelService {
       return this.createModelCapacityService.createWithTransaction(modelCapacityDto, updateModelDto.id, manager)
     })
 
-    if (promises.length) {
+    if (promises?.length) {
       await Promise.all(promises)
     }
   }
