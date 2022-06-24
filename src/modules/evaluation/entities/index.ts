@@ -1,4 +1,6 @@
 export * from './evaluation-member.entity'
+export * from './evaluation-model-process-result.entity'
+export * from './evaluation-model-level-result.entity'
 export * from './evaluation.entity'
 export * from './evaluation-project.entity'
 

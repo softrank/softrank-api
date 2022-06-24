@@ -1,6 +1,6 @@
 import { ModelCapacityTypeEnum } from '@modules/model/enum'
+import { IsEnum, IsOptional } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator'
 
 export class ListEvaluationModelCapacitiesIndicatorsQueryDto {
   @ApiProperty({ example: ModelCapacityTypeEnum.PROJECT, required: false })

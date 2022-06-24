@@ -7,7 +7,7 @@ export class AdjustmentDto {
   suggestion: string
   type: AjustmentTypeEnum
   problem: string
-  implemented: boolean
+  resolution: string
   expectedResult: ExpectedResultDto
 
   static fromEntity(ajustment: Adjustment): AdjustmentDto {
@@ -18,7 +18,7 @@ export class AdjustmentDto {
     ajustmentDto.type = ajustment.type
     ajustmentDto.problem = ajustment.problem
     ajustmentDto.suggestion = ajustment.suggestion
-    ajustmentDto.implemented = ajustment.implemented
+    ajustmentDto.resolution = ajustment.resolution
 
     if (expectedResult) {
       ajustmentDto.expectedResult = ExpectedResultDto.fromEntity(expectedResult)

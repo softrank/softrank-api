@@ -45,7 +45,7 @@ export class UpdateAdjustmentService {
     adjustment.problem = updateAdjustmentDto.problem
     adjustment.suggestion = updateAdjustmentDto.suggestion
     adjustment.type = updateAdjustmentDto.type
-    adjustment.implemented = updateAdjustmentDto.implemented
+    adjustment.resolution = updateAdjustmentDto.resolution
 
     return adjustment
   }

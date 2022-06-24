@@ -39,7 +39,9 @@ import {
   EvaluationPlan,
   EvidenceSource,
   EvidenceSourceFile,
-  ModelCapacityIndicator
+  ModelCapacityIndicator,
+  EvaluationModelLevelResult,
+  EvaluationModelProcessResult
 } from './entities'
 import {
   ListEvaluationAdjustments,
@@ -92,7 +94,9 @@ import {
       EvidenceSource,
       EvidenceSourceFile,
       ModelCapacityIndicator,
-      TargetAvaliation
+      TargetAvaliation,
+      EvaluationModelLevelResult,
+      EvaluationModelProcessResult
     ]),
     PublicModule,
     forwardRef(() => ModelModule),

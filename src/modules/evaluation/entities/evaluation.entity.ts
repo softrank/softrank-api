@@ -1,5 +1,7 @@
 import { Column, PrimaryGeneratedColumn, ManyToOne, Entity, OneToMany, JoinColumn } from 'typeorm'
 import { OrganizationalUnit } from '../../organizational-unit/entities/organzational-unit.entity'
+import { EvaluationModelProcessResult } from './evaluation-model-process-result.entity'
+import { EvaluationModelLevelResult } from './evaluation-model-level-result.entity'
 import { ExpectedResultIndicator } from './expected-result-indicator.entity'
 import { AuditableEntity } from '../../shared/entities/auditable.entity'
 import { EvaluationMember } from './evaluation-member.entity'
@@ -56,6 +58,18 @@ export class Evaluation extends AuditableEntity {
   @OneToMany(() => EvaluationPlan, (evaluationPlan) => evaluationPlan.evaluation, { cascade: false })
   @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
   plans: EvaluationPlan[]
+
+  @OneToMany(() => EvaluationModelProcessResult, (evaluationModelProcessResult) => evaluationModelProcessResult.evaluation, {
+    cascade: false
+  })
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  evaluationModelProcessResults: EvaluationModelProcessResult[]
+
+  @OneToMany(() => EvaluationModelLevelResult, (evaluationModelLevelResult) => evaluationModelLevelResult.evaluation, {
+    cascade: false
+  })
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  evaluationModelLevelResults: EvaluationModelLevelResult[]
 
   get plan(): EvaluationPlan {
     if (this.plans?.length) {
