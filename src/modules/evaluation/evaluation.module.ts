@@ -17,7 +17,13 @@ import {
 import { ModelModule } from '../model/model.module'
 import { AuditorModule } from '../auditor/auditor.module'
 import { EvaluatorModule } from '../evaluator/evaluator.module'
-import { EvaluationController, IndicatorController, AdjustmentController, EvidenceSourceController } from './controllers'
+import {
+  EvaluationController,
+  IndicatorController,
+  AdjustmentController,
+  EvidenceSourceController,
+  EvaluationIndicatorController
+} from './controllers'
 import { OrganizationalUnitModule } from '../organizational-unit/organizational-unit.module'
 import { PublicModule } from '../public/public.module'
 import { IndicatorFile } from './entities/indicator-files.entity'
@@ -58,6 +64,7 @@ import {
   GenerateEvaluationModelCapacityIndicatorsService,
   ListEvaluationModelCapacityIndicatorsService
 } from './services/model-capacity-indicators'
+import { SetExpectedResultIndicatorStatusService } from './services/expected-result-indicator'
 
 @Module({
   imports: [
@@ -85,7 +92,7 @@ import {
     forwardRef(() => OrganizationalUnitModule),
     FileManagerModule
   ],
-  controllers: [EvaluationController, IndicatorController, AdjustmentController, EvidenceSourceController],
+  controllers: [EvaluationController, IndicatorController, AdjustmentController, EvidenceSourceController, EvaluationIndicatorController],
   providers: [
     CreateEvaluationService,
     GenerateEvaluationIndicatorsService,
@@ -114,7 +121,8 @@ import {
     GenerateEvaluationModelCapacityIndicatorsService,
     ListEvaluationModelCapacityIndicatorsService,
     EvaluationHasAModelCapacityTypeService,
-    ListModelProcessToOrganizationalModelCapacitiesIndicator
+    ListModelProcessToOrganizationalModelCapacitiesIndicator,
+    SetExpectedResultIndicatorStatusService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

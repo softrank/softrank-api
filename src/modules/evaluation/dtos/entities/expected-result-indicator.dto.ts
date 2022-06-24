@@ -1,9 +1,11 @@
 import { ExpectedResultIndicator } from '@modules/evaluation/entities'
 import { IndicatorDto } from '@modules/evaluation/dtos/entities'
+import { ExpectedResultIndicatorStatusEnum } from '@modules/evaluation/enums'
 
 export class ExpectedResultIndicatorDto {
   id: string
   expectedResultId: string
+  status: ExpectedResultIndicatorStatusEnum
   name: string
   initial: string
   descriptions: string
@@ -14,6 +16,7 @@ export class ExpectedResultIndicatorDto {
     const expectedResultIndicatorDto = new ExpectedResultIndicatorDto()
 
     expectedResultIndicatorDto.id = expectedResultIndicator.id
+    expectedResultIndicatorDto.status = expectedResultIndicator.status
 
     if (expectedResult) {
       expectedResultIndicatorDto.expectedResultId = expectedResult.id
