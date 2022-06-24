@@ -23,6 +23,7 @@ export class ListEvaluationModelCapacityIndicatorsService {
       .createQueryBuilder('modelCapacityIndicator')
       .innerJoinAndSelect('modelCapacityIndicator.modelCapacity', 'modelCapacity')
       .leftJoinAndSelect('modelCapacityIndicator.indicators', 'indicator')
+      .leftJoinAndSelect('modelCapacityIndicator.targetAvaliations', 'targetAvaliation')
       .leftJoinAndSelect('indicator.evidenceSources', 'evidenceSource')
       .leftJoinAndSelect('evidenceSource.files', 'evidenceSourceFile')
       .leftJoinAndSelect('evidenceSource.evaluationProject', 'evaluationProject')

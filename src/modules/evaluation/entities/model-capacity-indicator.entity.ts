@@ -27,7 +27,7 @@ export class ModelCapacityIndicator extends AuditableEntity {
   @JoinColumn({ name: 'modelCapacityId', referencedColumnName: 'id' })
   modelCapacity: ModelCapacity
 
-  @OneToMany(() => TargetAvaliation, (targetStatus) => targetStatus.ownerId, { cascade: false })
+  @OneToMany(() => TargetAvaliation, (targetStatus) => targetStatus.modelCapacityIndicator, { cascade: false })
   @JoinColumn({ name: 'id', referencedColumnName: 'ownerId' })
-  targetAvaluations: TargetAvaliation[]
+  targetAvaliations: TargetAvaliation[]
 }

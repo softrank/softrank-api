@@ -5,6 +5,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 import { TargetAvaliationTypeEnum, TargetAvaliationStatusEnum, TargetAvaliationOwnerType } from '../enums'
 import { EvaluationProject } from './evaluation-project.entity'
 import { ExpectedResultIndicator } from './expected-result-indicator.entity'
+import { ModelCapacityIndicator } from './model-capacity-indicator.entity'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class TargetAvaliation<Status = TargetAvaliationStatusEnum> extends AuditableEntity {
@@ -37,4 +38,8 @@ export class TargetAvaliation<Status = TargetAvaliationStatusEnum> extends Audit
   @ManyToOne(() => ExpectedResultIndicator, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'ownerId', referencedColumnName: 'id' })
   expectedResultIndicator: ExpectedResultIndicator
+
+  @ManyToOne(() => ModelCapacityIndicator, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'ownerId', referencedColumnName: 'id' })
+  modelCapacityIndicator: ModelCapacityIndicator
 }
