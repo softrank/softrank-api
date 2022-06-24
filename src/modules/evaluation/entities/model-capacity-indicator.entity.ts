@@ -1,15 +1,19 @@
-import { Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { AuditableEntity } from '@modules/shared/entities'
 import { ModelCapacity } from '@modules/model/entities'
 import { TargetAvaliation } from './target-avaliations.entity'
 import { Evaluation } from './evaluation.entity'
 import { Indicator } from './indicator.entity'
+import { ModelCapacityIndicatorStatusEnum } from '../enums'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class ModelCapacityIndicator extends AuditableEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
+
+  @Column('varchar', { nullable: true })
+  status: ModelCapacityIndicatorStatusEnum
 
   @OneToMany(() => Indicator, (indicator) => indicator.modelCapacityIndicator)
   @JoinColumn({ name: 'id', referencedColumnName: 'modelCapacityIndicatorId' })

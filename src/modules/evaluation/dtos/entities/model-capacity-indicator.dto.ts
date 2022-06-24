@@ -1,8 +1,10 @@
 import { ModelCapacityIndicator } from '@modules/evaluation/entities'
+import { ModelCapacityIndicatorStatusEnum } from '@modules/evaluation/enums'
 import { IndicatorDto } from './indicator.dto'
 
 export class ModelCapacityIndicatorDto {
   id: string
+  status: ModelCapacityIndicatorStatusEnum
   modelCapacityId: string
   name: string
   indicators: IndicatorDto[]
@@ -12,6 +14,7 @@ export class ModelCapacityIndicatorDto {
     const modelCapacityIndicatorDto = new ModelCapacityIndicatorDto()
 
     modelCapacityIndicatorDto.id = modelCapacityIndcator.id
+    modelCapacityIndicatorDto.status = modelCapacityIndcator.status
 
     if (modelCapacity) {
       modelCapacityIndicatorDto.name = modelCapacity.name
