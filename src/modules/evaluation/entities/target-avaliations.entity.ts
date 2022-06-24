@@ -4,6 +4,7 @@ import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { TargetAvaliationTypeEnum, TargetAvaliationStatusEnum, TargetAvaliationOwnerType } from '../enums'
 import { EvaluationProject } from './evaluation-project.entity'
+import { ExpectedResultIndicator } from './expected-result-indicator.entity'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class TargetAvaliation<Status = TargetAvaliationStatusEnum> extends AuditableEntity {
@@ -19,7 +20,7 @@ export class TargetAvaliation<Status = TargetAvaliationStatusEnum> extends Audit
   @Column('varchar', { nullable: true })
   targetType: TargetAvaliationTypeEnum
 
-  @Column('varchar')
+  @Column('uuid', { nullable: true })
   ownerId: string
 
   @Column('varchar')
@@ -32,4 +33,8 @@ export class TargetAvaliation<Status = TargetAvaliationStatusEnum> extends Audit
   @ManyToOne(() => EvaluationProject, (evaluationProject) => evaluationProject.id, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'targetId', referencedColumnName: 'id' })
   evaluationProject: EvaluationProject
+
+  @ManyToOne(() => ExpectedResultIndicator, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'ownerId', referencedColumnName: 'id' })
+  expectedResultIndicator: ExpectedResultIndicator
 }

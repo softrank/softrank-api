@@ -32,7 +32,7 @@ export class ExpectedResultIndicator extends AuditableEntity {
   @JoinColumn({ name: 'evaluationId', referencedColumnName: 'id' })
   evaluation: Evaluation
 
-  @OneToMany(() => TargetAvaliation, (targetStatus) => targetStatus.ownerId, { cascade: false })
+  @OneToMany(() => TargetAvaliation, (targetStatus) => targetStatus.expectedResultIndicator, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'id', referencedColumnName: 'ownerId' })
-  targetAvaluations: TargetAvaliation[]
+  targetAvaliations: TargetAvaliation[]
 }

@@ -1,5 +1,5 @@
 import { ExpectedResultIndicator } from '@modules/evaluation/entities'
-import { IndicatorDto } from '@modules/evaluation/dtos/entities'
+import { IndicatorDto, TargetAvaliationDto } from '@modules/evaluation/dtos/entities'
 import { ExpectedResultIndicatorStatusEnum } from '@modules/evaluation/enums'
 
 export class ExpectedResultIndicatorDto {
@@ -8,11 +8,12 @@ export class ExpectedResultIndicatorDto {
   status: ExpectedResultIndicatorStatusEnum
   name: string
   initial: string
-  descriptions: string
+  description: string
   indicators: IndicatorDto[]
+  projectsAvaliations: TargetAvaliationDto[]
 
   static fromEntity(expectedResultIndicator: ExpectedResultIndicator): ExpectedResultIndicatorDto {
-    const { expectedResult, indicators } = expectedResultIndicator
+    const { expectedResult, indicators, targetAvaliations } = expectedResultIndicator
     const expectedResultIndicatorDto = new ExpectedResultIndicatorDto()
 
     expectedResultIndicatorDto.id = expectedResultIndicator.id
@@ -22,11 +23,15 @@ export class ExpectedResultIndicatorDto {
       expectedResultIndicatorDto.expectedResultId = expectedResult.id
       expectedResultIndicatorDto.initial = expectedResult.initial
       expectedResultIndicatorDto.name = expectedResult.name
-      expectedResultIndicatorDto.descriptions = expectedResult.description
+      expectedResultIndicatorDto.description = expectedResult.description
     }
 
     if (indicators) {
       expectedResultIndicatorDto.indicators = IndicatorDto.fromManyEntities(indicators)
+    }
+
+    if (targetAvaliations) {
+      expectedResultIndicatorDto.projectsAvaliations = TargetAvaliationDto.fromManyEntities(targetAvaliations)
     }
 
     return expectedResultIndicatorDto

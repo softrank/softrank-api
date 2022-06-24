@@ -68,6 +68,7 @@ export class ListEvaluationProcessesService {
       .innerJoinAndSelect('modelProcess.expectedResults', 'expectedResult')
       .innerJoinAndSelect('expectedResult.expectedResultIndicators', 'expectedResultIndicator')
       .leftJoinAndSelect('expectedResultIndicator.indicators', 'indicator')
+      .leftJoinAndSelect('expectedResultIndicator.targetAvaliations', 'targetAvaliation')
       .leftJoinAndSelect('indicator.evidenceSources', 'evidenceSource')
       .leftJoinAndSelect('evidenceSource.files', 'evidenceSourceFile')
       .leftJoinAndSelect('evidenceSource.evaluationProject', 'evaluationProject')
