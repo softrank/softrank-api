@@ -1,19 +1,16 @@
 import { ModelProcessAlreadyExistsError, ModelNotFoundError } from '@modules/model/errors'
+import { CreateExpectedResultService } from './create-expected-result.service'
 import { Model } from '@modules/model/entities/model.entity'
 import { ModelProcessDto } from '@modules/shared/dtos/model'
 import { CreateModelProcessDto } from '@modules/model/dtos'
 import { EntityManager, getConnection } from 'typeorm'
 import { ModelProcess } from '@modules/model/entities'
 import { Injectable } from '@nestjs/common'
-import { CreateExpectedResultService } from './create-expected-result.service'
 
 @Injectable()
 export class CreateModelProcessService {
   constructor(private readonly createExpectedResultService: CreateExpectedResultService) {}
-  public async create(
-    createModelProcessDto: CreateModelProcessDto,
-    modelId: string
-  ): Promise<ModelProcessDto> {
+  public async create(createModelProcessDto: CreateModelProcessDto, modelId: string): Promise<ModelProcessDto> {
     const createdModelProcess = await getConnection().transaction((manager: EntityManager) => {
       return this.createWithTransaction(createModelProcessDto, modelId, manager)
     })

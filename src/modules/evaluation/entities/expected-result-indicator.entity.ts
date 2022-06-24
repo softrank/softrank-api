@@ -3,7 +3,7 @@ import { AuditableEntity } from '@modules/shared/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { ExpectedResult } from '@modules/model/entities'
 import { Indicator } from '.'
-import { TargerAvaliation } from './target-avaliations.entity'
+import { TargetAvaliation } from './target-avaliations.entity'
 import { EvaluationIndicators } from './evaluation-indicators.entity'
 import { Evaluation } from './evaluation.entity'
 import { ExpectedResultIndicatorStatusEnum } from '../enums'
@@ -32,7 +32,7 @@ export class ExpectedResultIndicator extends AuditableEntity {
   @JoinColumn({ name: 'evaluationId', referencedColumnName: 'id' })
   evaluation: Evaluation
 
-  @OneToMany(() => TargerAvaliation, (targetStatus) => targetStatus.ownerId, { cascade: false })
+  @OneToMany(() => TargetAvaliation, (targetStatus) => targetStatus.ownerId, { cascade: false })
   @JoinColumn({ name: 'id', referencedColumnName: 'ownerId' })
-  targetAvaluations: TargerAvaliation[]
+  targetAvaluations: TargetAvaliation[]
 }

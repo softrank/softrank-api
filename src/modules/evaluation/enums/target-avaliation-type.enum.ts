@@ -1,4 +1,4 @@
-export enum TargeAvaliationTypeEnum {
+export enum TargetAvaliationTypeEnum {
   EVALUATION_PROJECT = 'evaluation_project',
   MODEL_PROCESS = 'modelProcess'
 }

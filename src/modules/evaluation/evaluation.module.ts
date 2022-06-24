@@ -64,8 +64,11 @@ import {
   GenerateEvaluationModelCapacityIndicatorsService,
   ListEvaluationModelCapacityIndicatorsService
 } from './services/model-capacity-indicators'
-import { SetExpectedResultIndicatorStatusService } from './services/expected-result-indicator'
-import { TargerAvaliation } from './entities/target-avaliations.entity'
+import {
+  SetExpectedResultIndicatorProjecAvaliationService,
+  SetExpectedResultIndicatorStatusService
+} from './services/expected-result-indicator'
+import { TargetAvaliation } from './entities/target-avaliations.entity'
 
 @Module({
   imports: [
@@ -85,7 +88,7 @@ import { TargerAvaliation } from './entities/target-avaliations.entity'
       EvidenceSource,
       EvidenceSourceFile,
       ModelCapacityIndicator,
-      TargerAvaliation
+      TargetAvaliation
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
@@ -124,7 +127,8 @@ import { TargerAvaliation } from './entities/target-avaliations.entity'
     ListEvaluationModelCapacityIndicatorsService,
     EvaluationHasAModelCapacityTypeService,
     ListModelProcessToOrganizationalModelCapacitiesIndicator,
-    SetExpectedResultIndicatorStatusService
+    SetExpectedResultIndicatorStatusService,
+    SetExpectedResultIndicatorProjecAvaliationService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })
