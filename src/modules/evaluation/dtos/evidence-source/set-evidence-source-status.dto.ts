@@ -7,7 +7,10 @@ export class SetEvidenceSourceStatusDto {
     this.status = status
   }
 
-  @ApiProperty({ example: EvidenceSourceStatusEnum.COMPLETE })
+  @ApiProperty({
+    example: EvidenceSourceStatusEnum.COMPLETE,
+    enum: Object.values(EvidenceSourceStatusEnum)
+  })
   @IsEnum(EvidenceSourceStatusEnum)
   @IsNotEmpty()
   status: EvidenceSourceStatusEnum

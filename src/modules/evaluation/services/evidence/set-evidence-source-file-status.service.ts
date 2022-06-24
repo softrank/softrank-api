@@ -9,7 +9,10 @@ import { EntityManager, getConnection, Repository } from 'typeorm'
 
 @Injectable()
 export class SetEvidenceSourceStatusService {
-  constructor(@InjectRepository(EvidenceSource) private readonly evidenceSourceRepository: Repository<EvidenceSource>) {}
+  constructor(
+    @InjectRepository(EvidenceSource)
+    private readonly evidenceSourceRepository: Repository<EvidenceSource>
+  ) {}
   public async set(setEvidenceSourceStatusDto: SetEvidenceSourceStatusDto): Promise<EvidenceSourceDto> {
     const evidenceSource = await getConnection().transaction((manager) => {
       return this.setWithTransaction(setEvidenceSourceStatusDto, manager)
