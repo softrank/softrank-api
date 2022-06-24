@@ -3,6 +3,7 @@ export * from './evaluation.entity'
 export * from './evaluation-project.entity'
 
 export * from './indicator.entity'
+export * from './target-avaliations.entity'
 export * from './evaluation-indicators.entity'
 export * from './expected-result-indicator.entity'
 export * from './model-capacity-indicator.entity'

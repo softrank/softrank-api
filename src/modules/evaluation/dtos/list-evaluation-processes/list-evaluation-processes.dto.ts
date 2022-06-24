@@ -1,10 +1,12 @@
 import { ModelProcess } from '@modules/model/entities'
+import { ModelProcessTypeEnum } from '@modules/model/enum'
 import { ListEvaluationProcessesExpectedResultIndicator } from './list-evaluation-processes-expected-result-indicator.dto'
 
 export class ListEvaluationProcessesResponseDto {
   id: string
   initial: string
   name: string
+  type: ModelProcessTypeEnum
   expectedResults: Array<ListEvaluationProcessesExpectedResultIndicator>
 
   static fromEntity(modelProcess: ModelProcess): ListEvaluationProcessesResponseDto {
@@ -13,6 +15,7 @@ export class ListEvaluationProcessesResponseDto {
     listEvaluationProcessesResponseDto.id = modelProcess.id
     listEvaluationProcessesResponseDto.initial = modelProcess.initial
     listEvaluationProcessesResponseDto.name = modelProcess.name
+    listEvaluationProcessesResponseDto.type = modelProcess.type
     listEvaluationProcessesResponseDto.expectedResults = ListEvaluationProcessesExpectedResultIndicator.fromManyEntities(
       modelProcess.expectedResults
     )

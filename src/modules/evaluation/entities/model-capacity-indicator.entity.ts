@@ -2,6 +2,7 @@ import { Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { AuditableEntity } from '@modules/shared/entities'
 import { ModelCapacity } from '@modules/model/entities'
+import { TargerAvaliation } from './target-avaliations.entity'
 import { Evaluation } from './evaluation.entity'
 import { Indicator } from './indicator.entity'
 
@@ -21,4 +22,8 @@ export class ModelCapacityIndicator extends AuditableEntity {
   @ManyToOne(() => ModelCapacity, (modelCapacity) => modelCapacity.id)
   @JoinColumn({ name: 'modelCapacityId', referencedColumnName: 'id' })
   modelCapacity: ModelCapacity
+
+  @OneToMany(() => TargerAvaliation, (targetStatus) => targetStatus.ownerId, { cascade: false })
+  @JoinColumn({ name: 'id', referencedColumnName: 'ownerId' })
+  targetAvaluations: TargerAvaliation[]
 }

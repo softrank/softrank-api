@@ -65,6 +65,7 @@ import {
   ListEvaluationModelCapacityIndicatorsService
 } from './services/model-capacity-indicators'
 import { SetExpectedResultIndicatorStatusService } from './services/expected-result-indicator'
+import { TargerAvaliation } from './entities/target-avaliations.entity'
 
 @Module({
   imports: [
@@ -83,7 +84,8 @@ import { SetExpectedResultIndicatorStatusService } from './services/expected-res
       EvaluationPlan,
       EvidenceSource,
       EvidenceSourceFile,
-      ModelCapacityIndicator
+      ModelCapacityIndicator,
+      TargerAvaliation
     ]),
     PublicModule,
     forwardRef(() => ModelModule),
