@@ -21,10 +21,7 @@ export class UpdateModelProcessService {
     return ModelProcessDto.fromEntity(updatedModelProcess)
   }
 
-  public async updateWithTransaction(
-    updateModelProcessDto: UpdateModelProcessDto,
-    manager: EntityManager
-  ): Promise<ModelProcess> {
+  public async updateWithTransaction(updateModelProcessDto: UpdateModelProcessDto, manager: EntityManager): Promise<ModelProcess> {
     const modelProcess = await this.findModelProcessById(updateModelProcessDto.id, manager)
     await this.verifyModelProcessConflicts(updateModelProcessDto, modelProcess.model.id, manager)
     const modelProcessToUpdate = this.updateModelProcessData(modelProcess, updateModelProcessDto)
@@ -66,30 +63,21 @@ export class UpdateModelProcessService {
     }
   }
 
-  private updateModelProcessData(
-    modelProcess: ModelProcess,
-    updateModelProcessDto: UpdateModelProcessDto
-  ): ModelProcess {
+  private updateModelProcessData(modelProcess: ModelProcess, updateModelProcessDto: UpdateModelProcessDto): ModelProcess {
     modelProcess.initial = updateModelProcessDto.initial
     modelProcess.name = updateModelProcessDto.name
+    modelProcess.type = updateModelProcessDto.type
     modelProcess.description = updateModelProcessDto.description
 
     return modelProcess
   }
 
-  private async createOrUpdateExpectedResults(
-    updateModelProcessDto: UpdateModelProcessDto,
-    manager: EntityManager
-  ): Promise<void> {
+  private async createOrUpdateExpectedResults(updateModelProcessDto: UpdateModelProcessDto, manager: EntityManager): Promise<void> {
     const promises = updateModelProcessDto.expectedResults?.map((expectedResultDto) => {
       if (expectedResultDto.id) {
         return this.updateExpectedResultService.updateWithTransaction(expectedResultDto, manager)
       }
-      return this.createExpectedResultService.createWithTransaction(
-        expectedResultDto,
-        updateModelProcessDto.id,
-        manager
-      )
+      return this.createExpectedResultService.createWithTransaction(expectedResultDto, updateModelProcessDto.id, manager)
     })
 
     if (promises?.length) {
