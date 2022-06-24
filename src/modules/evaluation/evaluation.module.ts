@@ -75,7 +75,7 @@ import {
   SetModelCapacityIndicatorStatusService,
   SetModelCapacityIndicatorTargetAvaliationService
 } from './services/model-capacity-indicator'
-import { CreateEvaluationModelProcessResultsService } from './services/evaluation-result'
+import { CreateEvaluationModelLevelResultsService, CreateEvaluationModelProcessResultsService } from './services/evaluation-result'
 
 @Module({
   imports: [
@@ -140,7 +140,8 @@ import { CreateEvaluationModelProcessResultsService } from './services/evaluatio
     SetExpectedResultIndicatorProjecAvaliationService,
     SetModelCapacityIndicatorStatusService,
     SetModelCapacityIndicatorTargetAvaliationService,
-    CreateEvaluationModelProcessResultsService
+    CreateEvaluationModelProcessResultsService,
+    CreateEvaluationModelLevelResultsService
   ],
   exports: [TypeOrmModule, ListEvaluationsService]
 })

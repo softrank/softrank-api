@@ -20,7 +20,13 @@ import { EvaluationDto } from '@modules/shared/dtos/evaluation'
 import { uuidParamValidation } from '@utils/validations'
 import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { ListEvaluationAdjustments } from '../services/adjustment'
-import { AdjustmentDto, EvaluationModelProcessResultDto, InterviewDto, ModelCapacityIndicatorDto } from '../dtos/entities'
+import {
+  AdjustmentDto,
+  EvaluationModelLevelResultDto,
+  EvaluationModelProcessResultDto,
+  InterviewDto,
+  ModelCapacityIndicatorDto
+} from '../dtos/entities'
 import {
   DeleteEvaluationPlanService,
   DeleteInterviewService,
@@ -40,8 +46,8 @@ import {
 import { ListEvaluationModelCapacitiesIndicatorsQueryDto } from '../dtos/model-capacity-indicator'
 import { VerifyIfEvaluationHasModelCapacityTypeDto } from '../dtos/evaluation/verify-if-evaluation-has-model-capacity-type-query.dto'
 import { ModelProcessDto } from '@modules/shared/dtos/model'
-import { CreateEvaluationModelProcessResultsService } from '../services/evaluation-result'
-import { CreateEvaluationModelProcessResultDto } from '../dtos/evaluation-result'
+import { CreateEvaluationModelLevelResultsService, CreateEvaluationModelProcessResultsService } from '../services/evaluation-result'
+import { CreateEvaluationModelLevelResultDto, CreateEvaluationModelProcessResultDto } from '../dtos/evaluation-result'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -62,7 +68,8 @@ export class EvaluationController {
     private readonly listEvaluationModelCapacityIndicatorsService: ListEvaluationModelCapacityIndicatorsService,
     private readonly evaluationHasAModelCapacityTypeService: EvaluationHasAModelCapacityTypeService,
     private readonly listModelProcessToOrganizationalModelCapacitiesIndicator: ListModelProcessToOrganizationalModelCapacitiesIndicator,
-    private readonly createEvaluationModelProcessResultsService: CreateEvaluationModelProcessResultsService
+    private readonly createEvaluationModelProcessResultsService: CreateEvaluationModelProcessResultsService,
+    private readonly createEvaluationModelLevelResultsService: CreateEvaluationModelLevelResultsService
   ) {}
 
   @Post()
@@ -114,6 +121,17 @@ export class EvaluationController {
     createEvaluationModelProcessResultDtos: CreateEvaluationModelProcessResultDto[]
   ): Promise<EvaluationModelProcessResultDto[]> {
     return this.createEvaluationModelProcessResultsService.create(evaluationId, createEvaluationModelProcessResultDtos)
+  }
+
+  @Post(':evaluationId/levels-results')
+  @RouteGuards()
+  @ApiBody({ type: () => [CreateEvaluationModelLevelResultDto] })
+  public createEvaluationLevelProcessResults(
+    @Param('evaluationId', uuidParamValidation()) evaluationId: string,
+    @Body(new ParseArrayPipe({ items: CreateEvaluationModelLevelResultDto }))
+    createEvaluationModelLevelResultDtos: CreateEvaluationModelLevelResultDto[]
+  ): Promise<EvaluationModelLevelResultDto[]> {
+    return this.createEvaluationModelLevelResultsService.create(evaluationId, createEvaluationModelLevelResultDtos)
   }
 
   @Delete('plans/:planId')
