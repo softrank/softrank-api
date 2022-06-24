@@ -5,7 +5,7 @@ import { OrganizationalUnitDto } from '@modules/shared/dtos/organizational-unit'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { EvaluationPlanDto, InterviewDto } from '../dtos/entities'
+import { EvaluationModelLevelResultDto, EvaluationModelProcessResultDto, EvaluationPlanDto, InterviewDto } from '../dtos/entities'
 import { EvaluationMember, Evaluation, EvaluationProject } from '../entities'
 import { EvaluationMemberType, EvaluationStateEnum, evaluationStateMapper, TranslatedEvaluationStateEnum } from '../enums'
 import { EvaluationNotFoundError } from '../errors'
@@ -35,6 +35,11 @@ export class FindEvaluationService {
       .innerJoinAndSelect('evaluation.organizationalUnit', 'organizationalUnit')
       .innerJoinAndSelect('organizationalUnit.commonEntity', 'organizationalUnitCommonEntity')
       .leftJoinAndSelect('evaluation.projects', 'projects')
+      .leftJoinAndSelect('evaluation.modelLevelResults', 'modelLevelResult')
+      .leftJoinAndSelect('modelLevelResult.modelLevel', 'modelLevel')
+      .leftJoinAndSelect('evaluation.modelProcessResults', 'modelProcessResult')
+      .leftJoinAndSelect('modelProcessResult.modelProcess', 'modelProcess')
+      .leftJoinAndSelect('modelProcessResult.evaluatedModelLevel', 'evaluatedModelLevel')
       .setParameters({ evaluationId })
       .getOne()
 
@@ -68,6 +73,8 @@ export class FindEvaluationService {
     evaluationDto.organizationalUnit = OrganizationalUnitDto.fromEntity(evaluation.organizationalUnit)
     evaluationDto.projects = this.buildEvaluationProjectsDtos(evaluation.projects)
     evaluationDto.interviews = InterviewDto.fromManyEntities(evaluation.interviews)
+    evaluationDto.modelProcessResults = EvaluationModelProcessResultDto.fromManyEntities(evaluation.modelProcessResults)
+    evaluationDto.modelLevelResults = EvaluationModelLevelResultDto.fromManyEntities(evaluation.modelLevelResults)
 
     if (evaluation.plan) {
       evaluationDto.plan = EvaluationPlanDto.fromEntity(evaluation.plan)

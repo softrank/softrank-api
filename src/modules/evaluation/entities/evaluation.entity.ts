@@ -71,6 +71,18 @@ export class Evaluation extends AuditableEntity {
   @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
   evaluationModelLevelResults: EvaluationModelLevelResult[]
 
+  @OneToMany(() => EvaluationModelProcessResult, (evaluationModelProcessResult) => evaluationModelProcessResult.evaluation, {
+    cascade: false
+  })
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  modelProcessResults: EvaluationModelProcessResult[]
+
+  @OneToMany(() => EvaluationModelLevelResult, (evaluationModelLevelResult) => evaluationModelLevelResult.evaluation, {
+    cascade: false
+  })
+  @JoinColumn({ name: 'id', referencedColumnName: 'evaluationId' })
+  modelLevelResults: EvaluationModelLevelResult[]
+
   get plan(): EvaluationPlan {
     if (this.plans?.length) {
       const mainPlan = this.plans.find((plan) => !plan.deletedAt)

@@ -14,13 +14,13 @@ import {
 } from '@modules/evaluation/services'
 import { AuthorizedUserDto } from '../../shared/dtos/public/authorized-user.dto'
 import { EvaluationIndicatorsDto } from '@modules/evaluation/dtos/evaluation-indicators'
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, ParseArrayPipe, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { AuthorizedUser, RouteGuards, SwaggerUploadFileDecorator } from '@modules/shared/decorators'
 import { EvaluationDto } from '@modules/shared/dtos/evaluation'
 import { uuidParamValidation } from '@utils/validations'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { ListEvaluationAdjustments } from '../services/adjustment'
-import { AdjustmentDto, InterviewDto, ModelCapacityIndicatorDto } from '../dtos/entities'
+import { AdjustmentDto, EvaluationModelProcessResultDto, InterviewDto, ModelCapacityIndicatorDto } from '../dtos/entities'
 import {
   DeleteEvaluationPlanService,
   DeleteInterviewService,
@@ -40,6 +40,8 @@ import {
 import { ListEvaluationModelCapacitiesIndicatorsQueryDto } from '../dtos/model-capacity-indicator'
 import { VerifyIfEvaluationHasModelCapacityTypeDto } from '../dtos/evaluation/verify-if-evaluation-has-model-capacity-type-query.dto'
 import { ModelProcessDto } from '@modules/shared/dtos/model'
+import { CreateEvaluationModelProcessResultsService } from '../services/evaluation-result'
+import { CreateEvaluationModelProcessResultDto } from '../dtos/evaluation-result'
 
 @Controller('evaluation')
 @ApiTags('Evaluation')
@@ -59,7 +61,8 @@ export class EvaluationController {
     private readonly generateEvaluationModelCapacityIndicatorsService: GenerateEvaluationModelCapacityIndicatorsService,
     private readonly listEvaluationModelCapacityIndicatorsService: ListEvaluationModelCapacityIndicatorsService,
     private readonly evaluationHasAModelCapacityTypeService: EvaluationHasAModelCapacityTypeService,
-    private readonly listModelProcessToOrganizationalModelCapacitiesIndicator: ListModelProcessToOrganizationalModelCapacitiesIndicator
+    private readonly listModelProcessToOrganizationalModelCapacitiesIndicator: ListModelProcessToOrganizationalModelCapacitiesIndicator,
+    private readonly createEvaluationModelProcessResultsService: CreateEvaluationModelProcessResultsService
   ) {}
 
   @Post()
@@ -100,6 +103,17 @@ export class EvaluationController {
   ): Promise<InterviewDto> {
     const uploadEvaluationPlanDto = new UploadEvaluationPlanDto(expressFile, evaluationId)
     return this.uploadEvaluationPlanService.upload(uploadEvaluationPlanDto)
+  }
+
+  @Post(':evaluationId/process-results')
+  @RouteGuards()
+  @ApiBody({ type: () => [CreateEvaluationModelProcessResultDto] })
+  public createEvaluationModelProcessResults(
+    @Param('evaluationId', uuidParamValidation()) evaluationId: string,
+    @Body(new ParseArrayPipe({ items: CreateEvaluationModelProcessResultDto }))
+    createEvaluationModelProcessResultDtos: CreateEvaluationModelProcessResultDto[]
+  ): Promise<EvaluationModelProcessResultDto[]> {
+    return this.createEvaluationModelProcessResultsService.create(evaluationId, createEvaluationModelProcessResultDtos)
   }
 
   @Delete('plans/:planId')

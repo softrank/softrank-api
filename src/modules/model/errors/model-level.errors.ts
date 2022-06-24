@@ -1,7 +1,7 @@
 import { HttpStatus, HttpException } from '@nestjs/common'
 
 export class ModelLevelNotFoundError extends HttpException {
-  constructor(message: string = 'Model level not found') {
+  constructor(message: string = 'Nível de modelo não encontrado.') {
     super(message, HttpStatus.NOT_FOUND)
   }
 }

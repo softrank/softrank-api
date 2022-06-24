@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 import { AuditableEntity } from '@modules/shared/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Evaluation } from './evaluation.entity'
-import { ModelLevel } from '@modules/model/entities'
+import { ModelLevel, ModelProcess } from '@modules/model/entities'
 
 @Entity({ schema: DatabaseSchemaEnum.EVALUATION })
 export class EvaluationModelProcessResult extends AuditableEntity {
@@ -16,7 +16,11 @@ export class EvaluationModelProcessResult extends AuditableEntity {
   @JoinColumn({ name: 'evaluatedModelLevelId', referencedColumnName: 'id' })
   evaluatedModelLevel: ModelLevel
 
-  @ManyToOne(() => Evaluation, (evaluation) => evaluation.id)
+  @ManyToOne(() => ModelProcess, (modelProcess) => modelProcess.id)
+  @JoinColumn({ name: 'modelProcessId', referencedColumnName: 'id' })
+  modelProcess: ModelProcess
+
+  @ManyToOne(() => Evaluation, (evaluation) => evaluation.id, { cascade: false })
   @JoinColumn({ name: 'evaluationId', referencedColumnName: 'id' })
   evaluation: Evaluation
 }

@@ -1,3 +1,4 @@
+import { ModelLevel } from '@modules/model/entities'
 import { AuditableEntity } from '@modules/shared/entities'
 import { DatabaseSchemaEnum } from '@modules/shared/enums'
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
@@ -10,6 +11,10 @@ export class EvaluationModelLevelResult extends AuditableEntity {
 
   @Column('varchar')
   result: string
+
+  @ManyToOne(() => ModelLevel, (modelLevel) => modelLevel.id, { cascade: false })
+  @JoinColumn({ name: 'modelLevelId', referencedColumnName: 'id' })
+  modelLevel: ModelLevel
 
   @ManyToOne(() => Evaluation, (evaluation) => evaluation.id)
   @JoinColumn({ name: 'evaluationId', referencedColumnName: 'id' })
